@@ -13,7 +13,8 @@ import {
   setDoc, 
   updateDoc, 
   deleteDoc,
-  where
+  where,
+  orderBy
 } from 'firebase/firestore';
 
 export function useWatchlist() {
@@ -28,8 +29,13 @@ export function useWatchlist() {
       return;
     }
 
-    // Filter query to only get documents belonging to the authenticated user
-    const q = query(collection(db, 'watchlists'), where('userId', '==', user.uid));
+    setIsLoaded(false);
+
+    // Using a simple query first to ensure no complex index requirements cause initial failures
+    const q = query(
+      collection(db, 'watchlists'), 
+      where('userId', '==', user.uid)
+    );
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items = snapshot.docs.map(doc => ({
@@ -39,8 +45,9 @@ export function useWatchlist() {
       setWatchlist(items);
       setIsLoaded(true);
     }, (error) => {
-      console.error("Firestore watchlist listener error:", error);
-      setIsLoaded(true); // Stop loading even if there's an error
+      // If we hit a permission error, we still want to stop the loading spinner
+      console.error("Zenith Watchlist Error:", error.message);
+      setIsLoaded(true);
     });
 
     return () => unsubscribe();
@@ -49,32 +56,30 @@ export function useWatchlist() {
   const addAnime = async (anime: Anime) => {
     if (!user) return;
     
-    // Avoid duplicates in the local state for better UI responsiveness, 
-    // though Firestore would handle it based on doc ID.
+    // Check local state first to prevent unnecessary writes
     if (watchlist.some(a => a.id === anime.id)) return;
 
-    try {
-      const animeRef = doc(db, 'watchlists', anime.id);
-      await setDoc(animeRef, {
-        ...anime,
-        userId: user.uid,
-        status: 'PLAN_TO_WATCH',
-        currentEpisode: 0,
-        updatedAt: new Date().toISOString()
-      });
-    } catch (e) {
-      console.error("Error adding anime:", e);
-    }
+    const animeRef = doc(db, 'watchlists', anime.id);
+    setDoc(animeRef, {
+      ...anime,
+      userId: user.uid,
+      status: 'PLAN_TO_WATCH',
+      currentEpisode: 0,
+      updatedAt: new Date().toISOString()
+    }, { merge: true }).catch(err => {
+      console.error("Failed to add anime:", err);
+    });
   };
 
   const updateAnimeStatus = async (id: string, status: WatchStatus) => {
     if (!user) return;
-    try {
-      const animeRef = doc(db, 'watchlists', id);
-      await updateDoc(animeRef, { status, updatedAt: new Date().toISOString() });
-    } catch (e) {
-      console.error("Error updating status:", e);
-    }
+    const animeRef = doc(db, 'watchlists', id);
+    updateDoc(animeRef, { 
+      status, 
+      updatedAt: new Date().toISOString() 
+    }).catch(err => {
+      console.error("Failed to update status:", err);
+    });
   };
 
   const updateEpisodeProgress = async (id: string, episode: number) => {
@@ -85,32 +90,28 @@ export function useWatchlist() {
     const newEp = Math.max(0, Math.min(episode, anime.totalEpisodes || 999));
     let newStatus = anime.status;
     
-    if (newEp === anime.totalEpisodes && anime.totalEpisodes > 0) {
+    if (anime.totalEpisodes > 0 && newEp === anime.totalEpisodes) {
       newStatus = 'COMPLETED';
     } else if (newEp > 0 && anime.status === 'PLAN_TO_WATCH') {
       newStatus = 'WATCHING';
     }
 
-    try {
-      const animeRef = doc(db, 'watchlists', id);
-      await updateDoc(animeRef, { 
-        currentEpisode: newEp, 
-        status: newStatus,
-        updatedAt: new Date().toISOString()
-      });
-    } catch (e) {
-      console.error("Error updating episodes:", e);
-    }
+    const animeRef = doc(db, 'watchlists', id);
+    updateDoc(animeRef, { 
+      currentEpisode: newEp, 
+      status: newStatus,
+      updatedAt: new Date().toISOString()
+    }).catch(err => {
+      console.error("Failed to update progress:", err);
+    });
   };
 
   const removeAnime = async (id: string) => {
     if (!user) return;
-    try {
-      const animeRef = doc(db, 'watchlists', id);
-      await deleteDoc(animeRef);
-    } catch (e) {
-      console.error("Error removing anime:", e);
-    }
+    const animeRef = doc(db, 'watchlists', id);
+    deleteDoc(animeRef).catch(err => {
+      console.error("Failed to remove anime:", err);
+    });
   };
 
   return {
