@@ -11,8 +11,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Zap, Mail, Lock, Loader2, Chrome, ArrowRight } from 'lucide-react';
+import { Zap, Mail, Lock, Loader2, Chrome, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 
@@ -63,136 +62,143 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#060608] relative overflow-hidden font-body">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[150px] rounded-full animate-pulse-glow" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/20 blur-[150px] rounded-full animate-pulse-glow" style={{ animationDelay: '2s' }} />
-      </div>
-
-      {/* Side Illustration - Hidden on mobile */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0A0A0B] text-[#F3F3F3] flex items-center justify-center p-4 md:p-8 font-body overflow-hidden relative">
+      {/* Background Anime Stickers (Decorative) */}
+      <div className="absolute bottom-[-20px] left-[-20px] w-48 h-48 md:w-64 md:h-64 opacity-60 z-0">
         <Image 
-          src="https://picsum.photos/seed/zenith-login/1200/1600" 
-          alt="Zenith Illustration" 
-          fill 
-          className="object-cover brightness-50 contrast-125"
-          priority
-          data-ai-hint="cyberpunk anime"
+          src="https://picsum.photos/seed/anime-sticker-1/400/400" 
+          alt="decoration" 
+          width={400} 
+          height={400} 
+          className="object-contain"
+          data-ai-hint="anime character sticker"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#060608]" />
-        
-        <div className="absolute bottom-20 left-20 z-10 space-y-4 max-w-md">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-primary text-[10px] font-black uppercase tracking-widest backdrop-blur-md">
-            <Zap className="w-3 h-3 fill-current" /> System Protocol Active
-          </div>
-          <h1 className="text-6xl font-black italic tracking-tighter text-white leading-[0.9]">
-            ASCEND TO THE <span className="text-primary text-glow">ZENITH</span>
-          </h1>
-          <p className="text-white/60 text-lg font-medium italic">
-            Join the elite network of anime enthusiasts. Track, discover, and master your collection.
-          </p>
+        <div className="absolute top-0 right-0 h-full flex items-center">
+          <span className="[writing-mode:vertical-rl] text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] rotate-180">
+            こんにちは
+          </span>
         </div>
       </div>
 
-      {/* Login Panel */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 relative z-10">
-        <Card className="w-full max-w-md bg-transparent border-none shadow-none">
-          <CardHeader className="space-y-6 text-center lg:text-left p-0 mb-10">
-            <div className="flex justify-center lg:justify-start">
-              <div className="flex items-center gap-3 group">
-                <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                  <Zap className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-                <h2 className="text-3xl font-black italic tracking-tighter text-glow flex items-center gap-1">
-                  <span className="text-primary">ZENITH</span>
-                  <span className="text-white">ANIME</span>
-                </h2>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <CardTitle className="text-5xl md:text-7xl font-black italic tracking-tighter text-white uppercase leading-[0.85]">
-                {isLogin ? 'LOGIN' : 'SIGN UP'}
-              </CardTitle>
-              <CardDescription className="text-muted-foreground font-medium italic text-base">
-                {isLogin ? 'Enter your credentials to re-sync with the archive.' : 'Initialize your record in the Zenith database.'}
-              </CardDescription>
-            </div>
-          </CardHeader>
+      <div className="absolute top-[-20px] right-[-20px] w-32 h-32 md:w-48 md:h-48 opacity-20 z-0 rotate-12">
+        <Image 
+          src="https://picsum.photos/seed/anime-sticker-2/300/300" 
+          alt="decoration" 
+          width={300} 
+          height={300} 
+          className="object-contain"
+          data-ai-hint="anime graphic"
+        />
+      </div>
+
+      {/* Main Container */}
+      <div className="w-full max-w-[400px] flex flex-col items-center space-y-12 relative z-10">
+        {/* Header Section */}
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <Zap className="w-5 h-5 text-[#FFB7B7] fill-current" />
+            <h1 className="text-xl font-bold tracking-[0.3em] text-[#FFB7B7] uppercase">ZENITH</h1>
+          </div>
           
-          <CardContent className="p-0 space-y-8">
-            <form onSubmit={handleAuth} className="space-y-5">
-              <div className="space-y-4">
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input 
-                    type="email" 
-                    placeholder="E-MAIL ADDRESS" 
-                    className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl focus:ring-primary focus:border-primary/50 transition-all font-bold tracking-tight text-white placeholder:text-white/20"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input 
-                    type="password" 
-                    placeholder="PASSWORD" 
-                    className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl focus:ring-primary focus:border-primary/50 transition-all font-bold tracking-tight text-white placeholder:text-white/20"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
+          <div className="relative inline-block">
+            <h2 className="text-3xl font-bold tracking-widest uppercase">
+              {isLogin ? 'WELCOME' : 'SIGN UP'}
+            </h2>
+            <span className="absolute -right-16 top-1 text-[10px] text-white/30 font-bold [writing-mode:vertical-rl] tracking-[0.2em]">
+              {isLogin ? 'どういたしまして' : 'サインアップ'}
+            </span>
+          </div>
+        </div>
 
-              <Button 
-                type="submit" 
-                className="w-full h-14 font-black italic rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground text-lg shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all hover:scale-[1.02] active:scale-95 group"
-                disabled={loading}
-              >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : (
-                  <span className="flex items-center gap-2 uppercase">
-                    {isLogin ? 'AUTHENTICATE' : 'INITIALIZE'}
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                )}
-              </Button>
-            </form>
-
+        {/* Form Section */}
+        <form onSubmit={handleAuth} className="w-full space-y-5">
+          <div className="space-y-4">
             <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-white/5" />
-              </div>
-              <div className="relative flex justify-center text-[10px] uppercase">
-                <span className="bg-[#060608] px-4 text-muted-foreground font-black tracking-[0.3em]">SOCIAL SYNC</span>
-              </div>
+              <User className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Input 
+                type="email" 
+                placeholder="email" 
+                className="h-12 bg-transparent border-white/20 rounded-full pl-14 pr-6 focus:border-[#FFB7B7] focus:ring-1 focus:ring-[#FFB7B7]/30 transition-all placeholder:text-white/20 text-sm font-medium"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
+            
+            <div className="relative">
+              <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Input 
+                type="password" 
+                placeholder="password" 
+                className="h-12 bg-transparent border-white/20 rounded-full pl-14 pr-6 focus:border-[#FFB7B7] focus:ring-1 focus:ring-[#FFB7B7]/30 transition-all placeholder:text-white/20 text-sm font-medium"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              {isLogin && (
+                <div className="flex justify-end pt-1">
+                  <button type="button" className="text-[10px] font-bold text-[#FFB7B7]/60 hover:text-[#FFB7B7] transition-colors">
+                    forget password?
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
 
-            <div className="grid grid-cols-1 gap-4">
-              <Button 
-                variant="outline" 
-                className="w-full h-14 border-white/10 bg-white/5 hover:bg-white/10 font-black italic rounded-2xl text-base transition-all gap-3"
-                onClick={handleGoogleLogin}
-                disabled={loading}
-              >
-                <Chrome className="w-5 h-5 text-primary" /> GOOGLE IDENTITY
-              </Button>
-            </div>
+          <Button 
+            type="submit" 
+            className="w-full h-12 bg-[#FFB7B7] hover:bg-[#FFB7B7]/90 text-black font-black tracking-widest rounded-full uppercase transition-all hover:scale-[1.02] active:scale-95 shadow-[0_4px_20px_rgba(255,183,183,0.3)]"
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLogin ? 'LOG IN' : 'SIGN UP')}
+          </Button>
+        </form>
 
-            <div className="text-center pt-4">
-              <button 
-                type="button"
-                className="text-sm font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest flex items-center justify-center gap-2 mx-auto"
-                onClick={() => setIsLogin(!isLogin)}
-              >
-                {isLogin ? "New user?" : "Existing operative?"} 
-                <span className="text-primary underline underline-offset-4">{isLogin ? "Create account" : "Sign in"}</span>
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Social Section */}
+        <div className="w-full space-y-6">
+          <div className="flex items-center gap-4 px-8">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-[10px] font-black text-white/30 tracking-widest">OR</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
+          <div className="flex justify-center gap-6">
+            <button 
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all group"
+            >
+              <Chrome className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
+            </button>
+            <button type="button" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all group">
+              <span className="text-white/60 group-hover:text-white font-black text-xs">f</span>
+            </button>
+            <button type="button" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all group">
+              <span className="text-white/60 group-hover:text-white font-black text-xs">𝕏</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Footer Toggle */}
+        <div className="text-center">
+          <button 
+            type="button"
+            className="text-[11px] font-medium text-white/40 hover:text-white transition-colors group"
+            onClick={() => setIsLogin(!isLogin)}
+          >
+            {isLogin ? "Don't have an account?" : "Already have an account?"} 
+            <span className="text-[#FFB7B7] font-bold ml-1.5 group-hover:underline underline-offset-4">
+              {isLogin ? "Sign Up" : "Log In"}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Side Japanese Decoration (Desktop Only) */}
+      <div className="hidden lg:block absolute left-12 top-1/2 -translate-y-1/2 space-y-4 opacity-10">
+        <span className="[writing-mode:vertical-rl] text-4xl font-black tracking-[1em]">
+          あなたを失いたくない
+        </span>
       </div>
     </div>
   );
