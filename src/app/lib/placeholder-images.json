@@ -1,0 +1,35 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-anime",
+      "description": "Cinematic anime cityscape",
+      "imageUrl": "https://picsum.photos/seed/anime1/1200/600",
+      "imageHint": "anime aesthetic landscape"
+    },
+    {
+      "id": "anime-poster-1",
+      "description": "Cyberpunk anime character",
+      "imageUrl": "https://picsum.photos/seed/cyber/400/600",
+      "imageHint": "cyberpunk anime"
+    },
+    {
+      "id": "anime-poster-2",
+      "description": "Fantasy forest anime",
+      "imageUrl": "https://picsum.photos/seed/fantasy/400/600",
+      "imageHint": "fantasy anime"
+    },
+    {
+      "id": "anime-poster-3",
+      "description": "Space odyssey anime",
+      "imageUrl": "https://picsum.photos/seed/space/400/600",
+      "imageHint": "space anime"
+    },
+    {
+      "id": "anime-poster-4",
+      "description": "School life anime",
+      "imageUrl": "https://picsum.photos/seed/school/400/600",
+      "imageHint": "school anime"
+    }
+  ]
+}
