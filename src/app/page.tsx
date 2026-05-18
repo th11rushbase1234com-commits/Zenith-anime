@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useWatchlist } from './hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
 import { GenreVisualizer } from '@/components/GenreVisualizer';
@@ -42,13 +42,15 @@ import {
 import { searchAnime, getTrendingAnime, getRecentAiring } from '@/services/anilist';
 import { Anime } from './types/anime';
 import { useAuth } from '@/context/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
-export default function ZenithApp() {
+function ZenithContent() {
   const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  
   const { 
     watchlist, 
     isLoaded, 
@@ -58,27 +60,32 @@ export default function ZenithApp() {
     addAnime 
   } = useWatchlist();
 
+  // State
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeSearchTerm, setActiveSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Anime[]>([]);
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
   const [recentAiring, setRecentAiring] = useState<Anime[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [activeTab, setActiveTab] = useState('home');
-  const [api, setApi] = useState<CarouselApi>();
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  // Pagination states
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
 
+  // Derived state from URL
+  const activeTab = searchParams.get('tab') || 'home';
+  const activeSearchTerm = searchParams.get('q') || '';
+
+  // Auth Redirect
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login');
     }
   }, [user, authLoading, router]);
 
+  // Initial Data
   useEffect(() => {
     async function loadInitialData() {
       const [trending, recent] = await Promise.all([
@@ -91,71 +98,73 @@ export default function ZenithApp() {
     loadInitialData();
   }, []);
 
+  // Handle URL Sync (Back Button Support)
   useEffect(() => {
-    if (!api) return;
+    if (activeSearchTerm) {
+      setSearchQuery(activeSearchTerm);
+      performSearch(activeSearchTerm, 1);
+    } else if (activeTab === 'search' && !activeSearchTerm) {
+      setSearchResults([]);
+      setSearchQuery('');
+    }
+  }, [activeSearchTerm, activeTab]);
+
+  // Carousel Logic
+  useEffect(() => {
+    if (!carouselApi) return;
     const intervalId = setInterval(() => {
-      api.scrollNext();
+      carouselApi.scrollNext();
     }, 6000);
-    api.on("select", () => {
-      setCurrentSlide(api.selectedScrollSnap());
+    carouselApi.on("select", () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap());
     });
     return () => clearInterval(intervalId);
-  }, [api]);
+  }, [carouselApi]);
 
-  const handleSearch = async (e?: React.FormEvent) => {
+  const performSearch = async (term: string, page: number) => {
+    setIsSearching(true);
+    try {
+      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(term, page);
+      setSearchResults(anime);
+      setHasNextPage(more);
+      setLastPage(total);
+      setCurrentPage(page);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const query = searchQuery.trim();
     if (!query) return;
     
-    setIsSearching(true);
-    setCurrentPage(1);
-    setActiveSearchTerm(query);
-    try {
-      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(query, 1);
-      setSearchResults(anime);
-      setHasNextPage(more);
-      setLastPage(total);
-      setActiveTab('search');
-      
-      // Remove focus from search bar after search is complete
-      searchInputRef.current?.blur();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSearching(false);
-    }
+    // Update URL to support Back button
+    router.push(`?tab=search&q=${encodeURIComponent(query)}`);
+    searchInputRef.current?.blur();
   };
 
   const handlePageChange = async (newPage: number) => {
     if (newPage < 1 || newPage > lastPage || !activeSearchTerm) return;
-    
-    setIsSearching(true);
-    try {
-      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(activeSearchTerm, newPage);
-      setSearchResults(anime);
-      setHasNextPage(more);
-      setLastPage(total);
-      setCurrentPage(newPage);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSearching(false);
-    }
+    performSearch(activeSearchTerm, newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateTo = (tab: string, q: string = '') => {
+    const params = new URLSearchParams();
+    params.set('tab', tab);
+    if (q) params.set('q', q);
+    router.push(`?${params.toString()}`);
   };
 
   const clearSearch = () => {
     setSearchQuery('');
-    setActiveSearchTerm('');
-    setSearchResults([]);
-    setActiveTab('home');
-    setCurrentPage(1);
-    setHasNextPage(false);
-    setLastPage(1);
+    navigateTo('home');
   };
 
   const handleBlur = () => {
-    // If the user typed something but didn't search (query != active term), clear/revert it
     if (searchQuery.trim() !== activeSearchTerm) {
       setSearchQuery(activeSearchTerm);
     }
@@ -171,10 +180,7 @@ export default function ZenithApp() {
   }
 
   const userName = user.displayName || user.email?.split('@')[0] || 'Zenith User';
-
-  const filteredWatchlist = (status?: string) => {
-    return watchlist.filter(a => !status || a.status === status);
-  };
+  const filteredWatchlist = (status?: string) => watchlist.filter(a => !status || a.status === status);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -193,7 +199,7 @@ export default function ZenithApp() {
         </div>
 
         <div className="flex items-center gap-4">
-          <form onSubmit={handleSearch} className="relative hidden sm:block">
+          <form onSubmit={handleSearchSubmit} className="relative hidden sm:block">
             <button 
               type="submit" 
               onMouseDown={(e) => e.preventDefault()}
@@ -245,7 +251,7 @@ export default function ZenithApp() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/5" />
                 <DropdownMenuItem 
-                  onClick={() => setActiveTab('library')}
+                  onClick={() => navigateTo('library')}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-white"
                 >
                   <Bookmark className="w-4 h-4" /> Personal Watchlist
@@ -271,7 +277,7 @@ export default function ZenithApp() {
           <div className="space-y-10 animate-in fade-in duration-700">
             <section className="relative w-full aspect-[16/9] md:aspect-[21/9] min-h-[400px] md:min-h-[600px] overflow-hidden">
               <Carousel 
-                setApi={setApi} 
+                setApi={setCarouselApi} 
                 className="w-full h-full"
                 opts={{
                   loop: true,
@@ -337,7 +343,7 @@ export default function ZenithApp() {
                 {trendingAnime.map((_, i) => (
                   <button 
                     key={i}
-                    onClick={() => api?.scrollTo(i)}
+                    onClick={() => carouselApi?.scrollTo(i)}
                     className={`h-1.5 transition-all duration-300 rounded-full ${i === currentSlide ? 'w-10 md:w-12 bg-primary' : 'w-3 md:w-4 bg-white/20 hover:bg-white/40'}`}
                   />
                 ))}
@@ -519,12 +525,24 @@ export default function ZenithApp() {
             ) : (
               <div className="flex flex-col items-center justify-center py-32 gap-6 text-center">
                 <p className="text-muted-foreground font-mono uppercase tracking-[0.3em]">No search results Found</p>
-                <Button variant="outline" onClick={clearSearch} className="rounded-full border-white/10 font-black italic">Return Home</Button>
               </div>
             )}
           </div>
         )}
       </main>
     </div>
+  );
+}
+
+export default function ZenithApp() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+        <p className="text-primary font-mono animate-pulse uppercase tracking-widest">Initialising Zenith Core...</p>
+      </div>
+    }>
+      <ZenithContent />
+    </Suspense>
   );
 }
