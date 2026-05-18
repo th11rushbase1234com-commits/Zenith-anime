@@ -461,29 +461,37 @@ export default function ZenithApp() {
                   ))}
                 </div>
                 
-                {/* Discrete Pagination */}
-                <div className="flex justify-center items-center gap-4 py-12">
-                  {currentPage > 1 && (
-                    <Button 
-                      variant="outline" 
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      className="rounded-full border-white/10 font-black italic text-[10px] px-6 h-10 tracking-widest hover:bg-white/5 transition-all"
-                    >
-                      <ChevronLeft className="w-4 h-4 mr-2" /> PREVIOUS
-                    </Button>
-                  )}
-                  <div className="px-6 py-2 bg-white/5 rounded-xl border border-white/10 font-mono text-[11px] font-black tracking-widest text-primary uppercase">
-                    Page {currentPage}
+                {/* Balanced Pagination */}
+                <div className="grid grid-cols-3 items-center w-full max-w-2xl mx-auto py-12 px-4 bg-white/5 rounded-3xl border border-white/5 backdrop-blur-md">
+                  <div className="flex justify-start">
+                    {currentPage > 1 && (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        className="rounded-full border-white/10 font-black italic text-[10px] px-6 h-10 tracking-widest hover:bg-white/5 hover:text-primary transition-all text-white"
+                      >
+                        <ChevronLeft className="w-4 h-4 mr-2" /> PREVIOUS
+                      </Button>
+                    )}
                   </div>
-                  {hasNextPage && (
-                    <Button 
-                      variant="outline" 
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      className="rounded-full border-white/10 font-black italic text-[10px] px-6 h-10 tracking-widest hover:bg-white/5 transition-all"
-                    >
-                      NEXT <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  )}
+                  
+                  <div className="flex justify-center">
+                    <div className="px-6 py-2 bg-primary/10 rounded-xl border border-primary/20 font-mono text-[11px] font-black tracking-widest text-primary uppercase shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+                      Page {currentPage}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    {hasNextPage && (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        className="rounded-full border-white/10 font-black italic text-[10px] px-6 h-10 tracking-widest hover:bg-white/5 hover:text-primary transition-all text-white"
+                      >
+                        NEXT <ChevronRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : (
