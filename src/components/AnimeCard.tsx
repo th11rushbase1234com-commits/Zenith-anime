@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -7,7 +6,7 @@ import { Anime, WatchStatus } from '@/app/types/anime';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Check, Clock, Plus, Trash2, ChevronRight, Hash, Eye } from 'lucide-react';
+import { Play, Check, Clock, Plus, Trash2, ChevronRight, Hash, Eye, Info } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 interface AnimeCardProps {
@@ -30,110 +29,89 @@ export function AnimeCard({
   const progress = anime.totalEpisodes > 0 ? (anime.currentEpisode / anime.totalEpisodes) * 100 : 0;
 
   return (
-    <Card className="group relative overflow-hidden bg-card/40 border-none anime-card-hover rounded-2xl ring-1 ring-white/5">
-      <div className="relative aspect-[3/4] w-full">
+    <div className="group relative flex flex-col gap-2 w-full">
+      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5 shadow-2xl transition-transform duration-500 hover:scale-[1.02] active:scale-[0.98]">
         <Image 
           src={anime.imageUrl} 
           alt={anime.title} 
           fill 
-          className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:blur-[2px] brightness-90 group-hover:brightness-50"
+          sizes="(max-width: 768px) 50vw, 20vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-110 brightness-90 group-hover:brightness-50"
           data-ai-hint="anime character"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/20 to-transparent opacity-80" />
         
-        {/* Status Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
+        {/* Quality/Type Tags */}
+        <div className="absolute top-2 left-2 flex items-center gap-1 z-10">
+          <div className="px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-md text-[8px] font-black text-white uppercase tracking-widest border border-white/10">
+            TV
+          </div>
           {anime.year > 0 && (
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white uppercase tracking-tighter">
-              <Hash className="w-3 h-3 text-primary" /> {anime.year}
+            <div className="px-1.5 py-0.5 rounded bg-primary/80 backdrop-blur-md text-[8px] font-black text-white uppercase tracking-widest">
+              {anime.year}
             </div>
           )}
         </div>
 
-        <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
-          {!isSearchMode && (
-            <>
-              {anime.status === 'WATCHING' && (
-                <Badge variant="default" className="bg-primary text-primary-foreground font-black italic shadow-[0_0_15px_rgba(168,85,247,0.5)]">
-                  ACTIVE
-                </Badge>
-              )}
-              {anime.status === 'COMPLETED' && (
-                <Badge variant="secondary" className="bg-accent text-accent-foreground font-black italic shadow-[0_0_15px_rgba(6,182,212,0.5)]">
-                  MASTERED
-                </Badge>
-              )}
-              {anime.status === 'PLAN_TO_WATCH' && (
-                <Badge variant="outline" className="bg-black/40 text-white border-white/20 font-black italic backdrop-blur-md">
-                  QUEUE
-                </Badge>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Hover Controls */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
-          <div className="flex flex-col gap-3 w-full">
+        {/* Hover Information Overlay */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-black via-black/40 to-transparent p-4 flex flex-col justify-end gap-3 z-20">
+          <div className="space-y-1">
+            <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Archive Data</h4>
+            <p className="text-[10px] text-white/70 line-clamp-3 leading-relaxed font-medium">
+              {anime.description.substring(0, 100)}...
+            </p>
+          </div>
+          
+          <div className="flex flex-col gap-2 pt-2">
             {isSearchMode ? (
-              <Button size="lg" onClick={() => onAdd?.(anime)} className="w-full bg-accent hover:bg-accent/80 text-accent-foreground font-black italic rounded-xl">
-                <Plus className="w-5 h-5 mr-2" /> INITIALIZE
+              <Button size="sm" onClick={() => onAdd?.(anime)} className="w-full bg-primary hover:bg-primary/80 text-primary-foreground font-black italic rounded-full text-[10px] h-8">
+                <Plus className="w-3.5 h-3.5 mr-1.5" /> ADD TO ARCHIVE
               </Button>
             ) : (
               <>
-                {anime.status !== 'WATCHING' && (
-                  <Button size="lg" variant="secondary" onClick={() => onUpdateStatus?.(anime.id, 'WATCHING')} className="w-full bg-primary/20 hover:bg-primary/40 border border-primary/50 text-primary font-black italic rounded-xl">
-                    <Play className="w-5 h-5 mr-2" /> RESUME
+                <div className="flex gap-2">
+                  <Button size="sm" variant="secondary" onClick={() => onUpdateStatus?.(anime.id, 'WATCHING')} className="flex-1 bg-white/10 hover:bg-white/20 border border-white/10 text-white font-black italic rounded-full h-8 text-[9px]">
+                    <Play className="w-3 h-3 mr-1 fill-current" /> RESUME
                   </Button>
-                )}
-                {anime.status !== 'COMPLETED' && (
-                  <Button size="lg" variant="secondary" onClick={() => onUpdateEpisode?.(anime.id, anime.currentEpisode + 1)} className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-black italic rounded-xl">
-                    <ChevronRight className="w-5 h-5 mr-2" /> NEXT EPISODE
+                  <Button size="sm" variant="secondary" onClick={() => onUpdateEpisode?.(anime.id, anime.currentEpisode + 1)} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 font-black italic rounded-full h-8 text-[9px]">
+                    <ChevronRight className="w-3 h-3 mr-1" /> EP +1
                   </Button>
-                )}
-                <Button size="sm" variant="ghost" onClick={() => onRemove?.(anime.id)} className="w-full text-destructive/70 hover:text-destructive hover:bg-destructive/10 font-bold text-xs mt-2">
-                  <Trash2 className="w-3 h-3 mr-2" /> PURGE RECORD
+                </div>
+                <Button size="sm" variant="ghost" onClick={() => onRemove?.(anime.id)} className="w-full text-white/40 hover:text-destructive hover:bg-destructive/10 font-bold text-[9px] h-6 rounded-full">
+                  <Trash2 className="w-3 h-3 mr-1" /> PURGE
                 </Button>
               </>
             )}
           </div>
         </div>
-      </div>
 
-      <div className="p-4 space-y-4 relative z-10 bg-card/60 backdrop-blur-md">
-        <div className="space-y-1">
-          <h3 className="font-headline font-bold text-base leading-tight line-clamp-2 text-white group-hover:text-primary transition-colors italic tracking-tight uppercase">
-            {anime.title}
-          </h3>
-          <div className="flex flex-wrap gap-1.5">
-            {anime.genres.slice(0, 2).map(g => (
-              <span key={g} className="text-[9px] px-2 py-0.5 rounded bg-white/5 border border-white/5 text-muted-foreground font-bold uppercase tracking-widest">
-                {g}
-              </span>
-            ))}
-            {anime.rating > 0 && (
-              <span className="text-[9px] px-2 py-0.5 rounded bg-accent/10 border border-accent/20 text-accent font-bold uppercase tracking-widest flex items-center gap-1">
-                <Eye className="w-2.5 h-2.5" /> {anime.rating}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {!isSearchMode && (
-          <div className="space-y-2 pt-1">
-            <div className="flex justify-between items-end text-[10px] font-mono">
-              <span className="text-muted-foreground uppercase tracking-widest">Progress</span>
-              <span className="text-white font-bold">{anime.currentEpisode} / {anime.totalEpisodes || '??'}</span>
-            </div>
-            <div className="relative h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-              <div 
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-accent transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(168,85,247,0.5)]"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+        {/* Progress bar on card for active ones */}
+        {!isSearchMode && anime.status === 'WATCHING' && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
+            <div 
+              className="h-full bg-primary shadow-[0_0_10px_hsl(var(--primary))]" 
+              style={{ width: `${progress}%` }} 
+            />
           </div>
         )}
       </div>
-    </Card>
+
+      <div className="px-1 py-1 flex flex-col gap-1.5">
+        <h3 className="font-bold text-sm leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase">
+          {anime.title}
+        </h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+             <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-1">
+              <Hash className="w-2.5 h-2.5 text-primary" /> {anime.totalEpisodes || '??'} EP
+            </span>
+          </div>
+          {anime.rating > 0 && (
+            <span className="text-[9px] text-accent font-black tracking-widest flex items-center gap-1">
+              <Eye className="w-3 h-3" /> {anime.rating}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

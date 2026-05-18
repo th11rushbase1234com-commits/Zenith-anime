@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -29,9 +28,9 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
 
   const statusData = React.useMemo(() => {
     const stats = {
-      'Completed': watchlist.filter(a => a.status === 'COMPLETED').length,
-      'Watching': watchlist.filter(a => a.status === 'WATCHING').length,
-      'Planning': watchlist.filter(a => a.status === 'PLAN_TO_WATCH').length,
+      'Mastered': watchlist.filter(a => a.status === 'COMPLETED').length,
+      'Active': watchlist.filter(a => a.status === 'WATCHING').length,
+      'Queued': watchlist.filter(a => a.status === 'PLAN_TO_WATCH').length,
     };
     return Object.entries(stats).map(([name, value]) => ({ name, value }));
   }, [watchlist]);
@@ -41,34 +40,34 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
   if (watchlist.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card className="glass-panel border-none">
-        <CardHeader>
-          <CardTitle className="text-lg font-headline">Genre Affinity</CardTitle>
-          <CardDescription>Your favorite anime categories</CardDescription>
-        </CardHeader>
-        <CardContent className="h-[250px]">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="bg-card/40 backdrop-blur-xl border border-white/5 rounded-3xl p-6 space-y-6">
+        <div className="space-y-1">
+          <h3 className="text-lg font-black italic uppercase tracking-widest text-white">Genre Spectrum</h3>
+          <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Density of narrative archetypes</p>
+        </div>
+        <div className="h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={genreCounts.slice(0, 5)}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-              <YAxis axisLine={false} tickLine={false} fontSize={12} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+            <BarChart data={genreCounts.slice(0, 6)}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} tick={{ fill: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }} />
+              <YAxis hide />
               <Tooltip 
-                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: 'none', borderRadius: '8px' }}
-                cursor={{ fill: 'hsl(var(--secondary))' }}
+                contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
               />
-              <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="value" fill="hsl(var(--primary))" radius={[10, 10, 10, 10]} barSize={20} />
             </BarChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card className="glass-panel border-none">
-        <CardHeader>
-          <CardTitle className="text-lg font-headline">Library Overview</CardTitle>
-          <CardDescription>Distribution of your watchlist</CardDescription>
-        </CardHeader>
-        <CardContent className="h-[250px]">
+      <div className="bg-card/40 backdrop-blur-xl border border-white/5 rounded-3xl p-6 space-y-6">
+        <div className="space-y-1">
+          <h3 className="text-lg font-black italic uppercase tracking-widest text-white">Archive Status</h3>
+          <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Global library distribution</p>
+        </div>
+        <div className="h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -76,22 +75,23 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
-                outerRadius={80}
-                paddingAngle={5}
+                outerRadius={85}
+                paddingAngle={8}
                 dataKey="value"
+                stroke="none"
               >
                 {statusData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip 
-                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: 'none', borderRadius: '8px' }}
+                contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
               />
-              <Legend verticalAlign="bottom" iconType="circle" />
+              <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }} />
             </PieChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
