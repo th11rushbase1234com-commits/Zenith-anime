@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -65,32 +64,32 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-background">
       {/* Background decoration */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full animate-pulse-glow" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/20 blur-[120px] rounded-full animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/15 blur-[120px] rounded-full animate-pulse-glow" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/15 blur-[120px] rounded-full animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
 
-      <Card className="w-full max-w-md glass-panel relative z-10 border-white/10 cyber-border">
+      <Card className="w-full max-w-md glass-panel relative z-10 border-white/5 rounded-[2.5rem] p-4 shadow-2xl">
         <CardHeader className="space-y-2 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
-              <Zap className="w-8 h-8 text-primary fill-primary/20" />
+          <div className="flex justify-center mb-6">
+            <div className="p-4 rounded-3xl bg-primary/20 border border-primary/30 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+              <Zap className="w-10 h-10 text-primary fill-primary/30" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-headline font-black tracking-tighter italic">
-            ZENITH<span className="text-primary">.GATE</span>
+          <CardTitle className="text-4xl font-black italic tracking-tighter text-glow">
+            ZENITH<span className="text-primary">ANIME</span>
           </CardTitle>
-          <CardDescription className="text-muted-foreground italic">
-            Initialize your terminal session
+          <CardDescription className="text-white/60 font-medium italic">
+            Sign in to access your personal collection
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <form onSubmit={handleAuth} className="space-y-4">
+        <CardContent className="space-y-8">
+          <form onSubmit={handleAuth} className="space-y-5">
             <div className="space-y-2">
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input 
                   type="email" 
-                  placeholder="USER_ID@EMAIL.COM" 
-                  className="pl-10 bg-black/40 border-white/10"
+                  placeholder="Email Address" 
+                  className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl focus:ring-primary transition-all"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -99,11 +98,11 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input 
                   type="password" 
-                  placeholder="ENCRYPTION_KEY" 
-                  className="pl-10 bg-black/40 border-white/10"
+                  placeholder="Password" 
+                  className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl focus:ring-primary transition-all"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -112,11 +111,11 @@ export default function LoginPage() {
             </div>
             <Button 
               type="submit" 
-              className="w-full font-black italic rounded-xl bg-primary hover:bg-primary/90"
+              className="w-full h-14 font-black italic rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground text-lg shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all"
               disabled={loading}
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              {isLogin ? 'AUTHENTICATE' : 'ESTABLISH LINK'}
+              {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+              {isLogin ? 'AUTHENTICATE' : 'CREATE ACCOUNT'}
             </Button>
           </form>
 
@@ -125,26 +124,26 @@ export default function LoginPage() {
               <span className="w-full border-t border-white/5" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground font-bold">OR</span>
+              <span className="bg-[#0c0c0e] px-4 text-muted-foreground font-black tracking-widest">OR CONTINUE WITH</span>
             </div>
           </div>
 
           <Button 
             variant="outline" 
-            className="w-full border-white/10 bg-black/40 hover:bg-white/5 font-black italic rounded-xl"
+            className="w-full h-14 border-white/10 bg-white/5 hover:bg-white/10 font-black italic rounded-2xl text-lg transition-all"
             onClick={handleGoogleLogin}
             disabled={loading}
           >
-            <Chrome className="w-4 h-4 mr-2" /> GOOGLE_SIGN_IN
+            <Chrome className="w-5 h-5 mr-3" /> GOOGLE SIGN IN
           </Button>
 
-          <div className="text-center">
+          <div className="text-center pt-2">
             <button 
               type="button"
-              className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest"
+              className="text-sm font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest"
               onClick={() => setIsLogin(!isLogin)}
             >
-              {isLogin ? "Need access? Create credentials" : "Already registered? Login"}
+              {isLogin ? "New user? Create an account" : "Have an account? Sign in"}
             </button>
           </div>
         </CardContent>

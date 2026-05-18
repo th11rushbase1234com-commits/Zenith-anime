@@ -1,4 +1,3 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 import { AuthProvider } from '@/context/auth-context';
@@ -6,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'Zenith Anime | Personal Watchlist',
-  description: 'Your intelligent portal to the world of anime discovery and tracking.',
+  description: 'Your premium portal for tracking and discovering anime.',
 };
 
 export default function RootLayout({
