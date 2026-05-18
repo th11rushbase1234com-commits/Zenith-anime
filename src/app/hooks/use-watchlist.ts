@@ -12,7 +12,11 @@ export function useWatchlist() {
   useEffect(() => {
     const saved = localStorage.getItem('zenith-watchlist');
     if (saved) {
-      setWatchlist(JSON.parse(saved));
+      try {
+        setWatchlist(JSON.parse(saved));
+      } catch (e) {
+        setWatchlist(INITIAL_ANIME);
+      }
     } else {
       setWatchlist(INITIAL_ANIME);
     }
@@ -26,7 +30,11 @@ export function useWatchlist() {
   }, [watchlist, isLoaded]);
 
   const addAnime = (anime: Anime) => {
-    setWatchlist(prev => [...prev, anime]);
+    setWatchlist(prev => {
+      // Avoid duplicates
+      if (prev.some(a => a.id === anime.id)) return prev;
+      return [...prev, { ...anime, status: 'PLAN_TO_WATCH', currentEpisode: 0 }];
+    });
   };
 
   const updateAnimeStatus = (id: string, status: WatchStatus) => {
@@ -36,9 +44,16 @@ export function useWatchlist() {
   const updateEpisodeProgress = (id: string, episode: number) => {
     setWatchlist(prev => prev.map(a => {
       if (a.id === id) {
-        const newEp = Math.min(episode, a.totalEpisodes);
-        const newStatus: WatchStatus = newEp === a.totalEpisodes ? 'COMPLETED' : 'WATCHING';
-        return { ...a, currentEpisode: newEp, status: a.status === 'PLAN_TO_WATCH' && newEp > 0 ? 'WATCHING' : (newEp === a.totalEpisodes ? 'COMPLETED' : a.status) };
+        const newEp = Math.max(0, Math.min(episode, a.totalEpisodes || 999));
+        let newStatus = a.status;
+        
+        if (newEp === a.totalEpisodes && a.totalEpisodes > 0) {
+          newStatus = 'COMPLETED';
+        } else if (newEp > 0 && a.status === 'PLAN_TO_WATCH') {
+          newStatus = 'WATCHING';
+        }
+
+        return { ...a, currentEpisode: newEp, status: newStatus };
       }
       return a;
     }));

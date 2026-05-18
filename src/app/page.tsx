@@ -1,15 +1,17 @@
+
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWatchlist } from './hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
 import { GenreVisualizer } from '@/components/GenreVisualizer';
 import { DiscoveryTool } from '@/components/DiscoveryTool';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Monitor, Bookmark, CheckCircle, TrendingUp, Sparkles, LayoutDashboard, Zap } from 'lucide-react';
+import { Search, Monitor, Bookmark, CheckCircle, TrendingUp, Sparkles, LayoutDashboard, Zap, Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { INITIAL_ANIME } from './lib/mock-data';
+import { searchAnime } from '@/services/jikan';
+import { Anime } from './types/anime';
 
 export default function ZenithApp() {
   const { 
@@ -22,15 +24,31 @@ export default function ZenithApp() {
   } = useWatchlist();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Anime[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const filteredWatchlist = (status?: string) => {
     return watchlist.filter(a => !status || a.status === status);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
+    if (!searchQuery.trim()) return;
+    
+    setIsSearching(true);
+    const results = await searchAnime(searchQuery);
+    setSearchResults(results);
+    setIsSearching(false);
+    
+    // Switch to discovery tab to show results if not already there, 
+    // or we could show them in a special overlay
+    setActiveTab('discovery');
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
   };
 
   if (!isLoaded) return null;
@@ -64,10 +82,19 @@ export default function ZenithApp() {
               <Search className="absolute left-6 w-5 h-5 text-primary" />
               <Input 
                 placeholder="ACCESS GLOBAL ANIME DATABASE..." 
-                className="pl-16 py-8 rounded-2xl bg-background border-2 border-white/5 shadow-2xl text-xl placeholder:text-muted-foreground/30 focus:ring-0 focus:border-primary/50 transition-all font-mono"
+                className="pl-16 pr-12 py-8 rounded-2xl bg-background border-2 border-white/5 shadow-2xl text-xl placeholder:text-muted-foreground/30 focus:ring-0 focus:border-primary/50 transition-all font-mono"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+              {searchQuery && (
+                <button 
+                  type="button" 
+                  onClick={clearSearch}
+                  className="absolute right-6 p-2 text-muted-foreground hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
             </div>
           </form>
         </div>
@@ -139,7 +166,7 @@ export default function ZenithApp() {
                     <div className="flex justify-between items-end">
                       <span className="text-muted-foreground text-sm font-bold uppercase tracking-widest">Sync Rate</span>
                       <span className="font-headline font-black text-4xl text-foreground">
-                        {Math.round((watchlist.filter(a => a.status === 'COMPLETED').length / watchlist.length) * 100 || 0)}%
+                        {Math.round((watchlist.filter(a => a.status === 'COMPLETED').length / (watchlist.length || 1)) * 100)}%
                       </span>
                     </div>
                   </div>
@@ -169,18 +196,23 @@ export default function ZenithApp() {
               </div>
 
               <TabsContent value="all" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-                {watchlist.map(anime => (
-                  <AnimeCard 
-                    key={anime.id} 
-                    anime={anime} 
-                    onUpdateStatus={updateAnimeStatus}
-                    onUpdateEpisode={updateEpisodeProgress}
-                    onRemove={removeAnime}
-                  />
-                ))}
+                {watchlist.length > 0 ? (
+                  watchlist.map(anime => (
+                    <AnimeCard 
+                      key={anime.id} 
+                      anime={anime} 
+                      onUpdateStatus={updateAnimeStatus}
+                      onUpdateEpisode={updateEpisodeProgress}
+                      onRemove={removeAnime}
+                    />
+                  ))
+                ) : (
+                  <div className="col-span-full py-20 text-center glass-panel rounded-3xl">
+                    <p className="text-muted-foreground text-lg">Your library is empty. Use Discovery to find content.</p>
+                  </div>
+                )}
               </TabsContent>
 
-              {/* ... other status tabs remain logically the same but styled similarly */}
               <TabsContent value="watching" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
                 {filteredWatchlist('WATCHING').map(anime => (
                   <AnimeCard key={anime.id} anime={anime} onUpdateStatus={updateAnimeStatus} onUpdateEpisode={updateEpisodeProgress} onRemove={removeAnime} />
@@ -202,7 +234,38 @@ export default function ZenithApp() {
           {/* Discovery Tab */}
           {activeTab === 'discovery' && (
             <div className="max-w-5xl mx-auto space-y-16">
-              <div className="text-center space-y-6">
+              
+              {/* Search Results Section */}
+              {isSearching ? (
+                <div className="flex flex-col items-center justify-center py-20 gap-4">
+                  <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                  <p className="text-primary font-mono animate-pulse">SYNCHRONIZING WITH GLOBAL DATABASE...</p>
+                </div>
+              ) : searchResults.length > 0 ? (
+                <div className="space-y-10">
+                  <div className="flex items-center justify-between border-b border-primary/20 pb-4">
+                    <h2 className="text-3xl font-headline font-bold">QUERY RESULTS</h2>
+                    <Button variant="ghost" size="sm" onClick={clearSearch} className="text-muted-foreground hover:text-white">
+                      CLEAR RESULTS
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    {searchResults.map(anime => (
+                      <AnimeCard 
+                        key={`search-${anime.id}`}
+                        anime={anime} 
+                        isSearchMode
+                        onAdd={() => {
+                          addAnime(anime);
+                          // Optionally show a success toast or change button state
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="text-center space-y-6 pt-10">
                 <div className="inline-block px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-black uppercase tracking-widest">
                   Artificial Intelligence
                 </div>
@@ -212,20 +275,6 @@ export default function ZenithApp() {
                 </p>
               </div>
               <DiscoveryTool watchlist={watchlist} />
-              
-              <div className="space-y-10">
-                <h3 className="text-3xl font-headline font-bold border-l-4 border-primary pl-6">GLOBAL TRENDS</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-                   {INITIAL_ANIME.slice(0, 3).map(anime => (
-                    <AnimeCard 
-                      key={`trending-${anime.id}`}
-                      anime={{...anime, id: `trending-${anime.id}`, status: 'PLAN_TO_WATCH'}} 
-                      isSearchMode
-                      onAdd={addAnime}
-                    />
-                   ))}
-                </div>
-              </div>
             </div>
           )}
 

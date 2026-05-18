@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -6,7 +7,7 @@ import { Anime, WatchStatus } from '@/app/types/anime';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Check, Clock, Plus, Trash2, ChevronRight, Hash } from 'lucide-react';
+import { Play, Check, Clock, Plus, Trash2, ChevronRight, Hash, Eye } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 interface AnimeCardProps {
@@ -26,7 +27,7 @@ export function AnimeCard({
   onAdd,
   isSearchMode = false 
 }: AnimeCardProps) {
-  const progress = (anime.currentEpisode / anime.totalEpisodes) * 100;
+  const progress = anime.totalEpisodes > 0 ? (anime.currentEpisode / anime.totalEpisodes) * 100 : 0;
 
   return (
     <Card className="group relative overflow-hidden bg-card/40 border-none anime-card-hover rounded-2xl ring-1 ring-white/5">
@@ -42,21 +43,32 @@ export function AnimeCard({
         
         {/* Status Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white uppercase tracking-tighter">
-            <Hash className="w-3 h-3 text-primary" /> {anime.year}
-          </div>
+          {anime.year > 0 && (
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white uppercase tracking-tighter">
+              <Hash className="w-3 h-3 text-primary" /> {anime.year}
+            </div>
+          )}
         </div>
 
         <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
-          {anime.status === 'WATCHING' && (
-            <Badge variant="default" className="bg-primary text-primary-foreground font-black italic shadow-[0_0_15px_rgba(168,85,247,0.5)]">
-              ACTIVE
-            </Badge>
-          )}
-          {anime.status === 'COMPLETED' && (
-            <Badge variant="secondary" className="bg-accent text-accent-foreground font-black italic shadow-[0_0_15px_rgba(6,182,212,0.5)]">
-              MASTERED
-            </Badge>
+          {!isSearchMode && (
+            <>
+              {anime.status === 'WATCHING' && (
+                <Badge variant="default" className="bg-primary text-primary-foreground font-black italic shadow-[0_0_15px_rgba(168,85,247,0.5)]">
+                  ACTIVE
+                </Badge>
+              )}
+              {anime.status === 'COMPLETED' && (
+                <Badge variant="secondary" className="bg-accent text-accent-foreground font-black italic shadow-[0_0_15px_rgba(6,182,212,0.5)]">
+                  MASTERED
+                </Badge>
+              )}
+              {anime.status === 'PLAN_TO_WATCH' && (
+                <Badge variant="outline" className="bg-black/40 text-white border-white/20 font-black italic backdrop-blur-md">
+                  QUEUE
+                </Badge>
+              )}
+            </>
           )}
         </div>
 
@@ -74,10 +86,12 @@ export function AnimeCard({
                     <Play className="w-5 h-5 mr-2" /> RESUME
                   </Button>
                 )}
-                <Button size="lg" variant="secondary" onClick={() => onUpdateEpisode?.(anime.id, anime.currentEpisode + 1)} className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-black italic rounded-xl">
-                   <ChevronRight className="w-5 h-5 mr-2" /> NEXT EPISODE
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => onRemove?.(anime.id)} className="w-full text-destructive/70 hover:text-destructive hover:bg-destructive/10 font-bold text-xs">
+                {anime.status !== 'COMPLETED' && (
+                  <Button size="lg" variant="secondary" onClick={() => onUpdateEpisode?.(anime.id, anime.currentEpisode + 1)} className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-black italic rounded-xl">
+                    <ChevronRight className="w-5 h-5 mr-2" /> NEXT EPISODE
+                  </Button>
+                )}
+                <Button size="sm" variant="ghost" onClick={() => onRemove?.(anime.id)} className="w-full text-destructive/70 hover:text-destructive hover:bg-destructive/10 font-bold text-xs mt-2">
                   <Trash2 className="w-3 h-3 mr-2" /> PURGE RECORD
                 </Button>
               </>
@@ -97,6 +111,11 @@ export function AnimeCard({
                 {g}
               </span>
             ))}
+            {anime.rating > 0 && (
+              <span className="text-[9px] px-2 py-0.5 rounded bg-accent/10 border border-accent/20 text-accent font-bold uppercase tracking-widest flex items-center gap-1">
+                <Eye className="w-2.5 h-2.5" /> {anime.rating}
+              </span>
+            )}
           </div>
         </div>
 
@@ -104,7 +123,7 @@ export function AnimeCard({
           <div className="space-y-2 pt-1">
             <div className="flex justify-between items-end text-[10px] font-mono">
               <span className="text-muted-foreground uppercase tracking-widest">Progress</span>
-              <span className="text-white font-bold">{anime.currentEpisode} / {anime.totalEpisodes}</span>
+              <span className="text-white font-bold">{anime.currentEpisode} / {anime.totalEpisodes || '??'}</span>
             </div>
             <div className="relative h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
               <div 
