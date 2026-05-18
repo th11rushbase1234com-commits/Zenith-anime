@@ -194,6 +194,7 @@ export default function ZenithApp() {
           <form onSubmit={handleSearch} className="relative hidden sm:block">
             <button 
               type="submit" 
+              onMouseDown={(e) => e.preventDefault()}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
               aria-label="Search"
             >
