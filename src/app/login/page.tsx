@@ -11,7 +11,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Mail, Lock, Loader2, Chrome, User, Zap } from 'lucide-react';
+import { Lock, Loader2, Chrome, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
@@ -67,26 +67,25 @@ export default function LoginPage() {
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 blur-[120px] rounded-full" />
 
       {/* Main Container */}
-      <div className="w-full max-w-[400px] flex flex-col items-center space-y-10 relative z-10">
-        {/* Header Section (Zenith Branding) */}
-        <div className="text-center space-y-4">
-          <div className="flex flex-col items-center justify-center gap-2 cursor-default group">
-            <h1 className="text-6xl md:text-7xl font-black italic tracking-tighter text-glow flex flex-col items-center leading-none">
+      <div className="w-full max-w-[400px] flex flex-col items-center space-y-12 relative z-10">
+        
+        {/* Header Section */}
+        <div className="text-center space-y-6">
+          <div className="flex flex-col items-center gap-3">
+            <h1 className="text-6xl md:text-7xl font-black italic tracking-tighter text-glow flex flex-col leading-none">
               <span className="text-primary">ZENITH</span>
               <span className="text-white">ANIME</span>
             </h1>
-            <div className="h-1 w-24 bg-primary rounded-full mt-2" />
+            <div className="h-1.5 w-16 bg-primary rounded-full" />
           </div>
           
-          <div className="pt-2">
-            <h2 className="text-xs font-black italic tracking-[0.4em] uppercase text-white/40">
-              {isLogin ? 'ACCESS TERMINAL' : 'CORE INITIALIZATION'}
-            </h2>
-          </div>
+          <h2 className="text-[10px] md:text-xs font-black italic tracking-[0.4em] uppercase text-white/40">
+            {isLogin ? 'WELCOME' : 'SIGN UP'}
+          </h2>
         </div>
 
         {/* Form Section */}
-        <form onSubmit={handleAuth} className="w-full space-y-5 pt-4">
+        <form onSubmit={handleAuth} className="w-full space-y-5">
           <div className="space-y-4">
             <div className="relative">
               <User className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
@@ -125,7 +124,7 @@ export default function LoginPage() {
             className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-black tracking-widest rounded-full uppercase transition-all hover:scale-[1.02] active:scale-95 shadow-[0_4px_20px_rgba(168,85,247,0.3)]"
             disabled={loading}
           >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLogin ? 'INITIALIZE LOGIN' : 'CREATE ACCOUNT')}
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLogin ? 'AUTHENTICATE' : 'INITIALIZE')}
           </Button>
         </form>
 
@@ -162,13 +161,6 @@ export default function LoginPage() {
             </span>
           </button>
         </div>
-      </div>
-
-      {/* Decorative Sidebar (Japanese Text) */}
-      <div className="hidden lg:block absolute left-12 top-1/2 -translate-y-1/2 space-y-4 opacity-5 pointer-events-none">
-        <span className="[writing-mode:vertical-rl] text-4xl font-black tracking-[1em] text-white uppercase">
-          ようこそ ゼンニス
-        </span>
       </div>
     </div>
   );
