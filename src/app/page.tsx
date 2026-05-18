@@ -480,8 +480,6 @@ export default function ZenithApp() {
                     <div className="px-6 flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-white/40">
                       <span>Page</span>
                       <span className="text-primary text-glow">{currentPage}</span>
-                      <span>of</span>
-                      <span>{lastPage}</span>
                     </div>
 
                     <Button 
