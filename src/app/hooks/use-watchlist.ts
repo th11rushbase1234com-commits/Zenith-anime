@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,8 +12,7 @@ import {
   setDoc, 
   updateDoc, 
   deleteDoc,
-  where,
-  orderBy
+  where
 } from 'firebase/firestore';
 
 export function useWatchlist() {
@@ -31,7 +29,7 @@ export function useWatchlist() {
 
     setIsLoaded(false);
 
-    // Using a simple query first to ensure no complex index requirements cause initial failures
+    // Ensure the query matches the security rules
     const q = query(
       collection(db, 'watchlists'), 
       where('userId', '==', user.uid)
@@ -45,8 +43,12 @@ export function useWatchlist() {
       setWatchlist(items);
       setIsLoaded(true);
     }, (error) => {
-      // If we hit a permission error, we still want to stop the loading spinner
-      console.error("Zenith Watchlist Error:", error.message);
+      // Handle the permission error gracefully
+      if (error.code === 'permission-denied') {
+        console.warn("Zenith Watchlist: Waiting for permissions or index sync...");
+      } else {
+        console.error("Zenith Watchlist Error:", error.message);
+      }
       setIsLoaded(true);
     });
 

@@ -1,16 +1,14 @@
-
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAy_RvxjmMfbvnu7sc8rGQtLN-Lr7U_vIU",
-  authDomain: "blood-list-66e5e.firebaseapp.com",
-  databaseURL: "https://blood-list-66e5e-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "blood-list-66e5e",
-  storageBucket: "blood-list-66e5e.firebasestorage.app",
-  messagingSenderId: "900859452994",
-  appId: "1:900859452994:web:bb55742a51ee7d61da57db"
+  apiKey: "AIzaSyDMcmQ1eSMP11Iwcq_FU7CQJAsPIUmZK3w",
+  authDomain: "studio-8047086496-cb891.firebaseapp.com",
+  projectId: "studio-8047086496-cb891",
+  storageBucket: "studio-8047086496-cb891.firebasestorage.app",
+  messagingSenderId: "738666537284",
+  appId: "1:738666537284:web:612131eec3389eab5a7711"
 };
 
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);

@@ -1,18 +1,17 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Allow users to read and write only their own watchlist items
     match /watchlists/{animeId} {
-      // Allow the user to read documents if they are the owner
-      // 'read' covers both 'get' (single doc) and 'list' (queries)
-      allow read: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
-      
-      // Allow the user to create a document if they are authenticated and set themselves as the owner
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      
-      // Allow update and delete if the user is the owner
       allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
