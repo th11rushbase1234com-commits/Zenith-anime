@@ -67,25 +67,26 @@ export default function LoginPage() {
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 blur-[120px] rounded-full" />
 
       {/* Main Container */}
-      <div className="w-full max-w-[400px] flex flex-col items-center space-y-12 relative z-10">
+      <div className="w-full max-w-[400px] flex flex-col items-center space-y-10 relative z-10">
         {/* Header Section (Zenith Branding) */}
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-3 mb-8 cursor-default group">
-            <h1 className="text-3xl font-black italic tracking-tighter text-glow flex items-center gap-1">
+        <div className="text-center space-y-4">
+          <div className="flex flex-col items-center justify-center gap-2 cursor-default group">
+            <h1 className="text-6xl md:text-7xl font-black italic tracking-tighter text-glow flex flex-col items-center leading-none">
               <span className="text-primary">ZENITH</span>
               <span className="text-white">ANIME</span>
             </h1>
+            <div className="h-1 w-24 bg-primary rounded-full mt-2" />
           </div>
           
-          <div className="relative inline-block">
-            <h2 className="text-4xl font-black italic tracking-tighter uppercase text-glow">
-              {isLogin ? 'WELCOME' : 'SIGN UP'}
+          <div className="pt-2">
+            <h2 className="text-xs font-black italic tracking-[0.4em] uppercase text-white/40">
+              {isLogin ? 'ACCESS TERMINAL' : 'CORE INITIALIZATION'}
             </h2>
           </div>
         </div>
 
         {/* Form Section */}
-        <form onSubmit={handleAuth} className="w-full space-y-5">
+        <form onSubmit={handleAuth} className="w-full space-y-5 pt-4">
           <div className="space-y-4">
             <div className="relative">
               <User className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
@@ -112,7 +113,7 @@ export default function LoginPage() {
               {isLogin && (
                 <div className="flex justify-end pt-1">
                   <button type="button" className="text-[10px] font-bold text-primary/60 hover:text-primary transition-colors uppercase tracking-widest">
-                    Forgot Password?
+                    Recovery Needed?
                   </button>
                 </div>
               )}
@@ -132,7 +133,7 @@ export default function LoginPage() {
         <div className="w-full space-y-6">
           <div className="flex items-center gap-4 px-8">
             <div className="flex-1 h-px bg-white/10" />
-            <span className="text-[10px] font-black text-white/30 tracking-widest uppercase">Sync With</span>
+            <span className="text-[10px] font-black text-white/30 tracking-widest uppercase">Sync Network</span>
             <div className="flex-1 h-px bg-white/10" />
           </div>
 
@@ -149,13 +150,13 @@ export default function LoginPage() {
         </div>
 
         {/* Footer Toggle */}
-        <div className="text-center">
+        <div className="text-center pt-4">
           <button 
             type="button"
             className="text-[11px] font-medium text-white/40 hover:text-white transition-colors group uppercase tracking-widest"
             onClick={() => setIsLogin(!isLogin)}
           >
-            {isLogin ? "New to the platform?" : "Already have an uplink?"} 
+            {isLogin ? "New user discovered?" : "Existing uplink found?"} 
             <span className="text-primary font-bold ml-1.5 group-hover:underline underline-offset-4">
               {isLogin ? "Sign Up" : "Log In"}
             </span>
@@ -165,7 +166,7 @@ export default function LoginPage() {
 
       {/* Decorative Sidebar (Japanese Text) */}
       <div className="hidden lg:block absolute left-12 top-1/2 -translate-y-1/2 space-y-4 opacity-5 pointer-events-none">
-        <span className="[writing-mode:vertical-rl] text-4xl font-black tracking-[1em] text-white">
+        <span className="[writing-mode:vertical-rl] text-4xl font-black tracking-[1em] text-white uppercase">
           ようこそ ゼンニス
         </span>
       </div>
