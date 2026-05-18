@@ -1,31 +1,26 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useWatchlist } from './hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
 import { GenreVisualizer } from '@/components/GenreVisualizer';
-import { DiscoveryTool } from '@/components/DiscoveryTool';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Search, 
   Monitor, 
   Bookmark, 
-  CheckCircle, 
-  Sparkles, 
   LayoutDashboard, 
   Zap, 
   Loader2, 
   LogOut, 
   Bell, 
   Library, 
-  Menu,
   ChevronRight,
-  ListPlus,
   Play,
-  User,
   Settings,
-  UserCircle
+  Flame
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,7 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { searchAnime } from '@/services/jikan';
+import { searchAnime, getTrendingAnime } from '@/services/jikan';
 import { Anime } from './types/anime';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
@@ -57,6 +52,7 @@ export default function ZenithApp() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Anime[]>([]);
+  const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
 
@@ -67,6 +63,14 @@ export default function ZenithApp() {
       router.push('/login');
     }
   }, [user, authLoading, router]);
+
+  useEffect(() => {
+    async function loadTrending() {
+      const trending = await getTrendingAnime();
+      setTrendingAnime(trending);
+    }
+    loadTrending();
+  }, []);
 
   const filteredWatchlist = (status?: string) => {
     return watchlist.filter(a => !status || a.status === status);
@@ -80,7 +84,7 @@ export default function ZenithApp() {
     const results = await searchAnime(searchQuery);
     setSearchResults(results);
     setIsSearching(false);
-    setActiveTab('discovery');
+    setActiveTab('search');
   };
 
   const clearSearch = () => {
@@ -149,22 +153,10 @@ export default function ZenithApp() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/5" />
                 <DropdownMenuItem 
-                  onClick={() => setActiveTab('home')}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-white"
-                >
-                  <LayoutDashboard className="w-4 h-4" /> Home Dashboard
-                </DropdownMenuItem>
-                <DropdownMenuItem 
                   onClick={() => setActiveTab('library')}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-white"
                 >
                   <Bookmark className="w-4 h-4" /> Personal Watchlist
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setActiveTab('discovery')}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-white"
-                >
-                  <Sparkles className="w-4 h-4" /> Discovery Hub
                 </DropdownMenuItem>
                 <DropdownMenuItem className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-white">
                   <Settings className="w-4 h-4" /> Settings
@@ -209,14 +201,11 @@ export default function ZenithApp() {
                   <span className="text-white">DATABASE</span>
                 </h2>
                 <p className="text-white/80 text-sm md:text-xl max-w-2xl line-clamp-3 font-medium">
-                  Welcome back, {userName}. Your personal anime archive is synchronized. Access your curated lists, monitor viewing velocity, and initiate high-resonance discovery probes.
+                  Welcome back, {userName}. Your personal anime archive is synchronized. Access your curated lists and monitor viewing velocity.
                 </p>
                 <div className="flex items-center gap-4 pt-4">
                   <Button onClick={() => setActiveTab('library')} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-10 h-14 rounded-full gap-2 text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105">
                     <Library className="w-6 h-6" /> ACCESS WATCHLIST
-                  </Button>
-                  <Button onClick={() => setActiveTab('discovery')} variant="outline" className="border-white/20 bg-white/5 backdrop-blur-md font-bold px-10 h-14 rounded-full gap-2 hover:bg-white/10 text-lg">
-                    <Sparkles className="w-6 h-6 text-accent" /> INITIATE DISCOVERY
                   </Button>
                 </div>
               </div>
@@ -224,6 +213,30 @@ export default function ZenithApp() {
 
             {/* Content Body */}
             <div className="px-4 md:px-12 space-y-16">
+              {/* Trending Section */}
+              <section className="space-y-6">
+                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                  <h3 className="text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
+                    <Flame className="w-6 h-6 text-primary fill-current" /> Trending Now
+                  </h3>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                  {trendingAnime.map(anime => (
+                    <AnimeCard 
+                      key={`trending-${anime.id}`}
+                      anime={anime} 
+                      isSearchMode
+                      onAdd={() => addAnime(anime)}
+                    />
+                  ))}
+                  {trendingAnime.length === 0 && (
+                    <div className="col-span-full py-12 flex justify-center">
+                      <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                    </div>
+                  )}
+                </div>
+              </section>
+
               <div className="flex flex-col lg:flex-row gap-12">
                 <div className="flex-1 space-y-12">
                   {/* Active Watching */}
@@ -250,7 +263,6 @@ export default function ZenithApp() {
                         <div className="col-span-full py-20 text-center bg-white/5 rounded-3xl border border-dashed border-white/10 flex flex-col items-center gap-4">
                           <Play className="w-12 h-12 text-muted-foreground/30" />
                           <p className="text-muted-foreground italic font-medium">Your active feed is empty.</p>
-                          <Button onClick={() => setActiveTab('discovery')} variant="ghost" className="text-primary hover:bg-primary/10">Browse Database</Button>
                         </div>
                       )}
                     </div>
@@ -307,19 +319,6 @@ export default function ZenithApp() {
                         <span className="font-black text-xl text-primary">
                           {Math.round((watchlist.filter(a => a.status === 'COMPLETED').length / (watchlist.length || 1)) * 100)}%
                         </span>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-4">
-                      <div className="bg-primary/10 border border-primary/20 rounded-2xl p-6 relative overflow-hidden group cursor-pointer" onClick={() => setActiveTab('discovery')}>
-                        <Sparkles className="absolute -right-4 -top-4 w-24 h-24 text-primary opacity-20 group-hover:scale-125 transition-transform duration-500" />
-                        <h3 className="text-lg font-black italic uppercase tracking-tighter text-primary">ZENITH PROBE</h3>
-                        <p className="text-[10px] text-white/60 font-medium mt-2 leading-relaxed">
-                          Analyze your resonance profile for high-frequency matches.
-                        </p>
-                        <Button size="sm" className="mt-4 w-full bg-primary hover:bg-primary/80 rounded-full h-8 px-4 text-[10px] font-black italic uppercase">
-                          INITIATE SCAN
-                        </Button>
                       </div>
                     </div>
                   </div>
@@ -381,10 +380,9 @@ export default function ZenithApp() {
           </div>
         )}
 
-        {/* Discovery Tab */}
-        {activeTab === 'discovery' && (
+        {/* Search Results Tab */}
+        {activeTab === 'search' && (
           <div className="px-4 md:px-12 pt-12 space-y-16 animate-in slide-in-from-right-10 duration-500">
-            {/* Search Results */}
             {isSearching ? (
               <div className="flex flex-col items-center justify-center py-32 gap-6">
                 <Loader2 className="w-16 h-16 text-primary animate-spin" />
@@ -411,22 +409,12 @@ export default function ZenithApp() {
                   ))}
                 </div>
               </div>
-            ) : null}
-
-            <div className="max-w-6xl mx-auto space-y-16 py-12">
-              <div className="text-center space-y-6">
-                <div className="inline-block px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest backdrop-blur-sm">
-                  Zenith Discovery Core
-                </div>
-                <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter text-glow leading-none">
-                  INITIATE <br /><span className="text-primary">DISCOVERY</span>
-                </h2>
-                <p className="text-white/60 text-lg max-w-2xl mx-auto italic font-medium leading-relaxed">
-                  "Parsing aesthetic resonances and narrative archetypes. Simulate potential matches for your unique profile."
-                </p>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-32 gap-6 text-center">
+                <p className="text-muted-foreground font-mono uppercase tracking-[0.3em]">No resonance matches found.</p>
+                <Button variant="outline" onClick={clearSearch} className="rounded-full border-white/10">Return Home</Button>
               </div>
-              <DiscoveryTool watchlist={watchlist} />
-            </div>
+            )}
           </div>
         )}
       </main>
