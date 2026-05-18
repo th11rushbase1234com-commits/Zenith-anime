@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useWatchlist } from './hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
 import { GenreVisualizer } from '@/components/GenreVisualizer';
@@ -21,7 +20,8 @@ import {
   Plus,
   X,
   History,
-  ChevronDown
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -68,9 +68,6 @@ export default function ZenithApp() {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  
-  const observerTarget = useRef(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -119,47 +116,22 @@ export default function ZenithApp() {
     }
   };
 
-  const loadMoreResults = useCallback(async () => {
-    if (isLoadingMore || !hasNextPage) return;
+  const handlePageChange = async (newPage: number) => {
+    if (newPage < 1) return;
     
-    setIsLoadingMore(true);
-    const nextPage = currentPage + 1;
+    setIsSearching(true);
     try {
-      const { anime, hasNextPage: more } = await searchAnime(searchQuery, nextPage);
-      setSearchResults(prev => [...prev, ...anime]);
+      const { anime, hasNextPage: more } = await searchAnime(searchQuery, newPage);
+      setSearchResults(anime);
       setHasNextPage(more);
-      setCurrentPage(nextPage);
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoadingMore(false);
+      setIsSearching(false);
     }
-  }, [currentPage, hasNextPage, isLoadingMore, searchQuery]);
-
-  // Infinite Scroll Observer
-  useEffect(() => {
-    if (activeTab !== 'search' || !hasNextPage || isLoadingMore) return;
-
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting) {
-          loadMoreResults();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
-    }
-
-    return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget);
-      }
-    };
-  }, [activeTab, hasNextPage, isLoadingMore, loadMoreResults]);
+  };
 
   const clearSearch = () => {
     setSearchQuery('');
@@ -468,7 +440,7 @@ export default function ZenithApp() {
         {/* Search Results Tab */}
         {activeTab === 'search' && (
           <div className="px-4 md:px-12 pt-12 space-y-16 animate-in slide-in-from-right-10 duration-500">
-            {isSearching && currentPage === 1 ? (
+            {isSearching ? (
               <div className="flex flex-col items-center justify-center py-32 gap-6">
                 <Loader2 className="w-16 h-16 text-primary animate-spin" />
                 <p className="text-primary font-mono animate-pulse uppercase tracking-[0.3em] font-black">SCANNING DATABASE...</p>
@@ -477,9 +449,6 @@ export default function ZenithApp() {
               <div className="space-y-10">
                 <div className="flex items-center justify-between border-b border-white/10 pb-6">
                   <h2 className="text-3xl font-black italic uppercase tracking-widest text-glow">Search Results</h2>
-                  <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                    Page {currentPage} {hasNextPage && "• Scanning more..."}
-                  </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8">
                   {searchResults.map((anime, idx) => (
@@ -492,24 +461,35 @@ export default function ZenithApp() {
                   ))}
                 </div>
                 
-                {/* Intersection Target for Pagination */}
-                <div ref={observerTarget} className="flex justify-center py-12">
-                  {isLoadingMore ? (
-                    <div className="flex items-center gap-3 text-primary font-mono text-xs uppercase tracking-widest animate-pulse">
-                      <Loader2 className="w-5 h-5 animate-spin" /> 
-                      Synchronizing more records...
-                    </div>
-                  ) : hasNextPage ? (
-                    <div className="h-10" /> 
-                  ) : (
-                    <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-widest">End of resonance match archive.</p>
+                {/* Discrete Pagination */}
+                <div className="flex justify-center items-center gap-4 py-12">
+                  {currentPage > 1 && (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      className="rounded-full border-white/10 font-black italic text-[10px] px-6 h-10 tracking-widest hover:bg-white/5 transition-all"
+                    >
+                      <ChevronLeft className="w-4 h-4 mr-2" /> PREVIOUS
+                    </Button>
+                  )}
+                  <div className="px-6 py-2 bg-white/5 rounded-xl border border-white/10 font-mono text-[11px] font-black tracking-widest text-primary uppercase">
+                    Page {currentPage}
+                  </div>
+                  {hasNextPage && (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      className="rounded-full border-white/10 font-black italic text-[10px] px-6 h-10 tracking-widest hover:bg-white/5 transition-all"
+                    >
+                      NEXT <ChevronRight className="w-4 h-4 ml-2" />
+                    </Button>
                   )}
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-32 gap-6 text-center">
                 <p className="text-muted-foreground font-mono uppercase tracking-[0.3em]">No resonance matches found.</p>
-                <Button variant="outline" onClick={clearSearch} className="rounded-full border-white/10">Return Home</Button>
+                <Button variant="outline" onClick={clearSearch} className="rounded-full border-white/10 font-black italic">Return Home</Button>
               </div>
             )}
           </div>
