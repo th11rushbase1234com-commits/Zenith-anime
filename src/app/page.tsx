@@ -461,31 +461,32 @@ export default function ZenithApp() {
                   ))}
                 </div>
                 
-                {/* Compact Separate Pagination Components */}
-                <div className="flex items-center justify-center gap-12 py-16">
+                {/* Ultra-Compact Stabilized Pagination */}
+                <div className="flex items-center justify-center gap-6 py-12">
                   <Button 
-                    variant="outline" 
+                    variant="ghost" 
+                    size="sm"
                     onClick={() => handlePageChange(currentPage - 1)}
-                    className="rounded-full border-white/10 font-black italic text-[10px] px-6 h-10 tracking-widest hover:bg-white/5 hover:text-primary transition-all text-white shadow-xl"
+                    className="h-9 px-4 rounded-full border border-white/5 bg-white/5 font-black italic text-[10px] tracking-widest hover:bg-white/10 hover:text-primary transition-all text-white/80"
                     style={{ visibility: currentPage > 1 ? 'visible' : 'hidden' }}
                   >
-                    <ChevronLeft className="w-4 h-4 mr-2" /> PREVIOUS
+                    <ChevronLeft className="w-3.5 h-3.5 mr-1" /> PREV
                   </Button>
                   
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em]">Sector</span>
-                    <div className="px-5 py-2 bg-primary/10 rounded-xl border border-primary/20 font-mono text-xs font-black tracking-widest text-primary uppercase shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+                  <div className="flex flex-col items-center gap-1 min-w-[60px]">
+                    <div className="px-3 py-1 bg-primary/10 rounded-lg border border-primary/20 font-mono text-[10px] font-black tracking-widest text-primary uppercase shadow-[0_0_10px_rgba(168,85,247,0.1)]">
                       {currentPage}
                     </div>
                   </div>
 
                   <Button 
-                    variant="outline" 
+                    variant="ghost" 
+                    size="sm"
                     onClick={() => handlePageChange(currentPage + 1)}
-                    className="rounded-full border-white/10 font-black italic text-[10px] px-6 h-10 tracking-widest hover:bg-white/5 hover:text-primary transition-all text-white shadow-xl"
+                    className="h-9 px-4 rounded-full border border-white/5 bg-white/5 font-black italic text-[10px] tracking-widest hover:bg-white/10 hover:text-primary transition-all text-white/80"
                     style={{ visibility: hasNextPage ? 'visible' : 'hidden' }}
                   >
-                    NEXT <ChevronRight className="w-4 h-4 ml-2" />
+                    NEXT <ChevronRight className="w-3.5 h-3.5 ml-1" />
                   </Button>
                 </div>
               </div>
