@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Zap, Mail, Lock, Loader2, Chrome, ArrowRight, Github } from 'lucide-react';
+import { Zap, Mail, Lock, Loader2, Chrome, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 
@@ -78,7 +78,7 @@ export default function LoginPage() {
           fill 
           className="object-cover brightness-50 contrast-125"
           priority
-          data-ai-hint="cyberpunk anime illustration"
+          data-ai-hint="cyberpunk anime"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#060608]" />
         
@@ -101,18 +101,18 @@ export default function LoginPage() {
           <CardHeader className="space-y-6 text-center lg:text-left p-0 mb-10">
             <div className="flex justify-center lg:justify-start">
               <div className="flex items-center gap-3 group">
-                <div className="p-2 rounded-xl bg-primary/20 border border-primary/30 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                  <Zap className="w-6 h-6 text-primary fill-primary/30" />
+                <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                  <Zap className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
-                <h2 className="text-3xl font-black italic tracking-tighter text-glow">
+                <h2 className="text-3xl font-black italic tracking-tighter text-glow flex items-center gap-1">
                   <span className="text-primary">ZENITH</span>
                   <span className="text-white">ANIME</span>
                 </h2>
               </div>
             </div>
             <div className="space-y-2">
-              <CardTitle className="text-4xl md:text-5xl font-black italic tracking-tighter text-white uppercase">
-                {isLogin ? 'Access Portal' : 'Create Profile'}
+              <CardTitle className="text-5xl md:text-7xl font-black italic tracking-tighter text-white uppercase leading-[0.85]">
+                {isLogin ? 'LOGIN' : 'SIGN UP'}
               </CardTitle>
               <CardDescription className="text-muted-foreground font-medium italic text-base">
                 {isLogin ? 'Enter your credentials to re-sync with the archive.' : 'Initialize your record in the Zenith database.'}
@@ -153,7 +153,7 @@ export default function LoginPage() {
                 disabled={loading}
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : (
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 uppercase">
                     {isLogin ? 'AUTHENTICATE' : 'INITIALIZE'}
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
