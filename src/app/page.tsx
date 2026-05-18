@@ -101,8 +101,8 @@ export default function ZenithApp() {
     return () => clearInterval(intervalId);
   }, [api]);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const query = searchQuery.trim();
     if (!query) return;
     
@@ -116,10 +116,10 @@ export default function ZenithApp() {
       setLastPage(total);
       setActiveTab('search');
       
-      // Keep focus on the search bar as requested
+      // Keep focus on the search bar
       setTimeout(() => {
         searchInputRef.current?.focus();
-      }, 0);
+      }, 50);
     } catch (error) {
       console.error(error);
     } finally {
@@ -156,7 +156,7 @@ export default function ZenithApp() {
   };
 
   const handleBlur = () => {
-    // If the user typed something but didn't search (query != active term), clear it
+    // If the user typed something but didn't search (query != active term), clear/revert it
     if (searchQuery.trim() !== activeSearchTerm) {
       setSearchQuery(activeSearchTerm);
     }
@@ -192,7 +192,13 @@ export default function ZenithApp() {
 
         <div className="flex items-center gap-4">
           <form onSubmit={handleSearch} className="relative hidden sm:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <button 
+              type="submit" 
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
+              aria-label="Search"
+            >
+              <Search className="w-4 h-4" />
+            </button>
             <Input 
               ref={searchInputRef}
               placeholder="Search anime" 
@@ -205,7 +211,7 @@ export default function ZenithApp() {
               <button 
                 type="button" 
                 onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors z-10"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -476,30 +482,34 @@ export default function ZenithApp() {
                   ))}
                 </div>
                 
-                <div className="flex items-center justify-center py-12">
-                  <div className="flex items-center gap-1 p-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      className={`h-10 w-10 rounded-xl hover:bg-white/10 text-white/60 hover:text-primary transition-all ${currentPage <= 1 ? 'invisible' : 'visible'}`}
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </Button>
+                {/* Compact Stabilized Pagination Bar */}
+                <div className="flex justify-center py-12">
+                  <div className="inline-flex items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full h-10 px-1 shadow-2xl overflow-hidden min-w-[200px]">
+                    <div className="flex-1 flex justify-start">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        className={`h-8 px-3 rounded-full hover:bg-white/10 text-[10px] font-black italic tracking-widest text-primary ${currentPage <= 1 ? 'invisible pointer-events-none' : 'visible'}`}
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5 mr-1" /> PREV
+                      </Button>
+                    </div>
                     
-                    <div className="px-6 flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-white/40">
-                      <span>Page</span>
-                      <span className="text-primary text-glow">{currentPage}</span>
+                    <div className="px-4 flex items-center justify-center font-black italic text-[11px] uppercase tracking-tighter text-glow min-w-[80px]">
+                      Page <span className="text-primary ml-1">{currentPage}</span>
                     </div>
 
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      className={`h-10 w-10 rounded-xl hover:bg-white/10 text-white/60 hover:text-primary transition-all ${!hasNextPage ? 'invisible' : 'visible'}`}
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </Button>
+                    <div className="flex-1 flex justify-end">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        className={`h-8 px-3 rounded-full hover:bg-white/10 text-[10px] font-black italic tracking-widest text-primary ${!hasNextPage ? 'invisible pointer-events-none' : 'visible'}`}
+                      >
+                        NEXT <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
