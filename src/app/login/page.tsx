@@ -84,9 +84,6 @@ export default function LoginPage() {
             <h2 className="text-4xl font-black italic tracking-tighter uppercase text-glow">
               {isLogin ? 'WELCOME' : 'SIGN UP'}
             </h2>
-            <span className="absolute -right-16 top-1 text-[10px] text-white/30 font-bold [writing-mode:vertical-rl] tracking-[0.2em] uppercase">
-              {isLogin ? 'Auth Required' : 'Join Zenith'}
-            </span>
           </div>
         </div>
 
