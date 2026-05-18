@@ -45,6 +45,7 @@ export async function searchAnime(query: string): Promise<Anime[]> {
 export async function getTrendingAnime(): Promise<Anime[]> {
   try {
     // Fetching top airing anime for the "Trending" section (Latest Releases)
+    // This is what sites like HiAnime and Crunchyroll show as "Latest/Trending"
     const response = await fetch(`${JIKAN_BASE_URL}/top/anime?filter=airing&limit=12`);
     if (!response.ok) throw new Error('Failed to fetch trending from Jikan');
     
