@@ -64,12 +64,13 @@ function mapMediaToAnime(media: any): Anime {
   };
 }
 
-export async function searchAnime(query: string, page: number = 1): Promise<{ anime: Anime[], hasNextPage: boolean }> {
+export async function searchAnime(query: string, page: number = 1): Promise<{ anime: Anime[], hasNextPage: boolean, lastPage: number }> {
   const searchQuery = `
     query ($search: String, $page: Int) {
       Page(page: $page, perPage: 18) {
         pageInfo {
           hasNextPage
+          lastPage
         }
         media(search: $search, type: ANIME) {
           ${MEDIA_QUERY_FIELDS}
@@ -82,11 +83,12 @@ export async function searchAnime(query: string, page: number = 1): Promise<{ an
     const data = await fetchAniList(searchQuery, { search: query, page });
     return {
       anime: data.Page.media.map(mapMediaToAnime),
-      hasNextPage: data.Page.pageInfo.hasNextPage
+      hasNextPage: data.Page.pageInfo.hasNextPage,
+      lastPage: data.Page.pageInfo.lastPage
     };
   } catch (error) {
     console.error('Search error:', error);
-    return { anime: [], hasNextPage: false };
+    return { anime: [], hasNextPage: false, lastPage: 1 };
   }
 }
 

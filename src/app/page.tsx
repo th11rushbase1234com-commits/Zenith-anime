@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -67,6 +68,7 @@ export default function ZenithApp() {
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
 
   useEffect(() => {
@@ -105,9 +107,10 @@ export default function ZenithApp() {
     setIsSearching(true);
     setCurrentPage(1);
     try {
-      const { anime, hasNextPage } = await searchAnime(searchQuery, 1);
+      const { anime, hasNextPage, lastPage } = await searchAnime(searchQuery, 1);
       setSearchResults(anime);
       setHasNextPage(hasNextPage);
+      setLastPage(lastPage);
       setActiveTab('search');
     } catch (error) {
       console.error(error);
@@ -117,13 +120,14 @@ export default function ZenithApp() {
   };
 
   const handlePageChange = async (newPage: number) => {
-    if (newPage < 1) return;
+    if (newPage < 1 || newPage > lastPage) return;
     
     setIsSearching(true);
     try {
-      const { anime, hasNextPage: more } = await searchAnime(searchQuery, newPage);
+      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(searchQuery, newPage);
       setSearchResults(anime);
       setHasNextPage(more);
+      setLastPage(total);
       setCurrentPage(newPage);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
@@ -139,6 +143,7 @@ export default function ZenithApp() {
     setActiveTab('home');
     setCurrentPage(1);
     setHasNextPage(false);
+    setLastPage(1);
   };
 
   if (authLoading || !isLoaded || !user) {
