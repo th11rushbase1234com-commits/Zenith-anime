@@ -516,7 +516,7 @@ export default function ZenithApp() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-32 gap-6 text-center">
-                <p className="text-muted-foreground font-mono uppercase tracking-[0.3em]">No resonance matches found.</p>
+                <p className="text-muted-foreground font-mono uppercase tracking-[0.3em]">No search results Found</p>
                 <Button variant="outline" onClick={clearSearch} className="rounded-full border-white/10 font-black italic">Return Home</Button>
               </div>
             )}
