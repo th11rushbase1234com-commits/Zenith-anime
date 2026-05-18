@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWatchlist } from './hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
 import { GenreVisualizer } from '@/components/GenreVisualizer';
@@ -14,11 +15,12 @@ import {
   Loader2, 
   LogOut, 
   Bell, 
-  ChevronRight,
   Play,
   Settings,
   Star,
-  Plus
+  Plus,
+  X,
+  History
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,7 +37,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { searchAnime, getTrendingAnime } from '@/services/jikan';
+import { searchAnime, getTrendingAnime, getRecentAiring } from '@/services/anilist';
 import { Anime } from './types/anime';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
@@ -56,6 +58,7 @@ export default function ZenithApp() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Anime[]>([]);
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
+  const [recentAiring, setRecentAiring] = useState<Anime[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [api, setApi] = useState<CarouselApi>();
@@ -68,25 +71,25 @@ export default function ZenithApp() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    async function loadTrending() {
-      const trending = await getTrendingAnime();
-      setTrendingAnime(trending.slice(0, 5));
+    async function loadInitialData() {
+      const [trending, recent] = await Promise.all([
+        getTrendingAnime(),
+        getRecentAiring()
+      ]);
+      setTrendingAnime(trending);
+      setRecentAiring(recent);
     }
-    loadTrending();
+    loadInitialData();
   }, []);
 
-  // Autoplay Logic for Carousel
   useEffect(() => {
     if (!api) return;
-
     const intervalId = setInterval(() => {
       api.scrollNext();
-    }, 6000); // 6 seconds per slide
-
+    }, 6000);
     api.on("select", () => {
       setCurrentSlide(api.selectedScrollSnap());
     });
-
     return () => clearInterval(intervalId);
   }, [api]);
 
@@ -139,11 +142,20 @@ export default function ZenithApp() {
           <form onSubmit={handleSearch} className="relative hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
-              placeholder="Query database..." 
-              className="pl-10 h-10 w-48 md:w-64 bg-white/5 border-none rounded-full text-sm focus:ring-1 focus:ring-primary transition-all"
+              placeholder="Search anime" 
+              className="pl-10 pr-10 h-10 w-48 md:w-64 bg-white/5 border-none rounded-full text-sm focus:ring-1 focus:ring-primary transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            {searchQuery && (
+              <button 
+                type="button" 
+                onClick={clearSearch}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </form>
           
           <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
@@ -166,7 +178,6 @@ export default function ZenithApp() {
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-black italic uppercase tracking-tight text-white">{userName}</p>
                     <p className="text-[10px] text-muted-foreground font-mono truncate">{user.email}</p>
-                    <p className="text-[9px] text-primary/60 font-mono mt-1">ID: {user.uid.slice(0, 12)}...</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/5" />
@@ -222,10 +233,10 @@ export default function ZenithApp() {
                         <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 space-y-6 max-w-4xl">
                           <div className="flex items-center gap-3">
                             <div className="px-3 py-1 bg-primary text-primary-foreground text-[10px] font-black italic rounded uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.5)]">
-                              LATEST RELEASE TRENDING
+                              TRENDING NOW
                             </div>
                             <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold rounded uppercase tracking-widest">
-                              <Star className="w-3 h-3 text-accent fill-current" /> {anime.rating}
+                              <Star className="w-3 h-3 text-accent fill-current" /> {Math.round(anime.rating * 10)}%
                             </div>
                           </div>
                           
@@ -260,7 +271,6 @@ export default function ZenithApp() {
                 </CarouselContent>
               </Carousel>
 
-              {/* Navigation Indicators */}
               <div className="absolute bottom-6 right-6 md:bottom-12 md:right-16 flex gap-2 z-20">
                 {trendingAnime.map((_, i) => (
                   <button 
@@ -276,11 +286,30 @@ export default function ZenithApp() {
             <div className="px-4 md:px-12 space-y-20">
               <div className="flex flex-col lg:flex-row gap-12">
                 <div className="flex-1 space-y-16">
+                  {/* Recent Airing / Latest Releases Feed */}
+                  <div className="space-y-8">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                      <h3 className="text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
+                        <History className="w-6 h-6 text-primary" /> Recently Aired
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6">
+                      {recentAiring.map(anime => (
+                        <AnimeCard 
+                          key={`recent-${anime.id}`} 
+                          anime={anime} 
+                          isSearchMode
+                          onAdd={() => addAnime(anime)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Active Watching */}
                   <div className="space-y-8">
                     <div className="flex items-center justify-between border-b border-white/5 pb-4">
                       <h3 className="text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
-                        <Monitor className="w-6 h-6 text-primary" /> Active Feed
+                        <Monitor className="w-6 h-6 text-accent" /> Active Feed
                       </h3>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -297,32 +326,6 @@ export default function ZenithApp() {
                         <div className="col-span-full py-20 text-center bg-white/5 rounded-3xl border border-dashed border-white/10 flex flex-col items-center gap-4">
                           <Play className="w-12 h-12 text-muted-foreground/30" />
                           <p className="text-muted-foreground italic font-medium">Your active feed is currently offline.</p>
-                          <Button variant="outline" onClick={() => clearSearch()} className="rounded-full border-white/10 text-[10px] font-black italic">DISCOVER ANIME</Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Planned */}
-                  <div className="space-y-8">
-                    <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                      <h3 className="text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
-                        <Bookmark className="w-6 h-6 text-accent" /> Queued Archives
-                      </h3>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6">
-                      {filteredWatchlist('PLAN_TO_WATCH').slice(0, 5).map(anime => (
-                        <AnimeCard 
-                          key={anime.id} 
-                          anime={anime} 
-                          onUpdateStatus={updateAnimeStatus}
-                          onUpdateEpisode={updateEpisodeProgress}
-                          onRemove={removeAnime}
-                        />
-                      ))}
-                      {filteredWatchlist('PLAN_TO_WATCH').length === 0 && (
-                        <div className="col-span-full py-20 text-center bg-white/5 rounded-3xl border border-dashed border-white/10">
-                          <p className="text-muted-foreground italic font-medium">No archives queued for analysis.</p>
                         </div>
                       )}
                     </div>
@@ -425,9 +428,7 @@ export default function ZenithApp() {
                       key={`search-${anime.id}`}
                       anime={anime} 
                       isSearchMode
-                      onAdd={() => {
-                        addAnime(anime);
-                      }}
+                      onAdd={() => addAnime(anime)}
                     />
                   ))}
                 </div>

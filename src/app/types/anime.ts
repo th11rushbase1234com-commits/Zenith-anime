@@ -14,6 +14,11 @@ export interface Anime {
   status: WatchStatus;
   year: number;
   emotionalImpact?: string;
+  externalLinks?: { site: string; url: string }[];
+  nextAiringEpisode?: {
+    episode: number;
+    airingAt: number;
+  };
 }
 
 export interface RecommendedAnime {
