@@ -165,6 +165,10 @@ function ZenithContent() {
   const clearAndGoHome = () => {
     setSearchQuery('');
     router.push('?tab=home');
+    // Ensure focus is removed after resetting
+    setTimeout(() => {
+      searchInputRef.current?.blur();
+    }, 0);
   };
 
   const handleBlur = () => {
