@@ -20,7 +20,9 @@ import {
   ChevronRight,
   Play,
   Settings,
-  Flame
+  Flame,
+  Star,
+  Plus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,7 +38,6 @@ import { Anime } from './types/anime';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function ZenithApp() {
   const { user, loading: authLoading, logout } = useAuth();
@@ -55,8 +56,7 @@ export default function ZenithApp() {
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
-
-  const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'zenith-hero');
+  const [featuredIndex, setFeaturedIndex] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -67,10 +67,13 @@ export default function ZenithApp() {
   useEffect(() => {
     async function loadTrending() {
       const trending = await getTrendingAnime();
-      setTrendingAnime(trending);
+      // Only keep the top 5 trending for the featured section
+      setTrendingAnime(trending.slice(0, 5));
     }
     loadTrending();
   }, []);
+
+  const featuredAnime = trendingAnime[featuredIndex];
 
   const filteredWatchlist = (status?: string) => {
     return watchlist.filter(a => !status || a.status === status);
@@ -97,7 +100,7 @@ export default function ZenithApp() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
         <Loader2 className="w-12 h-12 text-primary animate-spin" />
-        <p className="text-primary font-mono animate-pulse uppercase tracking-widest">Loading Zenith Anime...</p>
+        <p className="text-primary font-mono animate-pulse uppercase tracking-widest">Initialising Zenith Core...</p>
       </div>
     );
   }
@@ -121,7 +124,7 @@ export default function ZenithApp() {
           <form onSubmit={handleSearch} className="relative hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
-              placeholder="Search anime database..." 
+              placeholder="Query database..." 
               className="pl-10 h-10 w-48 md:w-64 bg-white/5 border-none rounded-full text-sm focus:ring-1 focus:ring-primary transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -135,9 +138,9 @@ export default function ZenithApp() {
           <div className="flex items-center gap-3 border-l border-white/10 pl-4 ml-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold cursor-pointer hover:bg-primary/30 transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold cursor-pointer hover:bg-primary/30 transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] overflow-hidden">
                   {user.photoURL ? (
-                    <Image src={user.photoURL} alt={userName} width={36} height={36} className="rounded-full" />
+                    <Image src={user.photoURL} alt={userName} width={36} height={36} className="rounded-full object-cover" />
                   ) : (
                     userName.charAt(0).toUpperCase()
                   )}
@@ -177,76 +180,92 @@ export default function ZenithApp() {
       <main className="flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden pb-12">
         {activeTab === 'home' && (
           <div className="space-y-10 animate-in fade-in duration-700">
-            {/* Hero Section */}
-            <section className="relative w-full aspect-[21/9] min-h-[450px] md:min-h-[550px] overflow-hidden">
-              {heroPlaceholder && (
-                <Image 
-                  src={heroPlaceholder.imageUrl} 
-                  alt="Zenith Anime Hero" 
-                  fill 
-                  priority
-                  className="object-cover transition-transform duration-10000 hover:scale-105"
-                  data-ai-hint={heroPlaceholder.imageHint}
-                />
+            {/* Featured Trending Hero Section */}
+            <section className="relative w-full aspect-[21/9] min-h-[500px] md:min-h-[650px] overflow-hidden">
+              {featuredAnime ? (
+                <>
+                  <Image 
+                    src={featuredAnime.imageUrl} 
+                    alt={featuredAnime.title} 
+                    fill 
+                    priority
+                    className="object-cover transition-all duration-1000 brightness-[0.4]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
+                  
+                  <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 space-y-6 max-w-4xl">
+                    <div className="flex items-center gap-3">
+                      <div className="px-3 py-1 bg-primary text-primary-foreground text-[10px] font-black italic rounded uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.5)]">
+                        TRENDING #{featuredIndex + 1}
+                      </div>
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold rounded uppercase tracking-widest">
+                        <Star className="w-3 h-3 text-accent fill-current" /> {featuredAnime.rating}
+                      </div>
+                    </div>
+                    
+                    <h2 className="text-5xl md:text-8xl font-black italic uppercase tracking-tighter text-glow leading-[0.9] line-clamp-2">
+                      {featuredAnime.title.split(' ').map((word, i) => (
+                        <span key={i} className={i % 2 === 1 ? 'text-primary' : 'text-white'}>
+                          {word}{' '}
+                        </span>
+                      ))}
+                    </h2>
+                    
+                    <p className="text-white/70 text-sm md:text-lg max-w-2xl line-clamp-3 font-medium italic">
+                      {featuredAnime.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-4 pt-4">
+                      <Button 
+                        onClick={() => addAnime(featuredAnime)}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-black italic px-10 h-14 rounded-full gap-2 text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105"
+                      >
+                        <Plus className="w-6 h-6" /> ADD TO WATCHLIST
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          const nextIdx = (featuredIndex + 1) % trendingAnime.length;
+                          setFeaturedIndex(nextIdx);
+                        }}
+                        className="border-white/20 bg-white/5 backdrop-blur-md hover:bg-white/10 text-white font-black italic px-8 h-14 rounded-full gap-2 text-lg transition-all"
+                      >
+                        NEXT TRENDING <ChevronRight className="w-6 h-6" />
+                      </Button>
+                    </div>
+
+                    {/* Navigation Dots */}
+                    <div className="flex gap-2 mt-8">
+                      {trendingAnime.map((_, i) => (
+                        <button 
+                          key={i}
+                          onClick={() => setFeaturedIndex(i)}
+                          className={`h-1.5 transition-all duration-300 rounded-full ${i === featuredIndex ? 'w-12 bg-primary' : 'w-4 bg-white/20 hover:bg-white/40'}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-white/5 animate-pulse">
+                  <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
-              
-              <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 space-y-6 max-w-4xl">
-                <div className="flex items-center gap-2 px-3 py-1 bg-primary/20 backdrop-blur-md border border-primary/30 text-primary text-[10px] font-black italic rounded w-fit uppercase tracking-widest">
-                  Personal Archive // Terminal Active
-                </div>
-                <h2 className="text-5xl md:text-8xl font-black italic uppercase tracking-tighter text-glow leading-[0.9]">
-                  ZENITH<span className="text-primary">CORE</span> <br />
-                  <span className="text-white">DATABASE</span>
-                </h2>
-                <p className="text-white/80 text-sm md:text-xl max-w-2xl line-clamp-3 font-medium">
-                  Welcome back, {userName}. Your personal anime archive is synchronized. Access your curated lists and monitor viewing velocity.
-                </p>
-                <div className="flex items-center gap-4 pt-4">
-                  <Button onClick={() => setActiveTab('library')} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-10 h-14 rounded-full gap-2 text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105">
-                    <Library className="w-6 h-6" /> ACCESS WATCHLIST
-                  </Button>
-                </div>
-              </div>
             </section>
 
             {/* Content Body */}
-            <div className="px-4 md:px-12 space-y-16">
-              {/* Trending Section */}
-              <section className="space-y-6">
-                <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                  <h3 className="text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
-                    <Flame className="w-6 h-6 text-primary fill-current" /> Trending Now
-                  </h3>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                  {trendingAnime.map(anime => (
-                    <AnimeCard 
-                      key={`trending-${anime.id}`}
-                      anime={anime} 
-                      isSearchMode
-                      onAdd={() => addAnime(anime)}
-                    />
-                  ))}
-                  {trendingAnime.length === 0 && (
-                    <div className="col-span-full py-12 flex justify-center">
-                      <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                    </div>
-                  )}
-                </div>
-              </section>
-
+            <div className="px-4 md:px-12 space-y-20">
               <div className="flex flex-col lg:flex-row gap-12">
-                <div className="flex-1 space-y-12">
+                <div className="flex-1 space-y-16">
                   {/* Active Watching */}
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
+                  <div className="space-y-8">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-4">
                       <h3 className="text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
                         <Monitor className="w-6 h-6 text-primary" /> Active Feed
                       </h3>
                       <button onClick={() => setActiveTab('library')} className="text-xs font-bold text-muted-foreground hover:text-primary flex items-center gap-1 uppercase tracking-widest transition-colors">
-                        Expand All <ChevronRight className="w-4 h-4" />
+                        View Archive <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -262,15 +281,16 @@ export default function ZenithApp() {
                       {filteredWatchlist('WATCHING').length === 0 && (
                         <div className="col-span-full py-20 text-center bg-white/5 rounded-3xl border border-dashed border-white/10 flex flex-col items-center gap-4">
                           <Play className="w-12 h-12 text-muted-foreground/30" />
-                          <p className="text-muted-foreground italic font-medium">Your active feed is empty.</p>
+                          <p className="text-muted-foreground italic font-medium">Your active feed is currently offline.</p>
+                          <Button variant="outline" onClick={() => clearSearch()} className="rounded-full border-white/10 text-[10px] font-black italic">DISCOVER ANIME</Button>
                         </div>
                       )}
                     </div>
                   </div>
 
                   {/* Planned */}
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
+                  <div className="space-y-8">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-4">
                       <h3 className="text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
                         <Bookmark className="w-6 h-6 text-accent" /> Queued Archives
                       </h3>
@@ -304,10 +324,13 @@ export default function ZenithApp() {
                       <div className="space-y-2">
                         <div className="flex justify-between items-end">
                           <span className="text-[10px] text-muted-foreground font-black uppercase">Archive Volume</span>
-                          <span className="font-bold text-lg text-glow">{watchlist.reduce((acc, a) => acc + a.currentEpisode, 0)} EP</span>
+                          <span className="font-bold text-lg text-glow">{watchlist.reduce((acc, a) => acc + (a.currentEpisode || 0), 0)} EP</span>
                         </div>
                         <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-primary" style={{ width: '65%' }} />
+                          <div 
+                            className="h-full bg-primary transition-all duration-1000" 
+                            style={{ width: `${Math.min(100, (watchlist.length * 10))}%` }} 
+                          />
                         </div>
                       </div>
                       <div className="flex justify-between items-center p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/10">
@@ -353,28 +376,13 @@ export default function ZenithApp() {
                     <TabsTrigger value="planned" className="rounded-full px-8 py-2.5 font-bold uppercase text-[10px] data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">QUEUED</TabsTrigger>
                     <TabsTrigger value="completed" className="rounded-full px-8 py-2.5 font-bold uppercase text-[10px] data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">MASTERED</TabsTrigger>
                   </TabsList>
-                  
-                  <TabsContent value="all" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 pt-12">
-                    {watchlist.map(anime => (
-                      <AnimeCard key={anime.id} anime={anime} onUpdateStatus={updateAnimeStatus} onUpdateEpisode={updateEpisodeProgress} onRemove={removeAnime} />
-                    ))}
-                  </TabsContent>
-                  <TabsContent value="watching" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 pt-12">
-                    {filteredWatchlist('WATCHING').map(anime => (
-                      <AnimeCard key={anime.id} anime={anime} onUpdateStatus={updateAnimeStatus} onUpdateEpisode={updateEpisodeProgress} onRemove={removeAnime} />
-                    ))}
-                  </TabsContent>
-                  <TabsContent value="planned" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 pt-12">
-                    {filteredWatchlist('PLAN_TO_WATCH').map(anime => (
-                      <AnimeCard key={anime.id} anime={anime} onUpdateStatus={updateAnimeStatus} onUpdateEpisode={updateEpisodeProgress} onRemove={removeAnime} />
-                    ))}
-                  </TabsContent>
-                  <TabsContent value="completed" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 pt-12">
-                    {filteredWatchlist('COMPLETED').map(anime => (
-                      <AnimeCard key={anime.id} anime={anime} onUpdateStatus={updateAnimeStatus} onUpdateEpisode={updateEpisodeProgress} onRemove={removeAnime} />
-                    ))}
-                  </TabsContent>
                 </Tabs>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 pt-6">
+                {watchlist.map(anime => (
+                  <AnimeCard key={anime.id} anime={anime} onUpdateStatus={updateAnimeStatus} onUpdateEpisode={updateEpisodeProgress} onRemove={removeAnime} />
+                ))}
               </div>
             </div>
           </div>
