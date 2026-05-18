@@ -106,11 +106,13 @@ export default function ZenithApp() {
     setIsSearching(true);
     setCurrentPage(1);
     try {
-      const { anime, hasNextPage, lastPage } = await searchAnime(searchQuery, 1);
+      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(searchQuery, 1);
       setSearchResults(anime);
-      setHasNextPage(hasNextPage);
-      setLastPage(lastPage);
+      setHasNextPage(more);
+      setLastPage(total);
       setActiveTab('search');
+      // Clear search query after results show
+      setSearchQuery('');
     } catch (error) {
       console.error(error);
     } finally {
@@ -123,7 +125,7 @@ export default function ZenithApp() {
     
     setIsSearching(true);
     try {
-      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(searchQuery, newPage);
+      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(searchQuery || '', newPage);
       setSearchResults(anime);
       setHasNextPage(more);
       setLastPage(total);
@@ -181,6 +183,10 @@ export default function ZenithApp() {
               className="pl-10 pr-10 h-10 w-48 md:w-64 bg-white/5 border-none rounded-full text-sm focus:ring-1 focus:ring-primary transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onBlur={() => {
+                // Clear query if user clicks away
+                setSearchQuery('');
+              }}
             />
             {searchQuery && (
               <button 
