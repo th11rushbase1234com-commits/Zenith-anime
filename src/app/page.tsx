@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -466,7 +465,7 @@ export default function ZenithApp() {
                   ))}
                 </div>
                 
-                {/* Ultra-Compact Stabilized Pagination */}
+                {/* Ultra-Compact Stabilized Pagination (Zenith Theme) */}
                 <div className="flex items-center justify-center gap-6 py-12">
                   <Button 
                     variant="ghost" 
