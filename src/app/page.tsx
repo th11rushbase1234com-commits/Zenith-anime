@@ -8,12 +8,16 @@ import { GenreVisualizer } from '@/components/GenreVisualizer';
 import { DiscoveryTool } from '@/components/DiscoveryTool';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Monitor, Bookmark, CheckCircle, TrendingUp, Sparkles, LayoutDashboard, Zap, Loader2, X } from 'lucide-react';
+import { Search, Monitor, Bookmark, CheckCircle, TrendingUp, Sparkles, LayoutDashboard, Zap, Loader2, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { searchAnime } from '@/services/jikan';
 import { Anime } from './types/anime';
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from 'next/navigation';
 
 export default function ZenithApp() {
+  const { user, loading: authLoading, logout } = useAuth();
+  const router = useRouter();
   const { 
     watchlist, 
     isLoaded, 
@@ -28,6 +32,12 @@ export default function ZenithApp() {
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
+
   const filteredWatchlist = (status?: string) => {
     return watchlist.filter(a => !status || a.status === status);
   };
@@ -40,9 +50,6 @@ export default function ZenithApp() {
     const results = await searchAnime(searchQuery);
     setSearchResults(results);
     setIsSearching(false);
-    
-    // Switch to discovery tab to show results if not already there, 
-    // or we could show them in a special overlay
     setActiveTab('discovery');
   };
 
@@ -51,7 +58,14 @@ export default function ZenithApp() {
     setSearchResults([]);
   };
 
-  if (!isLoaded) return null;
+  if (authLoading || !isLoaded || !user) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+        <p className="text-primary font-mono animate-pulse uppercase tracking-widest">Initialising Zenith OS...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20 selection:bg-accent selection:text-accent-foreground">
@@ -62,11 +76,22 @@ export default function ZenithApp() {
       </div>
 
       {/* Header/Hero */}
-      <header className="relative pt-16 pb-24 px-6 md:px-12">
+      <header className="relative pt-12 pb-24 px-6 md:px-12">
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center gap-10">
+          <div className="w-full flex justify-end mb-8">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={logout}
+              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 font-bold uppercase tracking-widest text-[10px]"
+            >
+              <LogOut className="w-4 h-4 mr-2" /> TERMINATE_SESSION
+            </Button>
+          </div>
+
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest animate-pulse">
-              <Zap className="w-3 h-3 fill-current" /> System Online
+              <Zap className="w-3 h-3 fill-current" /> System Online - USER: {user.email?.split('@')[0]}
             </div>
             <h1 className="text-6xl md:text-9xl font-headline font-extrabold tracking-tighter text-foreground text-glow">
               ZENITH<span className="text-primary">.OS</span>
@@ -257,7 +282,6 @@ export default function ZenithApp() {
                         isSearchMode
                         onAdd={() => {
                           addAnime(anime);
-                          // Optionally show a success toast or change button state
                         }}
                       />
                     ))}

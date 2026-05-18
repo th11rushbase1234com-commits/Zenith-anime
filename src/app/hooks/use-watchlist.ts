@@ -3,64 +3,109 @@
 
 import { useState, useEffect } from 'react';
 import { Anime, WatchStatus } from '../types/anime';
-import { INITIAL_ANIME } from '../lib/mock-data';
+import { db } from '@/lib/firebase';
+import { useAuth } from '@/context/auth-context';
+import { 
+  collection, 
+  onSnapshot, 
+  query, 
+  doc, 
+  setDoc, 
+  updateDoc, 
+  deleteDoc,
+  where
+} from 'firebase/firestore';
 
 export function useWatchlist() {
   const [watchlist, setWatchlist] = useState<Anime[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const saved = localStorage.getItem('zenith-watchlist');
-    if (saved) {
-      try {
-        setWatchlist(JSON.parse(saved));
-      } catch (e) {
-        setWatchlist(INITIAL_ANIME);
-      }
-    } else {
-      setWatchlist(INITIAL_ANIME);
+    if (!user) {
+      setWatchlist([]);
+      setIsLoaded(true);
+      return;
     }
-    setIsLoaded(true);
-  }, []);
 
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('zenith-watchlist', JSON.stringify(watchlist));
-    }
-  }, [watchlist, isLoaded]);
-
-  const addAnime = (anime: Anime) => {
-    setWatchlist(prev => {
-      // Avoid duplicates
-      if (prev.some(a => a.id === anime.id)) return prev;
-      return [...prev, { ...anime, status: 'PLAN_TO_WATCH', currentEpisode: 0 }];
+    const q = query(collection(db, 'watchlists'), where('userId', '==', user.uid));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id
+      } as Anime));
+      setWatchlist(items);
+      setIsLoaded(true);
     });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const addAnime = async (anime: Anime) => {
+    if (!user) return;
+    
+    // Avoid duplicates
+    if (watchlist.some(a => a.id === anime.id)) return;
+
+    try {
+      const animeRef = doc(db, 'watchlists', anime.id);
+      await setDoc(animeRef, {
+        ...anime,
+        userId: user.uid,
+        status: 'PLAN_TO_WATCH',
+        currentEpisode: 0,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (e) {
+      console.error("Error adding anime:", e);
+    }
   };
 
-  const updateAnimeStatus = (id: string, status: WatchStatus) => {
-    setWatchlist(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+  const updateAnimeStatus = async (id: string, status: WatchStatus) => {
+    if (!user) return;
+    try {
+      const animeRef = doc(db, 'watchlists', id);
+      await updateDoc(animeRef, { status, updatedAt: new Date().toISOString() });
+    } catch (e) {
+      console.error("Error updating status:", e);
+    }
   };
 
-  const updateEpisodeProgress = (id: string, episode: number) => {
-    setWatchlist(prev => prev.map(a => {
-      if (a.id === id) {
-        const newEp = Math.max(0, Math.min(episode, a.totalEpisodes || 999));
-        let newStatus = a.status;
-        
-        if (newEp === a.totalEpisodes && a.totalEpisodes > 0) {
-          newStatus = 'COMPLETED';
-        } else if (newEp > 0 && a.status === 'PLAN_TO_WATCH') {
-          newStatus = 'WATCHING';
-        }
+  const updateEpisodeProgress = async (id: string, episode: number) => {
+    if (!user) return;
+    const anime = watchlist.find(a => a.id === id);
+    if (!anime) return;
 
-        return { ...a, currentEpisode: newEp, status: newStatus };
-      }
-      return a;
-    }));
+    const newEp = Math.max(0, Math.min(episode, anime.totalEpisodes || 999));
+    let newStatus = anime.status;
+    
+    if (newEp === anime.totalEpisodes && anime.totalEpisodes > 0) {
+      newStatus = 'COMPLETED';
+    } else if (newEp > 0 && anime.status === 'PLAN_TO_WATCH') {
+      newStatus = 'WATCHING';
+    }
+
+    try {
+      const animeRef = doc(db, 'watchlists', id);
+      await updateDoc(animeRef, { 
+        currentEpisode: newEp, 
+        status: newStatus,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (e) {
+      console.error("Error updating episodes:", e);
+    }
   };
 
-  const removeAnime = (id: string) => {
-    setWatchlist(prev => prev.filter(a => a.id !== id));
+  const removeAnime = async (id: string) => {
+    if (!user) return;
+    try {
+      const animeRef = doc(db, 'watchlists', id);
+      await deleteDoc(animeRef);
+    } catch (e) {
+      console.error("Error removing anime:", e);
+    }
   };
 
   return {
