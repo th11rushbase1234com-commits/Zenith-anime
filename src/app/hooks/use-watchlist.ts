@@ -28,6 +28,7 @@ export function useWatchlist() {
       return;
     }
 
+    // Filter query to only get documents belonging to the authenticated user
     const q = query(collection(db, 'watchlists'), where('userId', '==', user.uid));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -37,6 +38,9 @@ export function useWatchlist() {
       } as Anime));
       setWatchlist(items);
       setIsLoaded(true);
+    }, (error) => {
+      console.error("Firestore watchlist listener error:", error);
+      setIsLoaded(true); // Stop loading even if there's an error
     });
 
     return () => unsubscribe();
@@ -45,7 +49,8 @@ export function useWatchlist() {
   const addAnime = async (anime: Anime) => {
     if (!user) return;
     
-    // Avoid duplicates
+    // Avoid duplicates in the local state for better UI responsiveness, 
+    // though Firestore would handle it based on doc ID.
     if (watchlist.some(a => a.id === anime.id)) return;
 
     try {

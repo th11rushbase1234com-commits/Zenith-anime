@@ -4,8 +4,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /watchlists/{animeId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Allow the user to read documents if they are the owner
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // Allow the user to create a document if they are authenticated and set themselves as the owner
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      
+      // Allow update and delete if the user is the owner
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
   }
 }
