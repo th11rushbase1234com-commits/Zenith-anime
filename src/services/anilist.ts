@@ -51,7 +51,7 @@ function mapMediaToAnime(media: any): Anime {
     id: String(media.id),
     title: media.title.english || media.title.romaji,
     genres: media.genres || [],
-    themes: [], // AniList uses 'tags' for themes, but for MVP genres is enough
+    themes: [], // AniList uses 'tags' for themes
     description: media.description?.replace(/<[^>]*>/g, '') || 'No description available.',
     imageUrl: media.coverImage.extraLarge || media.coverImage.large,
     rating: media.averageScore ? media.averageScore / 10 : 0,
@@ -64,10 +64,13 @@ function mapMediaToAnime(media: any): Anime {
   };
 }
 
-export async function searchAnime(query: string): Promise<Anime[]> {
+export async function searchAnime(query: string, page: number = 1): Promise<{ anime: Anime[], hasNextPage: boolean }> {
   const searchQuery = `
-    query ($search: String) {
-      Page(page: 1, perPage: 12) {
+    query ($search: String, $page: Int) {
+      Page(page: $page, perPage: 18) {
+        pageInfo {
+          hasNextPage
+        }
         media(search: $search, type: ANIME) {
           ${MEDIA_QUERY_FIELDS}
         }
@@ -76,11 +79,14 @@ export async function searchAnime(query: string): Promise<Anime[]> {
   `;
   
   try {
-    const data = await fetchAniList(searchQuery, { search: query });
-    return data.Page.media.map(mapMediaToAnime);
+    const data = await fetchAniList(searchQuery, { search: query, page });
+    return {
+      anime: data.Page.media.map(mapMediaToAnime),
+      hasNextPage: data.Page.pageInfo.hasNextPage
+    };
   } catch (error) {
     console.error('Search error:', error);
-    return [];
+    return { anime: [], hasNextPage: false };
   }
 }
 
@@ -120,7 +126,6 @@ export async function getRecentAiring(): Promise<Anime[]> {
   
   try {
     const data = await fetchAniList(recentQuery);
-    // Use a Map to keep only the latest entry per anime id
     const uniqueMedia = new Map();
     data.Page.airingSchedules.forEach((item: any) => {
       if (!uniqueMedia.has(item.media.id)) {

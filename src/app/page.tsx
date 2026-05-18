@@ -20,7 +20,8 @@ import {
   Star,
   Plus,
   X,
-  History
+  History,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -63,6 +64,11 @@ export default function ZenithApp() {
   const [activeTab, setActiveTab] = useState('home');
   const [api, setApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -98,16 +104,42 @@ export default function ZenithApp() {
     if (!searchQuery.trim()) return;
     
     setIsSearching(true);
-    const results = await searchAnime(searchQuery);
-    setSearchResults(results);
-    setIsSearching(false);
-    setActiveTab('search');
+    setCurrentPage(1);
+    try {
+      const { anime, hasNextPage } = await searchAnime(searchQuery, 1);
+      setSearchResults(anime);
+      setHasNextPage(hasNextPage);
+      setActiveTab('search');
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const loadMoreResults = async () => {
+    if (isLoadingMore || !hasNextPage) return;
+    
+    setIsLoadingMore(true);
+    const nextPage = currentPage + 1;
+    try {
+      const { anime, hasNextPage: more } = await searchAnime(searchQuery, nextPage);
+      setSearchResults(prev => [...prev, ...anime]);
+      setHasNextPage(more);
+      setCurrentPage(nextPage);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
 
   const clearSearch = () => {
     setSearchQuery('');
     setSearchResults([]);
     setActiveTab('home');
+    setCurrentPage(1);
+    setHasNextPage(false);
   };
 
   if (authLoading || !isLoaded || !user) {
@@ -409,29 +441,45 @@ export default function ZenithApp() {
         {/* Search Results Tab */}
         {activeTab === 'search' && (
           <div className="px-4 md:px-12 pt-12 space-y-16 animate-in slide-in-from-right-10 duration-500">
-            {isSearching ? (
+            {isSearching && currentPage === 1 ? (
               <div className="flex flex-col items-center justify-center py-32 gap-6">
                 <Loader2 className="w-16 h-16 text-primary animate-spin" />
-                <p className="text-primary font-mono animate-pulse uppercase tracking-[0.3em] font-black">SEARCHING DATABASE...</p>
+                <p className="text-primary font-mono animate-pulse uppercase tracking-[0.3em] font-black">SCANNING DATABASE...</p>
               </div>
             ) : searchResults.length > 0 ? (
               <div className="space-y-10">
                 <div className="flex items-center justify-between border-b border-white/10 pb-6">
-                  <h2 className="text-3xl font-black italic uppercase tracking-widest text-glow">PROBE RESULTS</h2>
-                  <Button variant="ghost" size="sm" onClick={clearSearch} className="text-muted-foreground hover:text-white border border-white/10 rounded-full px-6 transition-all hover:bg-white/5">
-                    RESET TERMINAL
-                  </Button>
+                  <h2 className="text-3xl font-black italic uppercase tracking-widest text-glow">Search Results</h2>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8">
-                  {searchResults.map(anime => (
+                  {searchResults.map((anime, idx) => (
                     <AnimeCard 
-                      key={`search-${anime.id}`}
+                      key={`search-${anime.id}-${idx}`}
                       anime={anime} 
                       isSearchMode
                       onAdd={() => addAnime(anime)}
                     />
                   ))}
                 </div>
+                
+                {hasNextPage && (
+                  <div className="flex justify-center pt-8 pb-12">
+                    <Button 
+                      onClick={loadMoreResults}
+                      disabled={isLoadingMore}
+                      variant="outline"
+                      className="group relative overflow-hidden bg-white/5 border-white/10 hover:border-primary/50 text-white font-black italic tracking-widest px-12 h-14 rounded-full transition-all hover:scale-105"
+                    >
+                      {isLoadingMore ? (
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 mr-2 group-hover:translate-y-1 transition-transform" />
+                      )}
+                      LOAD MORE TITLES
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+                    </Button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-32 gap-6 text-center">
