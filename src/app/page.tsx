@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useWatchlist } from './hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
 import { GenreVisualizer } from '@/components/GenreVisualizer';
@@ -69,6 +69,8 @@ export default function ZenithApp() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  
+  const observerTarget = useRef(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -82,7 +84,7 @@ export default function ZenithApp() {
         getTrendingAnime(),
         getRecentAiring()
       ]);
-      setTrendingAnime(trending);
+      setTrendingAnime(trending.slice(0, 5));
       setRecentAiring(recent);
     }
     loadInitialData();
@@ -117,7 +119,7 @@ export default function ZenithApp() {
     }
   };
 
-  const loadMoreResults = async () => {
+  const loadMoreResults = useCallback(async () => {
     if (isLoadingMore || !hasNextPage) return;
     
     setIsLoadingMore(true);
@@ -132,7 +134,32 @@ export default function ZenithApp() {
     } finally {
       setIsLoadingMore(false);
     }
-  };
+  }, [currentPage, hasNextPage, isLoadingMore, searchQuery]);
+
+  // Infinite Scroll Observer
+  useEffect(() => {
+    if (activeTab !== 'search' || !hasNextPage || isLoadingMore) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
+          loadMoreResults();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [activeTab, hasNextPage, isLoadingMore, loadMoreResults]);
 
   const clearSearch = () => {
     setSearchQuery('');
@@ -450,6 +477,9 @@ export default function ZenithApp() {
               <div className="space-y-10">
                 <div className="flex items-center justify-between border-b border-white/10 pb-6">
                   <h2 className="text-3xl font-black italic uppercase tracking-widest text-glow">Search Results</h2>
+                  <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                    Page {currentPage} {hasNextPage && "• Scanning more..."}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8">
                   {searchResults.map((anime, idx) => (
@@ -462,24 +492,19 @@ export default function ZenithApp() {
                   ))}
                 </div>
                 
-                {hasNextPage && (
-                  <div className="flex justify-center pt-8 pb-12">
-                    <Button 
-                      onClick={loadMoreResults}
-                      disabled={isLoadingMore}
-                      variant="outline"
-                      className="group relative overflow-hidden bg-white/5 border-white/10 hover:border-primary/50 text-white font-black italic tracking-widest px-12 h-14 rounded-full transition-all hover:scale-105"
-                    >
-                      {isLoadingMore ? (
-                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 mr-2 group-hover:translate-y-1 transition-transform" />
-                      )}
-                      LOAD MORE TITLES
-                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                    </Button>
-                  </div>
-                )}
+                {/* Intersection Target for Pagination */}
+                <div ref={observerTarget} className="flex justify-center py-12">
+                  {isLoadingMore ? (
+                    <div className="flex items-center gap-3 text-primary font-mono text-xs uppercase tracking-widest animate-pulse">
+                      <Loader2 className="w-5 h-5 animate-spin" /> 
+                      Synchronizing more records...
+                    </div>
+                  ) : hasNextPage ? (
+                    <div className="h-10" /> 
+                  ) : (
+                    <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-widest">End of resonance match archive.</p>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-32 gap-6 text-center">
