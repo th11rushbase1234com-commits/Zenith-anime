@@ -117,10 +117,8 @@ export default function ZenithApp() {
       setLastPage(total);
       setActiveTab('search');
       
-      // Keep focus on the search bar
-      setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 50);
+      // Remove focus from search bar after search is complete
+      searchInputRef.current?.blur();
     } catch (error) {
       console.error(error);
     } finally {
@@ -183,7 +181,7 @@ export default function ZenithApp() {
       {/* Top Navbar */}
       <nav className="sticky top-0 z-50 w-full h-16 bg-background/95 backdrop-blur-md border-b border-white/5 px-4 md:px-8 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveTab('home')}>
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={clearSearch}>
             <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]">
               <Home className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
             </div>
@@ -487,10 +485,10 @@ export default function ZenithApp() {
                   ))}
                 </div>
                 
-                {/* Compact Stabilized Pagination Bar */}
+                {/* Stabilized Pagination Bar */}
                 <div className="flex justify-center py-12">
-                  <div className="inline-flex items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full h-10 px-1 shadow-2xl overflow-hidden min-w-[200px]">
-                    <div className="flex-1 flex justify-start">
+                  <div className="inline-grid grid-cols-3 items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full h-10 px-1 shadow-2xl min-w-[200px] text-center">
+                    <div className="flex justify-start">
                       <Button 
                         variant="ghost" 
                         size="sm"
@@ -501,11 +499,11 @@ export default function ZenithApp() {
                       </Button>
                     </div>
                     
-                    <div className="px-4 flex items-center justify-center font-black italic text-[11px] uppercase tracking-tighter text-glow min-w-[80px]">
+                    <div className="px-2 font-black italic text-[10px] uppercase tracking-tighter text-glow whitespace-nowrap">
                       Page <span className="text-primary ml-1">{currentPage}</span>
                     </div>
 
-                    <div className="flex-1 flex justify-end">
+                    <div className="flex justify-end">
                       <Button 
                         variant="ghost" 
                         size="sm"
@@ -530,4 +528,3 @@ export default function ZenithApp() {
     </div>
   );
 }
-
