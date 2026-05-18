@@ -72,9 +72,8 @@ export default function LoginPage() {
         {/* Header Section */}
         <div className="text-center space-y-6">
           <div className="flex flex-col items-center gap-3">
-            <h1 className="text-6xl md:text-7xl font-black italic tracking-tighter text-glow flex flex-col leading-none">
-              <span className="text-primary">ZENITH</span>
-              <span className="text-white">ANIME</span>
+            <h1 className="text-6xl md:text-7xl font-black italic tracking-tighter text-glow leading-none text-primary">
+              ZENITH
             </h1>
             <div className="h-1.5 w-16 bg-primary rounded-full" />
           </div>
