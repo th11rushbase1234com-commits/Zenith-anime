@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useWatchlist } from './hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
 import { GenreVisualizer } from '@/components/GenreVisualizer';
@@ -47,6 +47,7 @@ import Image from 'next/image';
 export default function ZenithApp() {
   const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const { 
     watchlist, 
     isLoaded, 
@@ -57,6 +58,7 @@ export default function ZenithApp() {
   } = useWatchlist();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSearchTerm, setActiveSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Anime[]>([]);
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
   const [recentAiring, setRecentAiring] = useState<Anime[]>([]);
@@ -101,18 +103,23 @@ export default function ZenithApp() {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
+    const query = searchQuery.trim();
+    if (!query) return;
     
     setIsSearching(true);
     setCurrentPage(1);
+    setActiveSearchTerm(query);
     try {
-      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(searchQuery, 1);
+      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(query, 1);
       setSearchResults(anime);
       setHasNextPage(more);
       setLastPage(total);
       setActiveTab('search');
-      // Clear search query after results show
-      setSearchQuery('');
+      
+      // Keep focus on the search bar as requested
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 0);
     } catch (error) {
       console.error(error);
     } finally {
@@ -121,11 +128,11 @@ export default function ZenithApp() {
   };
 
   const handlePageChange = async (newPage: number) => {
-    if (newPage < 1 || newPage > lastPage) return;
+    if (newPage < 1 || newPage > lastPage || !activeSearchTerm) return;
     
     setIsSearching(true);
     try {
-      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(searchQuery || '', newPage);
+      const { anime, hasNextPage: more, lastPage: total } = await searchAnime(activeSearchTerm, newPage);
       setSearchResults(anime);
       setHasNextPage(more);
       setLastPage(total);
@@ -140,11 +147,19 @@ export default function ZenithApp() {
 
   const clearSearch = () => {
     setSearchQuery('');
+    setActiveSearchTerm('');
     setSearchResults([]);
     setActiveTab('home');
     setCurrentPage(1);
     setHasNextPage(false);
     setLastPage(1);
+  };
+
+  const handleBlur = () => {
+    // If the user typed something but didn't search (query != active term), clear it
+    if (searchQuery.trim() !== activeSearchTerm) {
+      setSearchQuery(activeSearchTerm);
+    }
   };
 
   if (authLoading || !isLoaded || !user) {
@@ -179,14 +194,12 @@ export default function ZenithApp() {
           <form onSubmit={handleSearch} className="relative hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
+              ref={searchInputRef}
               placeholder="Search anime" 
               className="pl-10 pr-10 h-10 w-48 md:w-64 bg-white/5 border-none rounded-full text-sm focus:ring-1 focus:ring-primary transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onBlur={() => {
-                // Clear query if user clicks away
-                setSearchQuery('');
-              }}
+              onBlur={handleBlur}
             />
             {searchQuery && (
               <button 
@@ -247,7 +260,6 @@ export default function ZenithApp() {
       <main className="flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden pb-12">
         {activeTab === 'home' && (
           <div className="space-y-10 animate-in fade-in duration-700">
-            {/* Draggable Auto-sliding Hero Section */}
             <section className="relative w-full aspect-[16/9] md:aspect-[21/9] min-h-[400px] md:min-h-[600px] overflow-hidden">
               <Carousel 
                 setApi={setApi} 
@@ -323,11 +335,9 @@ export default function ZenithApp() {
               </div>
             </section>
 
-            {/* Content Body */}
             <div className="px-4 md:px-12 space-y-20">
               <div className="flex flex-col lg:flex-row gap-12">
                 <div className="flex-1 space-y-16">
-                  {/* Recent Airing / Latest Releases Feed */}
                   <div className="space-y-8">
                     <div className="flex items-center justify-between border-b border-white/5 pb-4">
                       <h3 className="text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
@@ -346,7 +356,6 @@ export default function ZenithApp() {
                     </div>
                   </div>
 
-                  {/* Active Watching */}
                   <div className="space-y-8">
                     <div className="flex items-center justify-between border-b border-white/5 pb-4">
                       <h3 className="text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
@@ -373,7 +382,6 @@ export default function ZenithApp() {
                   </div>
                 </div>
 
-                {/* Sidebar Stats */}
                 <div className="w-full lg:w-80 shrink-0 space-y-8">
                   <div className="bg-card/60 backdrop-blur-xl border border-white/5 rounded-[2rem] p-8 space-y-8 sticky top-24">
                     <h3 className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2 border-b border-white/5 pb-4">
@@ -407,8 +415,7 @@ export default function ZenithApp() {
                 </div>
               </div>
 
-              {/* Data Visualizer Section */}
-              <section className="pt-8">
+              <section className="pt-8 pb-12">
                 <div className="flex flex-col space-y-2 mb-10">
                   <h2 className="text-3xl font-black italic uppercase tracking-tighter text-glow">Analytic Insights</h2>
                   <div className="h-1 w-20 bg-primary rounded-full" />
@@ -419,7 +426,6 @@ export default function ZenithApp() {
           </div>
         )}
 
-        {/* Collection Tab */}
         {activeTab === 'library' && (
           <div className="px-4 md:px-12 pt-12 space-y-12 animate-in slide-in-from-right-10 duration-500">
             <div className="flex flex-col space-y-6">
@@ -447,7 +453,6 @@ export default function ZenithApp() {
           </div>
         )}
 
-        {/* Search Results Tab */}
         {activeTab === 'search' && (
           <div className="px-4 md:px-12 pt-12 space-y-16 animate-in slide-in-from-right-10 duration-500">
             {isSearching ? (
@@ -471,7 +476,6 @@ export default function ZenithApp() {
                   ))}
                 </div>
                 
-                {/* Modern Mobile Friendly Pagination (Zenith Theme) */}
                 <div className="flex items-center justify-center py-12">
                   <div className="flex items-center gap-1 p-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl">
                     <Button 
