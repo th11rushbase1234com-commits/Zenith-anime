@@ -223,7 +223,8 @@ function ZenithContent() {
             {searchQuery && (
               <button 
                 type="button" 
-                onClick={() => setSearchQuery('')}
+                onClick={clearAndGoHome}
+                onMouseDown={(e) => e.preventDefault()}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors z-10"
               >
                 <X className="w-4 h-4" />
