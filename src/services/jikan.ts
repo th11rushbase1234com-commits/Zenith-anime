@@ -1,4 +1,3 @@
-
 import { Anime } from '@/app/types/anime';
 
 /**
@@ -9,9 +8,12 @@ import { Anime } from '@/app/types/anime';
 const JIKAN_BASE_URL = 'https://api.jikan.moe/v4';
 
 function mapJikanToAnime(item: any): Anime {
+  // Prioritize English title as requested, fall back to default title
+  const displayTitle = item.title_english || item.title;
+
   return {
     id: String(item.mal_id),
-    title: item.title,
+    title: displayTitle,
     genres: item.genres.map((g: any) => g.name),
     themes: item.themes.map((t: any) => t.name),
     description: item.synopsis || 'No description available.',
@@ -42,7 +44,7 @@ export async function searchAnime(query: string): Promise<Anime[]> {
 
 export async function getTrendingAnime(): Promise<Anime[]> {
   try {
-    // Fetching top airing anime for the "Trending" section
+    // Fetching top airing anime for the "Trending" section (Latest Releases)
     const response = await fetch(`${JIKAN_BASE_URL}/top/anime?filter=airing&limit=12`);
     if (!response.ok) throw new Error('Failed to fetch trending from Jikan');
     

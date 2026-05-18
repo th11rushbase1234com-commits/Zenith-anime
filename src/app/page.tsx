@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useWatchlist } from './hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
 import { GenreVisualizer } from '@/components/GenreVisualizer';
@@ -11,16 +10,13 @@ import {
   Search, 
   Monitor, 
   Bookmark, 
-  LayoutDashboard, 
   Zap, 
   Loader2, 
   LogOut, 
   Bell, 
-  Library, 
   ChevronRight,
   Play,
   Settings,
-  Flame,
   Star,
   Plus
 } from 'lucide-react';
@@ -33,6 +29,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import { searchAnime, getTrendingAnime } from '@/services/jikan';
 import { Anime } from './types/anime';
 import { useAuth } from '@/context/auth-context';
@@ -56,7 +58,8 @@ export default function ZenithApp() {
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
-  const [featuredIndex, setFeaturedIndex] = useState(0);
+  const [api, setApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -67,17 +70,25 @@ export default function ZenithApp() {
   useEffect(() => {
     async function loadTrending() {
       const trending = await getTrendingAnime();
-      // Only keep the top 5 trending for the featured section
       setTrendingAnime(trending.slice(0, 5));
     }
     loadTrending();
   }, []);
 
-  const featuredAnime = trendingAnime[featuredIndex];
+  // Autoplay Logic for Carousel
+  useEffect(() => {
+    if (!api) return;
 
-  const filteredWatchlist = (status?: string) => {
-    return watchlist.filter(a => !status || a.status === status);
-  };
+    const intervalId = setInterval(() => {
+      api.scrollNext();
+    }, 6000); // 6 seconds per slide
+
+    api.on("select", () => {
+      setCurrentSlide(api.selectedScrollSnap());
+    });
+
+    return () => clearInterval(intervalId);
+  }, [api]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +117,10 @@ export default function ZenithApp() {
   }
 
   const userName = user.displayName || user.email?.split('@')[0] || 'Zenith User';
+
+  const filteredWatchlist = (status?: string) => {
+    return watchlist.filter(a => !status || a.status === status);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -180,78 +195,81 @@ export default function ZenithApp() {
       <main className="flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden pb-12">
         {activeTab === 'home' && (
           <div className="space-y-10 animate-in fade-in duration-700">
-            {/* Featured Trending Hero Section */}
-            <section className="relative w-full aspect-[21/9] min-h-[500px] md:min-h-[650px] overflow-hidden">
-              {featuredAnime ? (
-                <>
-                  <Image 
-                    src={featuredAnime.imageUrl} 
-                    alt={featuredAnime.title} 
-                    fill 
-                    priority
-                    className="object-cover transition-all duration-1000 brightness-[0.4]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
-                  
-                  <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 space-y-6 max-w-4xl">
-                    <div className="flex items-center gap-3">
-                      <div className="px-3 py-1 bg-primary text-primary-foreground text-[10px] font-black italic rounded uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.5)]">
-                        TRENDING #{featuredIndex + 1}
-                      </div>
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold rounded uppercase tracking-widest">
-                        <Star className="w-3 h-3 text-accent fill-current" /> {featuredAnime.rating}
-                      </div>
-                    </div>
-                    
-                    <h2 className="text-5xl md:text-8xl font-black italic uppercase tracking-tighter text-glow leading-[0.9] line-clamp-2">
-                      {featuredAnime.title.split(' ').map((word, i) => (
-                        <span key={i} className={i % 2 === 1 ? 'text-primary' : 'text-white'}>
-                          {word}{' '}
-                        </span>
-                      ))}
-                    </h2>
-                    
-                    <p className="text-white/70 text-sm md:text-lg max-w-2xl line-clamp-3 font-medium italic">
-                      {featuredAnime.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-4 pt-4">
-                      <Button 
-                        onClick={() => addAnime(featuredAnime)}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-black italic px-10 h-14 rounded-full gap-2 text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105"
-                      >
-                        <Plus className="w-6 h-6" /> ADD TO WATCHLIST
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        onClick={() => {
-                          const nextIdx = (featuredIndex + 1) % trendingAnime.length;
-                          setFeaturedIndex(nextIdx);
-                        }}
-                        className="border-white/20 bg-white/5 backdrop-blur-md hover:bg-white/10 text-white font-black italic px-8 h-14 rounded-full gap-2 text-lg transition-all"
-                      >
-                        NEXT TRENDING <ChevronRight className="w-6 h-6" />
-                      </Button>
-                    </div>
-
-                    {/* Navigation Dots */}
-                    <div className="flex gap-2 mt-8">
-                      {trendingAnime.map((_, i) => (
-                        <button 
-                          key={i}
-                          onClick={() => setFeaturedIndex(i)}
-                          className={`h-1.5 transition-all duration-300 rounded-full ${i === featuredIndex ? 'w-12 bg-primary' : 'w-4 bg-white/20 hover:bg-white/40'}`}
+            {/* Draggable Auto-sliding Hero Section */}
+            <section className="relative w-full aspect-[16/9] md:aspect-[21/9] min-h-[400px] md:min-h-[600px] overflow-hidden">
+              <Carousel 
+                setApi={setApi} 
+                className="w-full h-full"
+                opts={{
+                  loop: true,
+                  align: "start",
+                }}
+              >
+                <CarouselContent className="h-full ml-0">
+                  {trendingAnime.length > 0 ? trendingAnime.map((anime, index) => (
+                    <CarouselItem key={anime.id} className="relative w-full h-full pl-0">
+                      <div className="relative w-full h-full">
+                        <Image 
+                          src={anime.imageUrl} 
+                          alt={anime.title} 
+                          fill 
+                          priority={index === 0}
+                          className="object-cover brightness-[0.4]"
                         />
-                      ))}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-white/5 animate-pulse">
-                  <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                </div>
-              )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
+                        
+                        <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 space-y-6 max-w-4xl">
+                          <div className="flex items-center gap-3">
+                            <div className="px-3 py-1 bg-primary text-primary-foreground text-[10px] font-black italic rounded uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.5)]">
+                              LATEST RELEASE TRENDING
+                            </div>
+                            <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold rounded uppercase tracking-widest">
+                              <Star className="w-3 h-3 text-accent fill-current" /> {anime.rating}
+                            </div>
+                          </div>
+                          
+                          <h2 className="text-4xl md:text-7xl font-black italic uppercase tracking-tighter text-glow leading-[0.9] line-clamp-2">
+                            {anime.title.split(' ').map((word, i) => (
+                              <span key={i} className={i % 2 === 1 ? 'text-primary' : 'text-white'}>
+                                {word}{' '}
+                              </span>
+                            ))}
+                          </h2>
+                          
+                          <p className="text-white/70 text-sm md:text-lg max-w-2xl line-clamp-3 font-medium italic">
+                            {anime.description}
+                          </p>
+
+                          <div className="flex flex-wrap gap-4 pt-4">
+                            <Button 
+                              onClick={() => addAnime(anime)}
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground font-black italic px-8 md:px-10 h-12 md:h-14 rounded-full gap-2 text-base md:text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105"
+                            >
+                              <Plus className="w-5 h-5 md:w-6 md:h-6" /> ADD TO WATCHLIST
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  )) : (
+                    <CarouselItem className="w-full h-full flex items-center justify-center bg-white/5 animate-pulse">
+                      <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                    </CarouselItem>
+                  )}
+                </CarouselContent>
+              </Carousel>
+
+              {/* Navigation Indicators */}
+              <div className="absolute bottom-6 right-6 md:bottom-12 md:right-16 flex gap-2 z-20">
+                {trendingAnime.map((_, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => api?.scrollTo(i)}
+                    className={`h-1.5 transition-all duration-300 rounded-full ${i === currentSlide ? 'w-10 md:w-12 bg-primary' : 'w-3 md:w-4 bg-white/20 hover:bg-white/40'}`}
+                  />
+                ))}
+              </div>
             </section>
 
             {/* Content Body */}
@@ -264,9 +282,6 @@ export default function ZenithApp() {
                       <h3 className="text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
                         <Monitor className="w-6 h-6 text-primary" /> Active Feed
                       </h3>
-                      <button onClick={() => setActiveTab('library')} className="text-xs font-bold text-muted-foreground hover:text-primary flex items-center gap-1 uppercase tracking-widest transition-colors">
-                        View Archive <ChevronRight className="w-4 h-4" />
-                      </button>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6">
                       {filteredWatchlist('WATCHING').slice(0, 5).map(anime => (
