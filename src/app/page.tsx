@@ -21,7 +21,8 @@ import {
   X,
   History,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Home
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -182,7 +183,10 @@ export default function ZenithApp() {
       {/* Top Navbar */}
       <nav className="sticky top-0 z-50 w-full h-16 bg-background/95 backdrop-blur-md border-b border-white/5 px-4 md:px-8 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab('home')}>
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveTab('home')}>
+            <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+              <Home className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            </div>
             <h1 className="text-2xl font-black italic tracking-tighter text-glow flex items-center gap-1">
               <span className="text-primary">ZENITH</span>
               <span className="text-white">ANIME</span>
@@ -526,3 +530,4 @@ export default function ZenithApp() {
     </div>
   );
 }
+
