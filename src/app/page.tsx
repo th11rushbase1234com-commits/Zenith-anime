@@ -20,9 +20,9 @@ import {
   Plus,
   X,
   History,
+  Home,
   ChevronLeft,
-  ChevronRight,
-  Home
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,13 +42,12 @@ import {
 import { searchAnime, getTrendingAnime, getRecentAiring } from '@/services/anilist';
 import { Anime } from './types/anime';
 import { useAuth } from '@/context/auth-context';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 function ZenithContent() {
   const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
   
   const { 
@@ -61,7 +60,9 @@ function ZenithContent() {
   } = useWatchlist();
 
   // State
+  const [activeTab, setActiveTab] = useState<'home' | 'library' | 'search'>('home');
   const [searchQuery, setSearchQuery] = useState('');
+  const [lastSearchedTerm, setLastSearchedTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Anime[]>([]);
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
   const [recentAiring, setRecentAiring] = useState<Anime[]>([]);
@@ -74,10 +75,6 @@ function ZenithContent() {
   const [lastPage, setLastPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
 
-  // Derived state from URL
-  const activeTab = searchParams.get('tab') || 'home';
-  const activeSearchTerm = searchParams.get('q') || '';
-
   // Auth Redirect
   useEffect(() => {
     if (!authLoading && !user) {
@@ -85,7 +82,7 @@ function ZenithContent() {
     }
   }, [user, authLoading, router]);
 
-  // Initial Data & Force Home on Reload
+  // Initial Data
   useEffect(() => {
     async function loadInitialData() {
       const [trending, recent] = await Promise.all([
@@ -96,25 +93,7 @@ function ZenithContent() {
       setRecentAiring(recent);
     }
     loadInitialData();
-    
-    // Always reset to home on page reload
-    if (window.location.search) {
-      router.replace('/');
-    }
-  }, [router]);
-
-  // Handle URL Sync (Back Button Support)
-  useEffect(() => {
-    if (activeSearchTerm) {
-      setSearchQuery(activeSearchTerm);
-      performSearch(activeSearchTerm, 1);
-    } else {
-      setSearchResults([]);
-      if (activeTab !== 'search') {
-        setSearchQuery('');
-      }
-    }
-  }, [activeSearchTerm, activeTab]);
+  }, []);
 
   // Carousel Logic
   useEffect(() => {
@@ -129,58 +108,47 @@ function ZenithContent() {
   }, [carouselApi]);
 
   const performSearch = async (term: string, page: number) => {
+    if (!term.trim()) return;
     setIsSearching(true);
+    setLastSearchedTerm(term);
     try {
       const { anime, hasNextPage: more, lastPage: total } = await searchAnime(term, page);
       setSearchResults(anime);
       setHasNextPage(more);
       setLastPage(total);
       setCurrentPage(page);
+      setActiveTab('search');
     } catch (error) {
       console.error(error);
     } finally {
       setIsSearching(false);
-      // Remove focus from search bar after search is complete
       searchInputRef.current?.blur();
     }
   };
 
-  const handleSearchSubmit = async (e?: React.FormEvent) => {
+  const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const query = searchQuery.trim();
-    if (!query) return;
-    
-    // Update URL to support Back button
-    router.push(`?tab=search&q=${encodeURIComponent(query)}`);
+    performSearch(searchQuery, 1);
   };
 
-  const handlePageChange = async (newPage: number) => {
-    if (newPage < 1 || newPage > lastPage || !activeSearchTerm) return;
-    performSearch(activeSearchTerm, newPage);
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > lastPage || !lastSearchedTerm) return;
+    performSearch(lastSearchedTerm, newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const navigateTo = (tab: string, q: string = '') => {
-    const params = new URLSearchParams();
-    params.set('tab', tab);
-    if (q) params.set('q', q);
-    router.push(`?${params.toString()}`);
   };
 
   const clearAndGoHome = () => {
     setSearchQuery('');
-    router.push('/');
-    // Explicitly remove focus and clear search results
+    setLastSearchedTerm('');
     setSearchResults([]);
-    setTimeout(() => {
-      searchInputRef.current?.blur();
-    }, 0);
+    setActiveTab('home');
+    searchInputRef.current?.blur();
   };
 
   const handleBlur = () => {
-    // If the user hasn't searched, clear the "draft" text
-    if (searchQuery.trim() !== activeSearchTerm) {
-      setSearchQuery(activeSearchTerm);
+    // Revert drafted text to the last successful search term if clicking away
+    if (searchQuery.trim() !== lastSearchedTerm) {
+      setSearchQuery(lastSearchedTerm);
     }
   };
 
@@ -265,7 +233,7 @@ function ZenithContent() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/5" />
                 <DropdownMenuItem 
-                  onClick={() => navigateTo('library')}
+                  onClick={() => setActiveTab('library')}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-white"
                 >
                   <Bookmark className="w-4 h-4" /> Personal Watchlist
