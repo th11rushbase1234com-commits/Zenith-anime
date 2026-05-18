@@ -465,33 +465,34 @@ export default function ZenithApp() {
                   ))}
                 </div>
                 
-                {/* Ultra-Compact Stabilized Pagination (Zenith Theme) */}
-                <div className="flex items-center justify-center gap-6 py-12">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    className="h-9 px-4 rounded-full border border-white/5 bg-white/5 font-black italic text-[10px] tracking-widest hover:bg-white/10 hover:text-primary transition-all text-white/80"
-                    style={{ visibility: currentPage > 1 ? 'visible' : 'hidden' }}
-                  >
-                    <ChevronLeft className="w-3.5 h-3.5 mr-1" /> PREV
-                  </Button>
-                  
-                  <div className="flex flex-col items-center gap-1 min-w-[60px]">
-                    <div className="px-3 py-1 bg-primary/10 rounded-lg border border-primary/20 font-mono text-[10px] font-black tracking-widest text-primary uppercase shadow-[0_0_10px_rgba(168,85,247,0.1)]">
-                      {currentPage}
+                {/* Modern Mobile Friendly Pagination (Zenith Theme) */}
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center gap-1 p-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      className={`h-10 w-10 rounded-xl hover:bg-white/10 text-white/60 hover:text-primary transition-all ${currentPage <= 1 ? 'invisible' : 'visible'}`}
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </Button>
+                    
+                    <div className="px-6 flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-white/40">
+                      <span>Page</span>
+                      <span className="text-primary text-glow">{currentPage}</span>
+                      <span>of</span>
+                      <span>{lastPage}</span>
                     </div>
-                  </div>
 
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    className="h-9 px-4 rounded-full border border-white/5 bg-white/5 font-black italic text-[10px] tracking-widest hover:bg-white/10 hover:text-primary transition-all text-white/80"
-                    style={{ visibility: hasNextPage ? 'visible' : 'hidden' }}
-                  >
-                    NEXT <ChevronRight className="w-3.5 h-3.5 ml-1" />
-                  </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      className={`h-10 w-10 rounded-xl hover:bg-white/10 text-white/60 hover:text-primary transition-all ${!hasNextPage ? 'invisible' : 'visible'}`}
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ) : (
