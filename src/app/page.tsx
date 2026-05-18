@@ -135,6 +135,7 @@ function ZenithContent() {
       console.error(error);
     } finally {
       setIsSearching(false);
+      // Remove focus from search bar after search is complete
       searchInputRef.current?.blur();
     }
   };
@@ -231,6 +232,9 @@ function ZenithContent() {
           </form>
           
           <div className="flex items-center gap-2 md:gap-3 border-l border-white/10 pl-2 md:pl-4">
+            <button className="hidden sm:flex w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/5 border border-white/10 items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all">
+              <Bell className="w-4 h-4 md:w-5 md:h-5" />
+            </button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold cursor-pointer hover:bg-primary/30 transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] overflow-hidden shrink-0">
