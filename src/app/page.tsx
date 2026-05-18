@@ -85,7 +85,7 @@ function ZenithContent() {
     }
   }, [user, authLoading, router]);
 
-  // Initial Data
+  // Initial Data & Force Home on Reload
   useEffect(() => {
     async function loadInitialData() {
       const [trending, recent] = await Promise.all([
@@ -96,7 +96,12 @@ function ZenithContent() {
       setRecentAiring(recent);
     }
     loadInitialData();
-  }, []);
+    
+    // Always reset to home on page reload
+    if (window.location.search) {
+      router.replace('/');
+    }
+  }, [router]);
 
   // Handle URL Sync (Back Button Support)
   useEffect(() => {
@@ -164,8 +169,9 @@ function ZenithContent() {
 
   const clearAndGoHome = () => {
     setSearchQuery('');
-    router.push('?tab=home');
-    // Ensure focus is removed after resetting
+    router.push('/');
+    // Explicitly remove focus and clear search results
+    setSearchResults([]);
     setTimeout(() => {
       searchInputRef.current?.blur();
     }, 0);
@@ -524,7 +530,7 @@ function ZenithContent() {
                         onClick={() => handlePageChange(currentPage + 1)}
                         className={`h-7 md:h-8 px-2 md:px-3 rounded-full hover:bg-white/10 text-[9px] md:text-[10px] font-black italic tracking-widest text-primary ${!hasNextPage ? 'invisible pointer-events-none' : 'visible'}`}
                       >
-                        NEXT <ChevronRight className="w-3 md:w-3.5 h-3 md:h-3.5 ml-0.5 md:ml-1" />
+                        NEXT <ChevronRight className="w-3 md:w-3.5 h-3 md:h-3.5 ml-0.5 md:mr-1" />
                       </Button>
                     </div>
                   </div>
