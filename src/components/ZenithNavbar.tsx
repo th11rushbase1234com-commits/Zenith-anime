@@ -34,7 +34,6 @@ export function ZenithNavbar() {
     e.preventDefault();
     if (searchQuery.trim()) {
       const query = searchQuery.trim();
-      // Clear input immediately after search to keep results as the focus
       setSearchQuery('');
       searchInputRef.current?.blur();
       router.push(`/search?q=${encodeURIComponent(query)}`);
@@ -48,8 +47,6 @@ export function ZenithNavbar() {
   };
 
   const handleBlur = () => {
-    // If the user clicks away without searching, clear the "draft" text
-    // We use a small timeout to allow clicking the search icon button itself
     setTimeout(() => {
       setSearchQuery('');
     }, 150);
@@ -126,7 +123,10 @@ export function ZenithNavbar() {
                 >
                   <Bookmark className="w-4 h-4" /> Personal Watchlist
                 </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-white">
+                <DropdownMenuItem 
+                  onClick={() => router.push('/settings')}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-white"
+                >
                   <Settings className="w-4 h-4" /> Settings
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-white/5" />
