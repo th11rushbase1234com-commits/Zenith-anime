@@ -4,74 +4,74 @@
     {
       "id": "avatar-goku",
       "description": "Goku",
-      "imageUrl": "https://picsum.photos/seed/anime-goku/200/200",
-      "imageHint": "anime goku"
+      "imageUrl": "https://picsum.photos/seed/101/200/200",
+      "imageHint": "goku anime"
     },
     {
       "id": "avatar-miku",
       "description": "Hatsune Miku",
-      "imageUrl": "https://picsum.photos/seed/anime-miku/200/200",
-      "imageHint": "anime miku"
+      "imageUrl": "https://picsum.photos/seed/102/200/200",
+      "imageHint": "miku anime"
     },
     {
       "id": "avatar-kaneki",
       "description": "Ken Kaneki",
-      "imageUrl": "https://picsum.photos/seed/anime-kaneki/200/200",
-      "imageHint": "anime kaneki"
+      "imageUrl": "https://picsum.photos/seed/103/200/200",
+      "imageHint": "kaneki anime"
     },
     {
       "id": "avatar-naruto",
       "description": "Naruto Uzumaki",
-      "imageUrl": "https://picsum.photos/seed/anime-naruto/200/200",
-      "imageHint": "anime naruto"
+      "imageUrl": "https://picsum.photos/seed/104/200/200",
+      "imageHint": "naruto anime"
     },
     {
       "id": "avatar-luffy",
       "description": "Monkey D. Luffy",
-      "imageUrl": "https://picsum.photos/seed/anime-luffy/200/200",
-      "imageHint": "anime luffy"
+      "imageUrl": "https://picsum.photos/seed/105/200/200",
+      "imageHint": "luffy anime"
     },
     {
       "id": "avatar-sailormoon",
       "description": "Sailor Moon",
-      "imageUrl": "https://picsum.photos/seed/anime-sailormoon/200/200",
-      "imageHint": "anime sailormoon"
+      "imageUrl": "https://picsum.photos/seed/106/200/200",
+      "imageHint": "sailormoon anime"
     },
     {
       "id": "avatar-zenitsu",
       "description": "Zenitsu Agatsuma",
-      "imageUrl": "https://picsum.photos/seed/anime-zenitsu/200/200",
-      "imageHint": "anime zenitsu"
+      "imageUrl": "https://picsum.photos/seed/107/200/200",
+      "imageHint": "zenitsu anime"
     },
     {
       "id": "avatar-nezuko",
       "description": "Nezuko Kamado",
-      "imageUrl": "https://picsum.photos/seed/anime-nezuko/200/200",
-      "imageHint": "anime nezuko"
+      "imageUrl": "https://picsum.photos/seed/108/200/200",
+      "imageHint": "nezuko anime"
     },
     {
       "id": "avatar-eren",
       "description": "Eren Yeager",
-      "imageUrl": "https://picsum.photos/seed/anime-eren/200/200",
-      "imageHint": "anime eren"
+      "imageUrl": "https://picsum.photos/seed/109/200/200",
+      "imageHint": "eren anime"
     },
     {
       "id": "avatar-mikasa",
       "description": "Mikasa Ackerman",
-      "imageUrl": "https://picsum.photos/seed/anime-mikasa/200/200",
-      "imageHint": "anime mikasa"
+      "imageUrl": "https://picsum.photos/seed/110/200/200",
+      "imageHint": "mikasa anime"
     },
     {
       "id": "avatar-gojo",
       "description": "Satoru Gojo",
-      "imageUrl": "https://picsum.photos/seed/anime-gojo/200/200",
-      "imageHint": "anime gojo"
+      "imageUrl": "https://picsum.photos/seed/111/200/200",
+      "imageHint": "gojo anime"
     },
     {
       "id": "avatar-sukuna",
       "description": "Ryomen Sukuna",
-      "imageUrl": "https://picsum.photos/seed/anime-sukuna/200/200",
-      "imageHint": "anime sukuna"
+      "imageUrl": "https://picsum.photos/seed/112/200/200",
+      "imageHint": "sukuna anime"
     }
   ]
 }

@@ -85,6 +85,8 @@ export default function SettingsPage() {
   }
 
   const initial = user.email?.charAt(0).toUpperCase() || 'Z';
+  const currentAvatarData = PlaceHolderImages.find(img => img.imageUrl === photoURL);
+  const currentHint = currentAvatarData?.imageHint || "anime character";
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center py-12 px-4 md:px-8">
@@ -112,7 +114,7 @@ export default function SettingsPage() {
                     width={160} 
                     height={160} 
                     className="w-full h-full object-cover"
-                    data-ai-hint="profile avatar"
+                    data-ai-hint={currentHint}
                   />
                 ) : (
                   initial
