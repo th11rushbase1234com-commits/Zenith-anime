@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Anime, WatchStatus } from '@/app/types/anime';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
+import { getEpisodeCounts } from '@/services/anify';
 
 interface AnimeCardProps {
   anime: Anime;
@@ -43,8 +44,22 @@ export function AnimeCard({
   onAdd
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
+    sub: anime.subCount || 0, 
+    dub: anime.dubCount || 0 
+  });
+  
   const itemInWatchlist = existingItem || (anime.status !== undefined && (anime as any).userId ? anime : undefined);
   const currentItem = itemInWatchlist || anime;
+
+  useEffect(() => {
+    async function fetchLiveTelemetry() {
+      // If we don't have sub/dub counts or if we want the absolute latest "Live" data
+      const counts = await getEpisodeCounts(currentItem.id);
+      setLiveCounts(counts);
+    }
+    fetchLiveTelemetry();
+  }, [currentItem.id]);
 
   const STATUS_CONFIG: Record<WatchStatus, { label: string; icon: any; color: string; bgColor: string }> = {
     WATCHING: { label: 'WATCHING', icon: Play, color: 'text-primary', bgColor: 'bg-primary/20' },
@@ -123,16 +138,16 @@ export function AnimeCard({
                 <Button 
                   size="sm" 
                   className={cn(
-                    "w-full font-black rounded-lg text-[9px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-2 shrink-0 border border-white/5 whitespace-nowrap",
+                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 whitespace-nowrap overflow-hidden",
                     itemInWatchlist 
                       ? "bg-white/10 hover:bg-white/20 text-white" 
                       : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(168,85,247,0.4)]"
                   )}
                 >
                   {itemInWatchlist ? (
-                    <><Settings2 className="w-3.5 h-3.5 mr-2 shrink-0" /> EDIT WATCHLIST</>
+                    <><Settings2 className="w-3.5 h-3.5 mr-1.5 shrink-0" /> EDIT WATCHLIST</>
                   ) : (
-                    <><Plus className="w-3.5 h-3.5 mr-2 shrink-0" /> ADD TO WATCHLIST</>
+                    <><Plus className="w-3.5 h-3.5 mr-1.5 shrink-0" /> ADD TO WATCHLIST</>
                   )}
                 </Button>
               </DialogTrigger>
@@ -190,12 +205,12 @@ export function AnimeCard({
           {/* Sub/Dub Badges */}
           <div className="flex items-center bg-white/10 rounded px-1.5 py-0.5 border border-white/5 shrink-0">
             <Tv className="w-2 h-2 text-white/60 mr-1" />
-            <span className="text-[8px] font-black text-white/80 uppercase">SUB {currentItem.subCount || currentItem.totalEpisodes || '??'}</span>
+            <span className="text-[8px] font-black text-white/80 uppercase">SUB {liveCounts.sub || currentItem.totalEpisodes || '??'}</span>
           </div>
-          {(currentItem.dubCount || 0) > 0 && (
+          {liveCounts.dub > 0 && (
             <div className="flex items-center bg-primary/20 rounded px-1.5 py-0.5 border border-primary/20 shrink-0">
               <Tv className="w-2 h-2 text-primary mr-1" />
-              <span className="text-[8px] font-black text-primary uppercase">DUB {currentItem.dubCount}</span>
+              <span className="text-[8px] font-black text-primary uppercase">DUB {liveCounts.dub}</span>
             </div>
           )}
         </div>

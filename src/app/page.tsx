@@ -93,6 +93,9 @@ export default function HomePage() {
     DROPPED: { label: 'DROPPED', icon: XCircle },
   };
 
+  const currentTrendingAnime = trendingAnime[currentSlide];
+  const existingTrendingItem = currentTrendingAnime ? getExistingItem(currentTrendingAnime.id) : null;
+
   return (
     <div className="bg-background text-foreground flex flex-col">
       <main className="flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden pb-12">
@@ -180,7 +183,7 @@ export default function HomePage() {
                                           : "hover:bg-white/5 text-muted-foreground hover:text-white"
                                       )}
                                     >
-                                      <config.icon className="w-4 h-4" />
+                                      <Play className="w-4 h-4" />
                                       {config.label}
                                     </Button>
                                   ))}
