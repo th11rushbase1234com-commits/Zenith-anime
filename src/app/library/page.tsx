@@ -53,22 +53,23 @@ export default function LibraryPage() {
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-12">
         <div className="space-y-10 animate-in slide-in-from-right-10 duration-500">
           
-          {/* Watchlist Header */}
-          <div className="flex flex-col gap-3 border-b border-white/10 pb-8">
+          {/* Watchlist Header - Compacted */}
+          <div className="flex flex-col gap-3 border-b border-white/10 pb-6">
             <div className="space-y-1">
-              <h2 className="text-3xl md:text-6xl font-black italic tracking-tighter uppercase text-glow leading-tight">
+              <h2 className="text-2xl md:text-5xl font-black italic tracking-tighter uppercase text-glow leading-tight">
                 WATCHLIST <span className="text-primary">ARCHIVES</span>
               </h2>
-              <p className="text-[9px] md:text-[10px] text-muted-foreground font-black italic uppercase tracking-[0.3em]">
+              <p className="text-[8px] md:text-[9px] text-muted-foreground font-black italic uppercase tracking-[0.3em]">
                 Anime Records & Zenith Nexus
               </p>
             </div>
           </div>
           
           <Tabs defaultValue="all" className="w-full space-y-8">
+            {/* Scrollable Navigation Container */}
             <div className="sticky top-16 z-30 bg-background/95 backdrop-blur-md py-4 -mx-4 px-4 border-b border-white/5">
-              <div className="overflow-x-auto scrollbar-hide w-full">
-                <TabsList className="bg-white/5 rounded-xl p-1 h-auto flex border border-white/5 min-w-max w-fit mx-auto sm:mx-0">
+              <div className="overflow-x-auto scrollbar-hide">
+                <TabsList className="bg-white/5 rounded-xl p-1 h-auto flex border border-white/5 min-w-max w-fit">
                   {TABS.map((tab) => (
                     <TabsTrigger 
                       key={tab.id}
