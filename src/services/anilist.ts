@@ -1,10 +1,10 @@
-
 import { Anime } from '@/app/types/anime';
 
 const ANILIST_URL = 'https://graphql.anilist.co';
 
 const MEDIA_QUERY_FIELDS = `
   id
+  idMal
   title {
     english
     romaji
@@ -39,17 +39,17 @@ async function fetchAniList(query: string, variables: any = {}) {
       body: JSON.stringify({ query, variables }),
     });
 
+    const json = await response.json();
+
     if (!response.ok) {
       if (response.status === 429) {
         return { errors: [{ message: 'AniList Rate Limit Hit. Please wait a moment.' }] };
       }
-      return { errors: [{ message: `HTTP Error: ${response.status}` }] };
+      return { errors: json.errors || [{ message: `HTTP Error: ${response.status}` }] };
     }
 
-    const json = await response.json();
     return json;
   } catch (error) {
-    // Catch low-level fetch errors (TypeError: Failed to fetch)
     return { errors: [{ message: error instanceof Error ? error.message : 'Connection failed' }] };
   }
 }
@@ -98,6 +98,27 @@ export async function searchAnime(query: string, page: number = 1): Promise<{ an
     };
   } catch (error) {
     return { anime: [], hasNextPage: false, lastPage: 1 };
+  }
+}
+
+export async function getAnimeByMalIds(malIds: number[]): Promise<Anime[]> {
+  const query = `
+    query ($ids: [Int]) {
+      Page(page: 1, perPage: 50) {
+        media(idMal_in: $ids, type: ANIME) {
+          ${MEDIA_QUERY_FIELDS}
+        }
+      }
+    }
+  `;
+  try {
+    const data = await fetchAniList(query, { ids: malIds });
+    if (data.errors || !data.data?.Page?.media) {
+      return [];
+    }
+    return data.data.Page.media.map(mapMediaToAnime);
+  } catch (error) {
+    return [];
   }
 }
 
