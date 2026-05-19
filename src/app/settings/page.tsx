@@ -86,7 +86,7 @@ export default function SettingsPage() {
 
   const initial = user.email?.charAt(0).toUpperCase() || 'Z';
   const currentAvatarData = PlaceHolderImages.find(img => img.imageUrl === photoURL);
-  const currentHint = currentAvatarData?.imageHint || "anime character";
+  const currentHint = currentAvatarData?.imageHint || "aesthetic scenery";
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center py-12 px-4 md:px-8">
@@ -98,7 +98,7 @@ export default function SettingsPage() {
             PROFILE <span className="text-primary">SETTINGS</span>
           </h2>
           <p className="text-xs md:text-sm text-muted-foreground font-medium italic uppercase tracking-widest">
-            Identity Configuration & Neural Link
+            Identity Configuration & Aesthetic Selection
           </p>
         </div>
 

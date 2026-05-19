@@ -2,76 +2,76 @@
 {
   "placeholderImages": [
     {
-      "id": "avatar-goku",
-      "description": "Goku",
-      "imageUrl": "https://picsum.photos/seed/771/200/200",
-      "imageHint": "goku anime"
+      "id": "avatar-cyber-city",
+      "description": "Cyberpunk City",
+      "imageUrl": "https://picsum.photos/seed/783/200/200",
+      "imageHint": "cyberpunk city"
     },
     {
-      "id": "avatar-miku",
-      "description": "Hatsune Miku",
-      "imageUrl": "https://picsum.photos/seed/772/200/200",
-      "imageHint": "miku anime"
+      "id": "avatar-neon-forest",
+      "description": "Neon Forest",
+      "imageUrl": "https://picsum.photos/seed/784/200/200",
+      "imageHint": "neon forest"
     },
     {
-      "id": "avatar-kaneki",
-      "description": "Ken Kaneki",
-      "imageUrl": "https://picsum.photos/seed/773/200/200",
-      "imageHint": "kaneki anime"
+      "id": "avatar-mountain",
+      "description": "Mountain Peak",
+      "imageUrl": "https://picsum.photos/seed/785/200/200",
+      "imageHint": "mountain peak"
     },
     {
-      "id": "avatar-naruto",
-      "description": "Naruto Uzumaki",
-      "imageUrl": "https://picsum.photos/seed/774/200/200",
-      "imageHint": "naruto anime"
+      "id": "avatar-aurora",
+      "description": "Aurora Borealis",
+      "imageUrl": "https://picsum.photos/seed/786/200/200",
+      "imageHint": "aurora borealis"
     },
     {
-      "id": "avatar-luffy",
-      "description": "Monkey D. Luffy",
-      "imageUrl": "https://picsum.photos/seed/775/200/200",
-      "imageHint": "luffy anime"
+      "id": "avatar-nebula",
+      "description": "Space Nebula",
+      "imageUrl": "https://picsum.photos/seed/787/200/200",
+      "imageHint": "space nebula"
     },
     {
-      "id": "avatar-sailormoon",
-      "description": "Sailor Moon",
-      "imageUrl": "https://picsum.photos/seed/776/200/200",
-      "imageHint": "sailormoon anime"
+      "id": "avatar-dunes",
+      "description": "Desert Dunes",
+      "imageUrl": "https://picsum.photos/seed/788/200/200",
+      "imageHint": "desert dunes"
     },
     {
-      "id": "avatar-zenitsu",
-      "description": "Zenitsu",
-      "imageUrl": "https://picsum.photos/seed/777/200/200",
-      "imageHint": "zenitsu anime"
+      "id": "avatar-ocean",
+      "description": "Deep Ocean",
+      "imageUrl": "https://picsum.photos/seed/789/200/200",
+      "imageHint": "deep ocean"
     },
     {
-      "id": "avatar-nezuko",
-      "description": "Nezuko",
-      "imageUrl": "https://picsum.photos/seed/778/200/200",
-      "imageHint": "nezuko anime"
+      "id": "avatar-rain",
+      "description": "Rainy Street",
+      "imageUrl": "https://picsum.photos/seed/790/200/200",
+      "imageHint": "rainy street"
     },
     {
-      "id": "avatar-eren",
-      "description": "Eren Yeager",
-      "imageUrl": "https://picsum.photos/seed/779/200/200",
-      "imageHint": "eren anime"
+      "id": "avatar-future",
+      "description": "Future Tech",
+      "imageUrl": "https://picsum.photos/seed/791/200/200",
+      "imageHint": "futuristic city"
     },
     {
-      "id": "avatar-mikasa",
-      "description": "Mikasa",
-      "imageUrl": "https://picsum.photos/seed/780/200/200",
-      "imageHint": "mikasa anime"
+      "id": "avatar-sunset",
+      "description": "Sunset Horizon",
+      "imageUrl": "https://picsum.photos/seed/792/200/200",
+      "imageHint": "sunset horizon"
     },
     {
-      "id": "avatar-gojo",
-      "description": "Satoru Gojo",
-      "imageUrl": "https://picsum.photos/seed/781/200/200",
-      "imageHint": "gojo anime"
+      "id": "avatar-abstract",
+      "description": "Abstract Neon",
+      "imageUrl": "https://picsum.photos/seed/793/200/200",
+      "imageHint": "abstract neon"
     },
     {
-      "id": "avatar-sukuna",
-      "description": "Ryomen Sukuna",
-      "imageUrl": "https://picsum.photos/seed/782/200/200",
-      "imageHint": "sukuna anime"
+      "id": "avatar-cave",
+      "description": "Crystal Cave",
+      "imageUrl": "https://picsum.photos/seed/794/200/200",
+      "imageHint": "crystal cave"
     }
   ]
 }
