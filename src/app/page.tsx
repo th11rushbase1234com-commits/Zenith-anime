@@ -4,13 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { useWatchlist } from './hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
 import { GenreVisualizer } from '@/components/GenreVisualizer';
-import { DiscoveryTool } from '@/components/DiscoveryTool';
 import { 
   Monitor, 
   Loader2, 
   Star,
   History,
-  Zap
+  Zap,
+  Plus,
+  Settings2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,10 +21,19 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { getTrendingAnime, getRecentAiring } from '@/services/anilist';
-import { Anime } from './types/anime';
+import { Anime, WatchStatus } from './types/anime';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { cn } from '@/lib/utils';
+import { Trash2, Play, Clock, PauseCircle, XCircle, CheckCircle2 } from 'lucide-react';
 
 export default function HomePage() {
   const { user, loading: authLoading } = useAuth();
@@ -34,6 +44,7 @@ export default function HomePage() {
   const [recentAiring, setRecentAiring] = useState<Anime[]>([]);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isHeroDialogOpen, setIsHeroDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -76,6 +87,14 @@ export default function HomePage() {
   const watchingAnime = watchlist.filter(a => a.status === 'WATCHING');
   const getExistingItem = (id: string) => watchlist.find(a => a.id === id);
 
+  const STATUS_CONFIG: Record<WatchStatus, { label: string; icon: any }> = {
+    WATCHING: { label: 'WATCHING', icon: Play },
+    PLAN_TO_WATCH: { label: 'PLAN TO WATCH', icon: Clock },
+    COMPLETED: { label: 'COMPLETED', icon: CheckCircle2 },
+    ON_HOLD: { label: 'ON HOLD', icon: PauseCircle },
+    DROPPED: { label: 'DROPPED', icon: XCircle },
+  };
+
   return (
     <div className="bg-background text-foreground flex flex-col">
       <main className="flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden pb-12">
@@ -87,53 +106,108 @@ export default function HomePage() {
               opts={{ loop: true, align: "start" }}
             >
               <CarouselContent className="h-full ml-0">
-                {trendingAnime.length > 0 ? trendingAnime.map((anime, index) => (
-                  <CarouselItem key={anime.id} className="relative w-full h-full pl-0">
-                    <div className="relative w-full h-full">
-                      <Image 
-                        src={anime.imageUrl} 
-                        alt={anime.title} 
-                        fill 
-                        priority={index === 0}
-                        className="object-cover brightness-[0.4]"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                      <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
-                      
-                      <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 space-y-4 md:space-y-6 max-w-4xl">
-                        <div className="flex items-center gap-3">
-                          <div className="px-2 py-0.5 md:px-3 md:py-1 bg-primary text-primary-foreground text-[8px] md:text-[10px] font-black italic rounded uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.5)]">
-                            TRENDING NOW
-                          </div>
-                          <div className="flex items-center gap-1.5 px-2 py-0.5 md:px-3 md:py-1 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[8px] md:text-[10px] font-bold rounded uppercase tracking-widest">
-                            <Star className="w-2.5 h-2.5 md:w-3 md:h-3 text-accent fill-current" /> {Math.round(anime.rating * 10)}%
-                          </div>
-                        </div>
+                {trendingAnime.length > 0 ? trendingAnime.map((anime, index) => {
+                  const existingItem = getExistingItem(anime.id);
+                  return (
+                    <CarouselItem key={anime.id} className="relative w-full h-full pl-0">
+                      <div className="relative w-full h-full">
+                        <Image 
+                          src={anime.imageUrl} 
+                          alt={anime.title} 
+                          fill 
+                          priority={index === 0}
+                          className="object-cover brightness-[0.4]"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
                         
-                        <h2 className="text-3xl md:text-7xl font-black italic uppercase tracking-tighter text-glow leading-[0.9] line-clamp-2">
-                          {anime.title.split(' ').map((word, i) => (
-                            <span key={i} className={i % 2 === 1 ? 'text-primary' : 'text-white'}>
-                              {word}{' '}
-                            </span>
-                          ))}
-                        </h2>
-                        
-                        <p className="text-white/70 text-xs md:text-lg max-w-2xl line-clamp-2 md:line-clamp-3 font-medium italic">
-                          {anime.description}
-                        </p>
+                        <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 space-y-4 md:space-y-6 max-w-4xl">
+                          <div className="flex items-center gap-3">
+                            <div className="px-2 py-0.5 md:px-3 md:py-1 bg-primary text-primary-foreground text-[8px] md:text-[10px] font-black italic rounded uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.5)]">
+                              TRENDING NOW
+                            </div>
+                            <div className="flex items-center gap-1.5 px-2 py-0.5 md:px-3 md:py-1 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[8px] md:text-[10px] font-bold rounded uppercase tracking-widest">
+                              <Star className="w-2.5 h-2.5 md:w-3 md:h-3 text-accent fill-current" /> {Math.round(anime.rating * 10)}%
+                            </div>
+                          </div>
+                          
+                          <h2 className="text-3xl md:text-7xl font-black italic uppercase tracking-tighter text-glow leading-[0.9] line-clamp-2">
+                            {anime.title.split(' ').map((word, i) => (
+                              <span key={i} className={i % 2 === 1 ? 'text-primary' : 'text-white'}>
+                                {word}{' '}
+                              </span>
+                            ))}
+                          </h2>
+                          
+                          <p className="text-white/70 text-xs md:text-lg max-w-2xl line-clamp-2 md:line-clamp-3 font-medium italic">
+                            {anime.description}
+                          </p>
 
-                        <div className="flex flex-wrap gap-4 pt-2 md:pt-4">
-                          <Button 
-                            onClick={() => router.push('/search?q=' + anime.title)}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground font-black italic px-6 md:px-10 h-10 md:h-14 rounded-full gap-2 text-sm md:text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105"
-                          >
-                            <Zap className="w-4 h-4 md:w-6 md:h-6" /> EXPLORE SERIES
-                          </Button>
+                          <div className="flex flex-wrap gap-4 pt-2 md:pt-4">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-black px-6 md:px-10 h-10 md:h-14 rounded-full gap-2 text-sm md:text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105 uppercase tracking-widest"
+                                >
+                                  {existingItem ? (
+                                    <><Settings2 className="w-4 h-4 md:w-6 md:h-6" /> EDIT WATCHLIST</>
+                                  ) : (
+                                    <><Plus className="w-4 h-4 md:w-6 md:h-6" /> ADD TO WATCHLIST</>
+                                  )}
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="glass-panel border-white/10 max-w-[320px] rounded-[2rem] p-6">
+                                <DialogHeader>
+                                  <DialogTitle className="text-sm font-black italic uppercase tracking-widest text-primary text-center">
+                                    {existingItem ? 'MANAGEMENT PORTAL' : 'INITIALIZATION PORTAL'}
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <div className="grid gap-2 pt-4">
+                                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest text-center mb-2">Select Sector</p>
+                                  {Object.entries(STATUS_CONFIG).map(([status, config]) => (
+                                    <Button
+                                      key={status}
+                                      variant="ghost"
+                                      onClick={() => {
+                                        if (existingItem) {
+                                          updateAnimeStatus(existingItem.id, status as WatchStatus);
+                                        } else {
+                                          addAnime(anime, status as WatchStatus);
+                                        }
+                                      }}
+                                      className={cn(
+                                        "h-12 justify-start gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest border border-transparent transition-all",
+                                        existingItem?.status === status 
+                                          ? "bg-primary/10 border-primary/20 text-primary" 
+                                          : "hover:bg-white/5 text-muted-foreground hover:text-white"
+                                      )}
+                                    >
+                                      <config.icon className="w-4 h-4" />
+                                      {config.label}
+                                    </Button>
+                                  ))}
+                                  
+                                  {existingItem && (
+                                    <div className="mt-4 pt-4 border-t border-white/5">
+                                      <Button
+                                        variant="ghost"
+                                        onClick={() => removeAnime(existingItem.id)}
+                                        className="w-full h-12 justify-center gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        PURGE RECORD
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CarouselItem>
-                )) : (
+                    </CarouselItem>
+                  );
+                }) : (
                   <div className="w-full h-full flex items-center justify-center bg-white/5 animate-pulse">
                     <Loader2 className="w-12 h-12 text-primary animate-spin" />
                   </div>
@@ -207,10 +281,6 @@ export default function HomePage() {
                 <div className="h-1 w-16 md:w-20 bg-primary rounded-full" />
               </div>
               <GenreVisualizer watchlist={watchlist} />
-            </section>
-
-            <section className="pt-8 pb-12">
-              <DiscoveryTool watchlist={watchlist} />
             </section>
           </div>
         </div>

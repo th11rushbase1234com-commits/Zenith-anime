@@ -15,8 +15,7 @@ import {
   XCircle,
   CheckCircle2,
   Calendar,
-  Layers,
-  ChevronRight
+  Layers
 } from 'lucide-react';
 import {
   Dialog,
@@ -43,7 +42,7 @@ export function AnimeCard({
   onAdd
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const itemInWatchlist = existingItem || (anime.status !== undefined && anime.id && (anime as any).userId ? anime : undefined);
+  const itemInWatchlist = existingItem || (anime.status !== undefined && (anime as any).userId ? anime : undefined);
   const currentItem = itemInWatchlist || anime;
 
   const STATUS_CONFIG: Record<WatchStatus, { label: string; icon: any; color: string; bgColor: string }> = {
@@ -123,7 +122,7 @@ export function AnimeCard({
                 <Button 
                   size="sm" 
                   className={cn(
-                    "w-full font-black italic rounded-xl text-[10px] h-11 transition-all",
+                    "w-full font-black rounded-xl text-[10px] h-11 transition-all uppercase tracking-widest flex items-center justify-center",
                     itemInWatchlist 
                       ? "bg-white/10 hover:bg-white/20 text-white border border-white/10" 
                       : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(168,85,247,0.4)]"

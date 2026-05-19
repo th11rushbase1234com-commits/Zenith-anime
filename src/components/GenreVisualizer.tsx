@@ -2,12 +2,10 @@
 
 import React from 'react';
 import { Anime } from '@/app/types/anime';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar 
+  PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 interface GenreVisualizerProps {
   watchlist: Anime[];
@@ -28,14 +26,16 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
 
   const statusData = React.useMemo(() => {
     const stats = {
-      'Mastered': watchlist.filter(a => a.status === 'COMPLETED').length,
-      'Active': watchlist.filter(a => a.status === 'WATCHING').length,
-      'Queued': watchlist.filter(a => a.status === 'PLAN_TO_WATCH').length,
+      'Watching': watchlist.filter(a => a.status === 'WATCHING').length,
+      'Planned': watchlist.filter(a => a.status === 'PLAN_TO_WATCH').length,
+      'On Hold': watchlist.filter(a => a.status === 'ON_HOLD').length,
+      'Completed': watchlist.filter(a => a.status === 'COMPLETED').length,
+      'Dropped': watchlist.filter(a => a.status === 'DROPPED').length,
     };
-    return Object.entries(stats).map(([name, value]) => ({ name, value }));
+    return Object.entries(stats).map(([name, value]) => ({ name, value })).filter(s => s.value > 0);
   }, [watchlist]);
 
-  const COLORS = ['#A89BFF', '#5E89F0', '#FF8CC6', '#7CF3A0', '#F3D27C'];
+  const COLORS = ['#A89BFF', '#5E89F0', '#F3D27C', '#7CF3A0', '#FF8CC6'];
 
   if (watchlist.length === 0) return null;
 
