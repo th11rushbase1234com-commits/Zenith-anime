@@ -9,10 +9,22 @@ export interface AnifyEpisodeCounts {
 }
 
 export async function getEpisodeCounts(anilistId: string): Promise<AnifyEpisodeCounts> {
+  if (!anilistId || anilistId === '0' || anilistId === 'undefined') {
+    return { sub: 0, dub: 0 };
+  }
+
   try {
     // Anify Info Endpoint: provides deep provider-specific episode data
-    const response = await fetch(`https://api.anify.tv/info/${anilistId}`);
+    // Use an AbortController to prevent long-hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const response = await fetch(`https://api.anify.tv/info/${anilistId}`, {
+      signal: controller.signal
+    });
     
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
       return { sub: 0, dub: 0 };
     }
@@ -35,7 +47,8 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnifyEpisodeC
 
     return { sub: subMax, dub: dubMax };
   } catch (error) {
-    console.error(`Anify Telemetry Error [${anilistId}]:`, error);
+    // Silently catch fetch errors (timeouts, CORS, network drops)
+    // to prevent triggering the global Next.js error overlay.
     return { sub: 0, dub: 0 };
   }
 }

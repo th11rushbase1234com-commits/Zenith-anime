@@ -45,7 +45,7 @@ export function AnimeCard({
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
-    sub: anime.subCount || 0, 
+    sub: anime.subCount || anime.totalEpisodes || 0, 
     dub: anime.dubCount || 0 
   });
   
@@ -53,12 +53,17 @@ export function AnimeCard({
   const currentItem = itemInWatchlist || anime;
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchLiveTelemetry() {
-      // If we don't have sub/dub counts or if we want the absolute latest "Live" data
+      if (!currentItem.id || currentItem.id === '0') return;
+      
       const counts = await getEpisodeCounts(currentItem.id);
-      setLiveCounts(counts);
+      if (isMounted && (counts.sub > 0 || counts.dub > 0)) {
+        setLiveCounts(counts);
+      }
     }
     fetchLiveTelemetry();
+    return () => { isMounted = false; };
   }, [currentItem.id]);
 
   const STATUS_CONFIG: Record<WatchStatus, { label: string; icon: any; color: string; bgColor: string }> = {
