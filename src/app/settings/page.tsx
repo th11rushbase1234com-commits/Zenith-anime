@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -24,21 +25,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-const AVATAR_OPTIONS = [
-  'https://picsum.photos/seed/anime-char-1/200/200',
-  'https://picsum.photos/seed/anime-char-2/200/200',
-  'https://picsum.photos/seed/anime-char-3/200/200',
-  'https://picsum.photos/seed/anime-char-4/200/200',
-  'https://picsum.photos/seed/anime-char-5/200/200',
-  'https://picsum.photos/seed/anime-char-6/200/200',
-  'https://picsum.photos/seed/anime-char-7/200/200',
-  'https://picsum.photos/seed/anime-char-8/200/200',
-  'https://picsum.photos/seed/anime-char-9/200/200',
-  'https://picsum.photos/seed/anime-char-10/200/200',
-  'https://picsum.photos/seed/anime-char-11/200/200',
-  'https://picsum.photos/seed/anime-char-12/200/200',
-];
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function SettingsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -139,27 +126,32 @@ export default function SettingsPage() {
                   <Pencil className="w-4 h-4 md:w-5 md:h-5" />
                 </button>
               </DialogTrigger>
-              <DialogContent className="glass-panel border-white/10 max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-black italic uppercase tracking-widest text-primary">SELECT AVATAR</DialogTitle>
+              <DialogContent className="glass-panel border-white/10 max-w-md overflow-hidden flex flex-col h-[80vh]">
+                <DialogHeader className="px-6 pt-6">
+                  <DialogTitle className="text-xl font-black italic uppercase tracking-widest text-primary">SELECT CORE AVATAR</DialogTitle>
                 </DialogHeader>
-                <div className="grid grid-cols-3 gap-4 pt-6">
-                  {AVATAR_OPTIONS.map((url, i) => (
-                    <button 
-                      key={i} 
-                      onClick={() => selectAvatar(url)}
-                      className="aspect-square rounded-2xl overflow-hidden border-2 border-transparent hover:border-primary transition-all hover:scale-105"
-                    >
-                      <Image 
-                        src={url} 
-                        alt={`Preset ${i}`} 
-                        width={100} 
-                        height={100} 
-                        className="w-full h-full object-cover" 
-                        data-ai-hint="anime character"
-                      />
-                    </button>
-                  ))}
+                <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-hide">
+                  <div className="grid grid-cols-3 gap-4">
+                    {PlaceHolderImages.filter(img => img.id.startsWith('avatar-')).map((img) => (
+                      <button 
+                        key={img.id} 
+                        onClick={() => selectAvatar(img.imageUrl)}
+                        className="group/avatar relative aspect-square rounded-2xl overflow-hidden border-2 border-transparent hover:border-primary transition-all hover:scale-105 bg-white/5"
+                      >
+                        <Image 
+                          src={img.imageUrl} 
+                          alt={img.description} 
+                          width={100} 
+                          height={100} 
+                          className="w-full h-full object-cover" 
+                          data-ai-hint={img.imageHint}
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center p-2">
+                          <span className="text-[8px] font-black text-white text-center uppercase tracking-tighter">{img.description}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>

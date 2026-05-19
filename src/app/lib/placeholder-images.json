@@ -2,22 +2,76 @@
 {
   "placeholderImages": [
     {
-      "id": "zenith-hero",
-      "description": "Cyberpunk anime cityscape at night",
-      "imageUrl": "https://picsum.photos/seed/zenith-city/1200/600",
-      "imageHint": "cyberpunk anime cityscape"
+      "id": "avatar-goku",
+      "description": "Goku from Dragon Ball",
+      "imageUrl": "https://picsum.photos/seed/anime-goku/200/200",
+      "imageHint": "anime goku"
     },
     {
-      "id": "anime-loading",
-      "description": "Tech terminal loading screen",
-      "imageUrl": "https://picsum.photos/seed/zenith-load/400/600",
-      "imageHint": "anime tech interface"
+      "id": "avatar-miku",
+      "description": "Hatsune Miku",
+      "imageUrl": "https://picsum.photos/seed/anime-miku/200/200",
+      "imageHint": "anime miku"
     },
     {
-      "id": "default-poster",
-      "description": "Generic anime character silhouette",
-      "imageUrl": "https://picsum.photos/seed/zenith-poster/400/600",
-      "imageHint": "anime character silhouette"
+      "id": "avatar-kaneki",
+      "description": "Ken Kaneki from Tokyo Ghoul",
+      "imageUrl": "https://picsum.photos/seed/anime-kaneki/200/200",
+      "imageHint": "anime kaneki"
+    },
+    {
+      "id": "avatar-naruto",
+      "description": "Naruto Uzumaki",
+      "imageUrl": "https://picsum.photos/seed/anime-naruto/200/200",
+      "imageHint": "anime naruto"
+    },
+    {
+      "id": "avatar-luffy",
+      "description": "Monkey D. Luffy",
+      "imageUrl": "https://picsum.photos/seed/anime-luffy/200/200",
+      "imageHint": "anime luffy"
+    },
+    {
+      "id": "avatar-sailormoon",
+      "description": "Sailor Moon",
+      "imageUrl": "https://picsum.photos/seed/anime-sailormoon/200/200",
+      "imageHint": "anime sailormoon"
+    },
+    {
+      "id": "avatar-zenitsu",
+      "description": "Zenitsu from Demon Slayer",
+      "imageUrl": "https://picsum.photos/seed/anime-zenitsu/200/200",
+      "imageHint": "anime zenitsu"
+    },
+    {
+      "id": "avatar-nezuko",
+      "description": "Nezuko from Demon Slayer",
+      "imageUrl": "https://picsum.photos/seed/anime-nezuko/200/200",
+      "imageHint": "anime nezuko"
+    },
+    {
+      "id": "avatar-eren",
+      "description": "Eren Yeager from AOT",
+      "imageUrl": "https://picsum.photos/seed/anime-eren/200/200",
+      "imageHint": "anime eren"
+    },
+    {
+      "id": "avatar-mikasa",
+      "description": "Mikasa Ackerman from AOT",
+      "imageUrl": "https://picsum.photos/seed/anime-mikasa/200/200",
+      "imageHint": "anime mikasa"
+    },
+    {
+      "id": "avatar-gojo",
+      "description": "Satoru Gojo from JJK",
+      "imageUrl": "https://picsum.photos/seed/anime-gojo/200/200",
+      "imageHint": "anime gojo"
+    },
+    {
+      "id": "avatar-sukuna",
+      "description": "Ryomen Sukuna from JJK",
+      "imageUrl": "https://picsum.photos/seed/anime-sukuna/200/200",
+      "imageHint": "anime sukuna"
     }
   ]
 }
