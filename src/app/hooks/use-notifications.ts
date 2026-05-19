@@ -9,11 +9,9 @@ import {
   onSnapshot, 
   query, 
   doc, 
-  setDoc, 
   updateDoc, 
   deleteDoc,
   where,
-  orderBy,
   addDoc,
   getDocs,
   limit
@@ -35,11 +33,10 @@ export function useNotifications() {
       return;
     }
 
+    // Simplified query to avoid composite index requirement
     const q = query(
       collection(db, 'notifications'), 
-      where('userId', '==', user.uid),
-      orderBy('createdAt', 'desc'),
-      limit(20)
+      where('userId', '==', user.uid)
     );
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -47,8 +44,20 @@ export function useNotifications() {
         ...doc.data(),
         id: doc.id
       } as ZenithNotification));
-      setNotifications(items);
+      
+      // Perform sorting and limiting client-side to avoid "missing index" errors
+      const processedItems = items
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 20);
+
+      setNotifications(processedItems);
       setUnreadCount(items.filter(i => !i.isRead).length);
+    }, (error) => {
+      if (error.code === 'failed-precondition') {
+        console.warn("Zenith Notifications: Index missing, falling back to manual sort.");
+      } else {
+        console.error("Zenith Notifications Error:", error);
+      }
     });
 
     return () => unsubscribe();
@@ -76,10 +85,8 @@ export function useNotifications() {
             
             const existing = await getDocs(existingQ);
             
-            // For MVP, we only notify if NO notification exists for this anime yet
-            // In a full app, we'd check against aired.nextAiringEpisode.episode
             if (existing.empty) {
-              await addDoc(collection(db, 'notifications'), {
+              addDoc(collection(db, 'notifications'), {
                 userId: user.uid,
                 animeId: aired.id,
                 animeTitle: aired.title,
@@ -87,7 +94,7 @@ export function useNotifications() {
                 type: 'EPISODE',
                 isRead: false,
                 createdAt: new Date().toISOString()
-              });
+              }).catch(err => console.error("Failed to create notification:", err));
             }
           }
         }
@@ -96,13 +103,14 @@ export function useNotifications() {
       }
     };
 
-    checkNewEpisodes();
-  }, [user, watchlist.length]);
+    const timer = setTimeout(checkNewEpisodes, 3000); // Debounce sync
+    return () => clearTimeout(timer);
+  }, [user, watchlist]);
 
   const markAsRead = async (id: string) => {
     if (!user) return;
     const ref = doc(db, 'notifications', id);
-    await updateDoc(ref, { isRead: true });
+    updateDoc(ref, { isRead: true }).catch(err => console.error("Failed to mark read:", err));
   };
 
   const markAllAsRead = async () => {
@@ -110,12 +118,12 @@ export function useNotifications() {
     const batchPromises = notifications
       .filter(n => !n.isRead)
       .map(n => updateDoc(doc(db, 'notifications', n.id), { isRead: true }));
-    await Promise.all(batchPromises);
+    await Promise.all(batchPromises).catch(err => console.error("Batch update failed:", err));
   };
 
   const deleteNotification = async (id: string) => {
     if (!user) return;
-    await deleteDoc(doc(db, 'notifications', id));
+    deleteDoc(doc(db, 'notifications', id)).catch(err => console.error("Failed to delete:", err));
   };
 
   return {
