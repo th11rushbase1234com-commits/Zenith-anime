@@ -59,7 +59,7 @@ function ZenithContent() {
     addAnime 
   } = useWatchlist();
 
-  // State
+  // State - Defaults to 'home' to ensure reload resets the page
   const [activeTab, setActiveTab] = useState<'home' | 'library' | 'search'>('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [lastSearchedTerm, setLastSearchedTerm] = useState('');
@@ -122,6 +122,7 @@ function ZenithContent() {
       console.error(error);
     } finally {
       setIsSearching(false);
+      // Remove focus after search is initiated
       searchInputRef.current?.blur();
     }
   };
@@ -142,11 +143,13 @@ function ZenithContent() {
     setLastSearchedTerm('');
     setSearchResults([]);
     setActiveTab('home');
+    // Explicitly remove focus from the search bar
     searchInputRef.current?.blur();
   };
 
   const handleBlur = () => {
     // Revert drafted text to the last successful search term if clicking away
+    // Only if we aren't clearing it
     if (searchQuery.trim() !== lastSearchedTerm) {
       setSearchQuery(lastSearchedTerm);
     }
@@ -175,7 +178,6 @@ function ZenithContent() {
             </div>
             <h1 className="text-xl md:text-2xl font-black italic tracking-tighter text-glow flex items-center gap-1">
               <span className="text-primary">ZENITH</span>
-              <span className="text-white hidden xs:inline">ANIME</span>
             </h1>
           </div>
         </div>
