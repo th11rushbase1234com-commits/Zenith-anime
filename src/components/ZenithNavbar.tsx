@@ -9,7 +9,8 @@ import {
   Bell, 
   Bookmark, 
   Settings, 
-  LogOut
+  LogOut,
+  Database
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
@@ -122,6 +123,12 @@ export function ZenithNavbar() {
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-white"
                 >
                   <Bookmark className="w-4 h-4" /> Personal Watchlist
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => router.push('/import-export')}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-white"
+                >
+                  <Database className="w-4 h-4" /> Import / Export
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => router.push('/settings')}
