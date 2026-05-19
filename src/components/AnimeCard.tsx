@@ -15,7 +15,8 @@ import {
   XCircle,
   CheckCircle2,
   Calendar,
-  Layers
+  Layers,
+  Tv
 } from 'lucide-react';
 import {
   Dialog,
@@ -122,16 +123,16 @@ export function AnimeCard({
                 <Button 
                   size="sm" 
                   className={cn(
-                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-tight flex items-center justify-center px-1 shrink-0",
+                    "w-full font-bold rounded-lg text-[9px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-2 shrink-0 border border-white/5",
                     itemInWatchlist 
-                      ? "bg-white/10 hover:bg-white/20 text-white border border-white/10" 
+                      ? "bg-white/10 hover:bg-white/20 text-white" 
                       : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(168,85,247,0.4)]"
                   )}
                 >
                   {itemInWatchlist ? (
-                    <><Settings2 className="w-3 h-3 mr-1.5 shrink-0" /> <span className="truncate">EDIT WATCHLIST</span></>
+                    <><Settings2 className="w-3.5 h-3.5 mr-2 shrink-0" /> EDIT WATCHLIST</>
                   ) : (
-                    <><Plus className="w-3 h-3 mr-1.5 shrink-0" /> <span className="truncate">ADD TO WATCHLIST</span></>
+                    <><Plus className="w-3.5 h-3.5 mr-2 shrink-0" /> ADD TO WATCHLIST</>
                   )}
                 </Button>
               </DialogTrigger>
@@ -180,16 +181,33 @@ export function AnimeCard({
       </div>
 
       {/* Content Info */}
-      <div className="px-2 flex flex-col gap-0.5">
-        <h3 className="font-black text-[12px] md:text-[13px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase">
+      <div className="px-1 flex flex-col gap-1.5">
+        <h3 className="font-black text-[11px] md:text-[12px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase">
           {currentItem.title}
         </h3>
-        <div className="flex items-center justify-between opacity-60">
+        
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Sub/Dub Badges */}
+          <div className="flex items-center gap-1.5">
+            <div className="flex items-center bg-white/10 rounded px-1.5 py-0.5 border border-white/5">
+              <Tv className="w-2 h-2 text-white/60 mr-1" />
+              <span className="text-[8px] font-black text-white/80 uppercase">SUB {currentItem.totalEpisodes || currentItem.subCount || '??'}</span>
+            </div>
+            {(currentItem.dubCount || 0) > 0 && (
+              <div className="flex items-center bg-primary/20 rounded px-1.5 py-0.5 border border-primary/20">
+                <Tv className="w-2 h-2 text-primary mr-1" />
+                <span className="text-[8px] font-black text-primary uppercase">DUB {currentItem.dubCount}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between opacity-50">
           <span className="text-[7px] text-white/40 font-black uppercase flex items-center gap-1">
             <Calendar className="w-2 h-2" /> {currentItem.year || 'TBA'}
           </span>
           {currentItem.genres && currentItem.genres.length > 0 && (
-            <span className="text-[7px] text-primary/60 font-black uppercase tracking-tight truncate max-w-[80px]">
+            <span className="text-[7px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[80px]">
               {currentItem.genres[0]}
             </span>
           )}

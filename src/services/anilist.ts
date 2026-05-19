@@ -1,4 +1,3 @@
-
 import { Anime } from '@/app/types/anime';
 
 const ANILIST_URL = 'https://graphql.anilist.co';
@@ -69,6 +68,8 @@ function mapMediaToAnime(media: any): Anime {
     currentEpisode: 0,
     status: 'PLAN_TO_WATCH',
     year: media.seasonYear || 0,
+    subCount: media.episodes || 0,
+    dubCount: 0, // Default to 0 as AniList doesn't reliably track dub counts via API
     externalLinks: media.externalLinks || [],
     nextAiringEpisode: media.nextAiringEpisode
   };
