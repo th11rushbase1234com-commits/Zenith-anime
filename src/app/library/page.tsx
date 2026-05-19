@@ -7,14 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Loader2, 
   Bookmark, 
-  LayoutGrid, 
   Play, 
   Clock, 
   CheckCircle2, 
   PauseCircle, 
   Trash2,
-  Database,
-  BarChart3
+  Database
 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
@@ -50,47 +48,25 @@ export default function LibraryPage() {
     { id: 'dropped', label: 'DROPPED', icon: Trash2, status: 'DROPPED' },
   ];
 
-  const totalEpisodes = watchlist.reduce((acc, a) => acc + (a.currentEpisode || 0), 0);
-  const completionRate = watchlist.length > 0 
-    ? Math.round((watchlist.filter(a => a.status === 'COMPLETED').length / watchlist.length) * 100) 
-    : 0;
-
   return (
-    <div className="bg-background text-foreground flex flex-col min-h-screen">
-      <main className="flex-1 w-full max-w-[1920px] mx-auto px-4 md:px-12 py-12">
+    <div className="bg-background text-foreground flex flex-col min-h-screen overflow-x-hidden">
+      <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-12">
         <div className="space-y-12 animate-in slide-in-from-right-10 duration-500">
           
-          {/* Library Header & Stats */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 border-b border-white/10 pb-10">
+          {/* Watchlist Header */}
+          <div className="flex flex-col gap-4 border-b border-white/10 pb-10">
             <div className="space-y-2">
               <h2 className="text-4xl md:text-7xl font-black italic tracking-tighter uppercase text-glow">
-                LIBRARY <span className="text-primary">ARCHIVES</span>
+                WATCHLIST <span className="text-primary">ARCHIVES</span>
               </h2>
               <p className="text-[10px] md:text-xs text-muted-foreground font-black italic uppercase tracking-[0.3em]">
-                System Records & Consumption Telemetry
+                Anime Records & Zenith Nexus
               </p>
-            </div>
-            
-            <div className="flex gap-4 md:gap-8">
-              <div className="flex flex-col items-end">
-                <span className="text-[9px] font-black text-primary uppercase tracking-widest">Volume</span>
-                <span className="text-xl md:text-2xl font-black italic">{watchlist.length} TITLES</span>
-              </div>
-              <div className="w-px h-10 bg-white/10" />
-              <div className="flex flex-col items-end">
-                <span className="text-[9px] font-black text-accent uppercase tracking-widest">Impact</span>
-                <span className="text-xl md:text-2xl font-black italic">{totalEpisodes} EPISODES</span>
-              </div>
-              <div className="w-px h-10 bg-white/10" />
-              <div className="flex flex-col items-end">
-                <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Sync</span>
-                <span className="text-xl md:text-2xl font-black italic">{completionRate}%</span>
-              </div>
             </div>
           </div>
           
           <Tabs defaultValue="all" className="w-full space-y-10">
-            <div className="sticky top-20 z-30 bg-background/80 backdrop-blur-md py-2 -mx-4 px-4">
+            <div className="sticky top-16 z-30 bg-background/80 backdrop-blur-md py-4 -mx-4 px-4 border-b border-white/5">
               <div className="overflow-x-auto scrollbar-hide">
                 <TabsList className="bg-white/5 rounded-2xl p-1 h-auto flex border border-white/5 min-w-max">
                   {TABS.map((tab) => (
