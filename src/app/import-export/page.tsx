@@ -28,6 +28,7 @@ export default function ImportExportPage() {
   
   const [processing, setProcessing] = useState(false);
   const [importCount, setImportCount] = useState<number | null>(null);
+  const [currentProgress, setCurrentProgress] = useState(0);
 
   if (authLoading || !isLoaded || !user) {
     return (
@@ -102,6 +103,7 @@ export default function ImportExportPage() {
 
     setProcessing(true);
     setImportCount(null);
+    setCurrentProgress(0);
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -109,37 +111,40 @@ export default function ImportExportPage() {
         const content = e.target?.result as string;
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(content, "text/xml");
-        const animeNodes = xmlDoc.getElementsByTagName("anime");
+        const animeNodes = Array.from(xmlDoc.getElementsByTagName("anime"));
 
         if (animeNodes.length === 0) {
           throw new Error("Invalid MAL XML structure.");
         }
 
         let successCount = 0;
-        // Batch processing to avoid overwhelming API/DB
-        for (let i = 0; i < animeNodes.length; i++) {
+        const total = animeNodes.length;
+
+        for (let i = 0; i < total; i++) {
           const node = animeNodes[i];
           const malId = node.getElementsByTagName("series_animedb_id")[0]?.textContent;
           const statusText = node.getElementsByTagName("my_status")[0]?.textContent;
-          const watchedEpisodes = node.getElementsByTagName("my_watched_episodes")[0]?.textContent;
-
+          
           if (malId && statusText) {
-            const zenithStatus = mapMalToZenithStatus(statusText);
-            // Recover metadata from AniList
-            const animeDetails = await getAnimeByMalId(parseInt(malId));
-            
-            if (animeDetails) {
-              const enrichedItem = {
-                ...animeDetails,
-                currentEpisode: parseInt(watchedEpisodes || '0')
-              };
-              await addAnime(enrichedItem, zenithStatus);
-              successCount++;
+            try {
+              const zenithStatus = mapMalToZenithStatus(statusText);
+              const animeDetails = await getAnimeByMalId(parseInt(malId));
+              
+              if (animeDetails) {
+                await addAnime(animeDetails, zenithStatus);
+                successCount++;
+              }
+            } catch (innerError) {
+              console.warn(`Skipping ID ${malId} due to error:`, innerError);
             }
           }
           
-          // Small delay every 5 items to respect AniList rate limits
-          if (i % 5 === 0) await new Promise(r => setTimeout(r, 500));
+          setCurrentProgress(Math.round(((i + 1) / total) * 100));
+          
+          // Moderate rate limiting: 800ms delay every 3 items to be safe with AniList (90 req/min)
+          if ((i + 1) % 3 === 0) {
+            await new Promise(r => setTimeout(r, 800));
+          }
         }
 
         setImportCount(successCount);
@@ -211,7 +216,7 @@ export default function ImportExportPage() {
               <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-start gap-3">
                 <ShieldAlert className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
                 <p className="text-[9px] text-destructive font-bold uppercase tracking-wider leading-normal">
-                  Caution: Metadata recovery takes time. Please do not close the window during synchronization.
+                  Caution: Metadata recovery takes time. Rate limiting is active to ensure connection stability.
                 </p>
               </div>
             </div>
@@ -227,9 +232,15 @@ export default function ImportExportPage() {
             <Button 
               onClick={() => fileInputRef.current?.click()}
               disabled={processing}
-              className="w-full h-14 bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black rounded-full uppercase tracking-widest transition-all hover:scale-[1.02]"
+              className="w-full h-14 bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black rounded-full uppercase tracking-widest transition-all hover:scale-[1.02] relative overflow-hidden"
             >
-              {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : 'UPLOAD MAL XML'}
+              {processing ? (
+                <div className="flex items-center gap-3">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>SYNCING {currentProgress}%</span>
+                  <div className="absolute bottom-0 left-0 h-1 bg-primary transition-all duration-300" style={{ width: `${currentProgress}%` }} />
+                </div>
+              ) : 'UPLOAD MAL XML'}
             </Button>
           </div>
         </div>

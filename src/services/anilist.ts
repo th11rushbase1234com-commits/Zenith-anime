@@ -29,21 +29,29 @@ const MEDIA_QUERY_FIELDS = `
 `;
 
 async function fetchAniList(query: string, variables: any = {}) {
-  const response = await fetch(ANILIST_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify({ query, variables }),
-  });
+  try {
+    const response = await fetch(ANILIST_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ query, variables }),
+    });
 
-  const json = await response.json();
-  if (json.errors) {
-    console.error('AniList API Error:', json.errors);
-    throw new Error('AniList request failed');
+    if (!response.ok) {
+      if (response.status === 429) {
+        console.warn('AniList Rate Limit Hit. Cooling down...');
+      }
+      return { errors: [{ message: `HTTP Error: ${response.status}` }] };
+    }
+
+    const json = await response.json();
+    return json;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return { errors: [{ message: error instanceof Error ? error.message : 'Network error' }] };
   }
-  return json.data;
 }
 
 function mapMediaToAnime(media: any): Anime {
@@ -81,6 +89,8 @@ export async function searchAnime(query: string, page: number = 1): Promise<{ an
   
   try {
     const data = await fetchAniList(searchQuery, { search: query, page });
+    if (data.errors) return { anime: [], hasNextPage: false, lastPage: 1 };
+    
     return {
       anime: data.Page.media.map(mapMediaToAnime),
       hasNextPage: data.Page.pageInfo.hasNextPage,
@@ -102,7 +112,10 @@ export async function getAnimeByMalId(malId: number): Promise<Anime | null> {
   `;
   try {
     const data = await fetchAniList(query, { id: malId });
-    return data.Media ? mapMediaToAnime(data.Media) : null;
+    if (data.errors || !data.data?.Media) {
+      return null;
+    }
+    return mapMediaToAnime(data.data.Media);
   } catch (error) {
     console.error(`Metadata recovery failed for ID ${malId}:`, error);
     return null;
@@ -122,7 +135,8 @@ export async function getTrendingAnime(): Promise<Anime[]> {
   
   try {
     const data = await fetchAniList(trendingQuery);
-    return data.Page.media.map(mapMediaToAnime);
+    if (data.errors) return [];
+    return data.data.Page.media.map(mapMediaToAnime);
   } catch (error) {
     console.error('Trending error:', error);
     return [];
@@ -145,8 +159,10 @@ export async function getRecentAiring(): Promise<Anime[]> {
   
   try {
     const data = await fetchAniList(recentQuery);
+    if (data.errors) return [];
+    
     const uniqueMedia = new Map();
-    data.Page.airingSchedules.forEach((item: any) => {
+    data.data.Page.airingSchedules.forEach((item: any) => {
       if (!uniqueMedia.has(item.media.id)) {
         uniqueMedia.set(item.media.id, mapMediaToAnime(item.media));
       }
