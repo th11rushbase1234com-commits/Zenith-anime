@@ -51,31 +51,31 @@ export default function LibraryPage() {
   return (
     <div className="bg-background text-foreground flex flex-col min-h-screen overflow-x-hidden">
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-12">
-        <div className="space-y-12 animate-in slide-in-from-right-10 duration-500">
+        <div className="space-y-10 animate-in slide-in-from-right-10 duration-500">
           
           {/* Watchlist Header */}
-          <div className="flex flex-col gap-4 border-b border-white/10 pb-10">
-            <div className="space-y-2">
-              <h2 className="text-4xl md:text-7xl font-black italic tracking-tighter uppercase text-glow">
+          <div className="flex flex-col gap-3 border-b border-white/10 pb-8">
+            <div className="space-y-1">
+              <h2 className="text-3xl md:text-6xl font-black italic tracking-tighter uppercase text-glow leading-tight">
                 WATCHLIST <span className="text-primary">ARCHIVES</span>
               </h2>
-              <p className="text-[10px] md:text-xs text-muted-foreground font-black italic uppercase tracking-[0.3em]">
+              <p className="text-[9px] md:text-[10px] text-muted-foreground font-black italic uppercase tracking-[0.3em]">
                 Anime Records & Zenith Nexus
               </p>
             </div>
           </div>
           
-          <Tabs defaultValue="all" className="w-full space-y-10">
-            <div className="sticky top-16 z-30 bg-background/80 backdrop-blur-md py-4 -mx-4 px-4 border-b border-white/5">
-              <div className="overflow-x-auto scrollbar-hide">
-                <TabsList className="bg-white/5 rounded-2xl p-1 h-auto flex border border-white/5 min-w-max">
+          <Tabs defaultValue="all" className="w-full space-y-8">
+            <div className="sticky top-16 z-30 bg-background/95 backdrop-blur-md py-4 -mx-4 px-4 border-b border-white/5">
+              <div className="overflow-x-auto scrollbar-hide w-full">
+                <TabsList className="bg-white/5 rounded-xl p-1 h-auto flex border border-white/5 min-w-max w-fit mx-auto sm:mx-0">
                   {TABS.map((tab) => (
                     <TabsTrigger 
                       key={tab.id}
                       value={tab.id} 
-                      className="rounded-xl px-5 py-3 font-black uppercase text-[10px] tracking-widest flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+                      className="rounded-lg px-4 py-2.5 font-black uppercase text-[9px] md:text-[10px] tracking-widest flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300"
                     >
-                      <tab.icon className="w-3.5 h-3.5" />
+                      <tab.icon className="w-3 h-3" />
                       {tab.label}
                       <span className="ml-1 opacity-50 font-mono">[{filteredWatchlist(tab.status).length}]</span>
                     </TabsTrigger>
@@ -97,13 +97,13 @@ export default function LibraryPage() {
                     />
                   ))}
                   {filteredWatchlist(tab.status).length === 0 && (
-                    <div className="col-span-full py-32 text-center bg-white/5 rounded-[3rem] border border-dashed border-white/10 flex flex-col items-center justify-center gap-6 animate-in fade-in duration-700">
-                      <div className="p-6 rounded-full bg-white/5 border border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
-                        <Bookmark className="w-12 h-12 text-muted-foreground/20" />
+                    <div className="col-span-full py-24 text-center bg-white/5 rounded-[2.5rem] border border-dashed border-white/10 flex flex-col items-center justify-center gap-6 animate-in fade-in duration-700">
+                      <div className="p-5 rounded-full bg-white/5 border border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+                        <Bookmark className="w-10 h-10 text-muted-foreground/20" />
                       </div>
-                      <div className="space-y-3">
-                        <p className="text-sm text-muted-foreground italic font-black uppercase tracking-[0.2em]">Archival sector empty</p>
-                        <p className="text-[10px] text-muted-foreground/40 font-mono uppercase">Status: No records detected in {tab.label}</p>
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground italic font-black uppercase tracking-[0.2em]">Archival sector empty</p>
+                        <p className="text-[9px] text-muted-foreground/40 font-mono uppercase">Status: No records detected in {tab.label}</p>
                       </div>
                     </div>
                   )}
