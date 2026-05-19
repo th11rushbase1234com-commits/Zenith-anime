@@ -9,7 +9,6 @@ import {
   Monitor, 
   Loader2, 
   Star,
-  Plus,
   History,
   Zap
 } from 'lucide-react';
@@ -29,7 +28,7 @@ import Image from 'next/image';
 export default function HomePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const { watchlist, isLoaded, addAnime, updateAnimeStatus, updateEpisodeProgress, removeAnime } = useWatchlist();
+  const { watchlist, isLoaded, addAnime, updateAnimeStatus, removeAnime } = useWatchlist();
   
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
   const [recentAiring, setRecentAiring] = useState<Anime[]>([]);
@@ -188,7 +187,6 @@ export default function HomePage() {
                         key={anime.id} 
                         anime={anime} 
                         onUpdateStatus={updateAnimeStatus}
-                        onUpdateEpisode={updateEpisodeProgress}
                         onRemove={removeAnime}
                       />
                     ))}

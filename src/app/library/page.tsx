@@ -20,7 +20,7 @@ import { useRouter } from 'next/navigation';
 export default function LibraryPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const { watchlist, isLoaded, updateAnimeStatus, updateEpisodeProgress, removeAnime } = useWatchlist();
+  const { watchlist, isLoaded, updateAnimeStatus, removeAnime } = useWatchlist();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -40,7 +40,7 @@ export default function LibraryPage() {
   const filteredWatchlist = (status?: string) => watchlist.filter(a => !status || a.status === status);
 
   const TABS = [
-    { id: 'all', label: 'GLOBAL NEXUS', icon: Database, status: undefined },
+    { id: 'all', label: 'ALL ANIME', icon: Database, status: undefined },
     { id: 'watching', label: 'WATCHING', icon: Play, status: 'WATCHING' },
     { id: 'planned', label: 'PLAN TO WATCH', icon: Clock, status: 'PLAN_TO_WATCH' },
     { id: 'on_hold', label: 'ON HOLD', icon: PauseCircle, status: 'ON_HOLD' },
@@ -53,10 +53,10 @@ export default function LibraryPage() {
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-12">
         <div className="space-y-10 animate-in slide-in-from-right-10 duration-500">
           
-          {/* Watchlist Header - Compacted and Clean */}
+          {/* Watchlist Header */}
           <div className="flex flex-col gap-2 border-b border-white/10 pb-6">
             <div className="space-y-0.5">
-              <h2 className="text-xl md:text-3xl font-black italic tracking-tighter uppercase text-glow leading-tight">
+              <h2 className="text-xl md:text-2xl font-black italic tracking-tighter uppercase text-glow leading-tight">
                 WATCHLIST <span className="text-primary">ARCHIVES</span>
               </h2>
               <p className="text-[7px] md:text-[8px] text-muted-foreground/60 font-black italic uppercase tracking-[0.4em]">
@@ -91,7 +91,6 @@ export default function LibraryPage() {
                       key={anime.id} 
                       anime={anime} 
                       onUpdateStatus={updateAnimeStatus} 
-                      onUpdateEpisode={updateEpisodeProgress} 
                       onRemove={removeAnime} 
                     />
                   ))}

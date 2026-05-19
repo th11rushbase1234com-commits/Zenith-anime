@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   Calendar,
   Layers,
-  Activity,
   ChevronRight
 } from 'lucide-react';
 import {
@@ -32,7 +31,6 @@ interface AnimeCardProps {
   anime: Anime;
   existingItem?: Anime;
   onUpdateStatus?: (id: string, status: WatchStatus) => void;
-  onUpdateEpisode?: (id: string, episode: number) => void;
   onRemove?: (id: string) => void;
   onAdd?: (anime: Anime, status: WatchStatus) => void;
 }
@@ -41,17 +39,12 @@ export function AnimeCard({
   anime, 
   existingItem,
   onUpdateStatus, 
-  onUpdateEpisode, 
   onRemove, 
   onAdd
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const itemInWatchlist = existingItem || (anime.status !== undefined && anime.id ? anime : undefined);
+  const itemInWatchlist = existingItem || (anime.status !== undefined && anime.id && (anime as any).userId ? anime : undefined);
   const currentItem = itemInWatchlist || anime;
-  
-  const progress = currentItem.totalEpisodes > 0 
-    ? (currentItem.currentEpisode / currentItem.totalEpisodes) * 100 
-    : 0;
 
   const STATUS_CONFIG: Record<WatchStatus, { label: string; icon: any; color: string; bgColor: string }> = {
     WATCHING: { label: 'WATCHING', icon: Play, color: 'text-primary', bgColor: 'bg-primary/20' },
@@ -103,9 +96,6 @@ export function AnimeCard({
               {currentStatus.label}
             </div>
           )}
-          <div className="px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-[9px] font-black text-white uppercase tracking-widest border border-white/10 w-fit">
-            {currentItem.totalEpisodes > 0 ? `${currentItem.totalEpisodes} EP` : 'MOVIE'}
-          </div>
         </div>
 
         {/* Rating Badge */}
@@ -149,7 +139,7 @@ export function AnimeCard({
               <DialogContent className="glass-panel border-white/10 max-w-[320px] rounded-[2rem] p-6">
                 <DialogHeader>
                   <DialogTitle className="text-sm font-black italic uppercase tracking-widest text-primary text-center">
-                    WATCHLIST PORTAL
+                    {itemInWatchlist ? 'MANAGEMENT PORTAL' : 'INITIALIZATION PORTAL'}
                   </DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-2 pt-4">
@@ -170,42 +160,24 @@ export function AnimeCard({
                       {config.label}
                     </Button>
                   ))}
+                  
                   {itemInWatchlist && (
-                    <Button
-                      variant="ghost"
-                      onClick={handleRemove}
-                      className="h-12 justify-start gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive mt-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      PURGE RECORD
-                    </Button>
+                    <div className="mt-4 pt-4 border-t border-white/5">
+                      <Button
+                        variant="ghost"
+                        onClick={handleRemove}
+                        className="w-full h-12 justify-center gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        PURGE RECORD
+                      </Button>
+                    </div>
                   )}
                 </div>
               </DialogContent>
             </Dialog>
-
-            {itemInWatchlist && itemInWatchlist.status === 'WATCHING' && (
-              <Button 
-                size="sm" 
-                variant="secondary" 
-                onClick={() => onUpdateEpisode?.(itemInWatchlist.id, itemInWatchlist.currentEpisode + 1)} 
-                className="w-full bg-primary/20 text-primary hover:bg-primary/30 border border-primary/20 font-black italic rounded-xl h-11 text-[9px] transition-all"
-              >
-                <ChevronRight className="w-4 h-4 mr-1.5" /> INCREMENT EPISODE
-              </Button>
-            )}
           </div>
         </div>
-
-        {/* Progress bar */}
-        {itemInWatchlist && itemInWatchlist.status === 'WATCHING' && (
-          <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/60 z-30">
-            <div 
-              className="h-full bg-primary shadow-[0_0_15px_rgba(168,85,247,0.8)] transition-all duration-500" 
-              style={{ width: `${progress}%` }} 
-            />
-          </div>
-        )}
       </div>
 
       {/* Content Info */}
@@ -214,14 +186,14 @@ export function AnimeCard({
           {currentItem.title}
         </h3>
         <div className="flex items-center justify-between opacity-60">
-          <div className="flex items-center gap-2">
-             <span className="text-[8px] text-muted-foreground font-black uppercase tracking-widest flex items-center gap-1.5">
-              <Activity className="w-3 h-3 text-primary/60" /> {itemInWatchlist ? `${itemInWatchlist.currentEpisode} / ` : ''}{currentItem.totalEpisodes || '?'} EP
-            </span>
-          </div>
           <span className="text-[8px] text-white/40 font-black uppercase italic flex items-center gap-1">
             <Calendar className="w-2.5 h-2.5" /> {currentItem.year || 'TBA'}
           </span>
+          {currentItem.genres && currentItem.genres.length > 0 && (
+            <span className="text-[8px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[100px]">
+              {currentItem.genres[0]}
+            </span>
+          )}
         </div>
       </div>
     </div>
