@@ -100,7 +100,7 @@ export default function SettingsPage() {
         {/* Header section */}
         <div className="text-center space-y-4">
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter uppercase text-glow">
-            TELEMETRY <span className="text-primary">SETTINGS</span>
+            PROFILE <span className="text-primary">SETTINGS</span>
           </h2>
           <p className="text-xs md:text-sm text-muted-foreground font-medium italic uppercase tracking-widest">
             Identity Configuration & Neural Link
