@@ -69,7 +69,7 @@ function mapMediaToAnime(media: any): Anime {
     status: 'PLAN_TO_WATCH',
     year: media.seasonYear || 0,
     subCount: media.episodes || 0,
-    dubCount: 0, // Default to 0 as AniList doesn't reliably track dub counts via API
+    dubCount: 0, // Note: AniList doesn't provide specific dub counts. Consider Anify or Consumet API for this.
     externalLinks: media.externalLinks || [],
     nextAiringEpisode: media.nextAiringEpisode
   };
