@@ -1,7 +1,8 @@
+
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import React, { useState, useRef, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Search, 
   Home, 
@@ -9,8 +10,7 @@ import {
   Bell, 
   Bookmark, 
   Settings, 
-  LogOut,
-  Monitor
+  LogOut
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
@@ -28,9 +28,16 @@ import Link from 'next/link';
 export function ZenithNavbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
-  const [searchQuery, setSearchQuery] = useState('');
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.get('q') || '';
+  
+  const [searchQuery, setSearchQuery] = useState(urlQuery);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync state if URL changes (e.g. back button)
+  useEffect(() => {
+    setSearchQuery(urlQuery);
+  }, [urlQuery]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

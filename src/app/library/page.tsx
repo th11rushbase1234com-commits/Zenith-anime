@@ -1,9 +1,9 @@
+
 'use client';
 
 import React, { useEffect } from 'react';
 import { useWatchlist } from '../hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
-import { ZenithNavbar } from '@/components/ZenithNavbar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Bookmark } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
@@ -32,9 +32,7 @@ export default function LibraryPage() {
   const filteredWatchlist = (status?: string) => watchlist.filter(a => !status || a.status === status);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <ZenithNavbar />
-
+    <div className="bg-background text-foreground flex flex-col">
       <main className="flex-1 w-full max-w-[1920px] mx-auto px-4 md:px-12 py-12">
         <div className="space-y-12 animate-in slide-in-from-right-10 duration-500">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-10">

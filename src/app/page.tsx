@@ -1,10 +1,10 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useWatchlist } from './hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
 import { GenreVisualizer } from '@/components/GenreVisualizer';
-import { ZenithNavbar } from '@/components/ZenithNavbar';
 import { DiscoveryTool } from '@/components/DiscoveryTool';
 import { 
   Monitor, 
@@ -79,9 +79,7 @@ export default function HomePage() {
   const watchingAnime = watchlist.filter(a => a.status === 'WATCHING');
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <ZenithNavbar />
-
+    <div className="bg-background text-foreground flex flex-col">
       <main className="flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden pb-12">
         <div className="space-y-10 animate-in fade-in duration-700">
           <section className="relative w-full aspect-[16/9] md:aspect-[21/9] min-h-[350px] md:min-h-[600px] overflow-hidden">

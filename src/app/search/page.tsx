@@ -1,10 +1,10 @@
+
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useWatchlist } from '../hooks/use-watchlist';
 import { AnimeCard } from '@/components/AnimeCard';
-import { ZenithNavbar } from '@/components/ZenithNavbar';
 import { searchAnime } from '@/services/anilist';
 import { Anime } from '../types/anime';
 import { Button } from '@/components/ui/button';
@@ -64,9 +64,7 @@ function SearchResults() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <ZenithNavbar />
-
+    <div className="bg-background text-foreground flex flex-col">
       <main className="flex-1 w-full max-w-[1920px] mx-auto px-4 md:px-12 py-12">
         <div className="space-y-12 animate-in slide-in-from-right-10 duration-500">
           {isSearching ? (
