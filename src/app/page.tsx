@@ -145,7 +145,7 @@ export default function HomePage() {
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button 
-                                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-black px-6 md:px-10 h-10 md:h-14 rounded-full gap-2 text-sm md:text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105 uppercase tracking-widest"
+                                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-black px-6 md:px-10 h-10 md:h-14 rounded-full gap-3 text-sm md:text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105 uppercase tracking-widest"
                                 >
                                   {existingItem ? (
                                     <><Settings2 className="w-4 h-4 md:w-6 md:h-6 shrink-0" /> EDIT WATCHLIST</>
