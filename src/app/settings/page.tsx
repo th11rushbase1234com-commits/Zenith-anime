@@ -26,12 +26,18 @@ import {
 } from "@/components/ui/dialog";
 
 const AVATAR_OPTIONS = [
-  'https://picsum.photos/seed/z1/200/200',
-  'https://picsum.photos/seed/z2/200/200',
-  'https://picsum.photos/seed/z3/200/200',
-  'https://picsum.photos/seed/z4/200/200',
-  'https://picsum.photos/seed/z5/200/200',
-  'https://picsum.photos/seed/z6/200/200',
+  'https://picsum.photos/seed/anime-char-1/200/200',
+  'https://picsum.photos/seed/anime-char-2/200/200',
+  'https://picsum.photos/seed/anime-char-3/200/200',
+  'https://picsum.photos/seed/anime-char-4/200/200',
+  'https://picsum.photos/seed/anime-char-5/200/200',
+  'https://picsum.photos/seed/anime-char-6/200/200',
+  'https://picsum.photos/seed/anime-char-7/200/200',
+  'https://picsum.photos/seed/anime-char-8/200/200',
+  'https://picsum.photos/seed/anime-char-9/200/200',
+  'https://picsum.photos/seed/anime-char-10/200/200',
+  'https://picsum.photos/seed/anime-char-11/200/200',
+  'https://picsum.photos/seed/anime-char-12/200/200',
 ];
 
 export default function SettingsPage() {
@@ -144,7 +150,14 @@ export default function SettingsPage() {
                       onClick={() => selectAvatar(url)}
                       className="aspect-square rounded-2xl overflow-hidden border-2 border-transparent hover:border-primary transition-all hover:scale-105"
                     >
-                      <Image src={url} alt={`Preset ${i}`} width={100} height={100} className="w-full h-full object-cover" />
+                      <Image 
+                        src={url} 
+                        alt={`Preset ${i}`} 
+                        width={100} 
+                        height={100} 
+                        className="w-full h-full object-cover" 
+                        data-ai-hint="anime character"
+                      />
                     </button>
                   ))}
                 </div>
