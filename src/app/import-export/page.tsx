@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -11,10 +12,12 @@ import {
   Upload, 
   ShieldAlert, 
   CheckCircle2, 
-  FileJson,
+  FileCode,
   LayoutDashboard
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { getAnimeByMalId } from '@/services/anilist';
+import { WatchStatus } from '../types/anime';
 
 export default function ImportExportPage() {
   const { user, loading: authLoading } = useAuth();
@@ -35,12 +38,45 @@ export default function ImportExportPage() {
     );
   }
 
+  const mapZenithToMalStatus = (status: WatchStatus): string => {
+    switch(status) {
+      case 'WATCHING': return 'Watching';
+      case 'COMPLETED': return 'Completed';
+      case 'ON_HOLD': return 'On-Hold';
+      case 'DROPPED': return 'Dropped';
+      case 'PLAN_TO_WATCH': return 'Plan to Watch';
+      default: return 'Plan to Watch';
+    }
+  };
+
+  const mapMalToZenithStatus = (status: string): WatchStatus => {
+    const s = status.toLowerCase();
+    if (s.includes('watching')) return 'WATCHING';
+    if (s.includes('completed')) return 'COMPLETED';
+    if (s.includes('hold')) return 'ON_HOLD';
+    if (s.includes('dropped')) return 'DROPPED';
+    return 'PLAN_TO_WATCH';
+  };
+
   const handleExport = () => {
     try {
-      const dataStr = JSON.stringify(watchlist, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      let xml = '<?xml version="1.0" encoding="UTF-8" ?>\n<myanimelist>\n';
+      xml += '  <myinfo>\n    <user_export_type>1</user_export_type>\n  </myinfo>\n';
       
-      const exportFileDefaultName = `zenith-watchlist-backup-${new Date().toISOString().split('T')[0]}.json`;
+      watchlist.forEach(item => {
+        xml += '  <anime>\n';
+        xml += `    <series_animedb_id>${item.id}</series_animedb_id>\n`;
+        xml += `    <my_watched_episodes>${item.currentEpisode || 0}</my_watched_episodes>\n`;
+        xml += `    <my_status>${mapZenithToMalStatus(item.status)}</my_status>\n`;
+        xml += `    <my_score>${item.rating ? Math.round(item.rating * 10) : 0}</my_score>\n`;
+        xml += `    <update_on_import>1</update_on_import>\n`;
+        xml += '  </anime>\n';
+      });
+      
+      xml += '</myanimelist>';
+      
+      const dataUri = 'data:text/xml;charset=utf-8,' + encodeURIComponent(xml);
+      const exportFileDefaultName = `zenith-watchlist-mal-${new Date().toISOString().split('T')[0]}.xml`;
       
       const linkElement = document.createElement('a');
       linkElement.setAttribute('href', dataUri);
@@ -49,13 +85,13 @@ export default function ImportExportPage() {
 
       toast({
         title: "Export Successful",
-        description: `${watchlist.length} records have been packaged into JSON format.`,
+        description: `${watchlist.length} records exported in MAL XML format.`,
       });
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Export Failed",
-        description: "Could not generate backup file.",
+        description: "Could not generate XML archive.",
       });
     }
   };
@@ -71,31 +107,51 @@ export default function ImportExportPage() {
     reader.onload = async (e) => {
       try {
         const content = e.target?.result as string;
-        const data = JSON.parse(content);
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(content, "text/xml");
+        const animeNodes = xmlDoc.getElementsByTagName("anime");
 
-        if (!Array.isArray(data)) {
-          throw new Error("Invalid format: Backup must be an array of records.");
+        if (animeNodes.length === 0) {
+          throw new Error("Invalid MAL XML structure.");
         }
 
         let successCount = 0;
-        for (const item of data) {
-          // Basic validation of imported item structure
-          if (item.id && item.title && item.status) {
-            await addAnime(item, item.status);
-            successCount++;
+        // Batch processing to avoid overwhelming API/DB
+        for (let i = 0; i < animeNodes.length; i++) {
+          const node = animeNodes[i];
+          const malId = node.getElementsByTagName("series_animedb_id")[0]?.textContent;
+          const statusText = node.getElementsByTagName("my_status")[0]?.textContent;
+          const watchedEpisodes = node.getElementsByTagName("my_watched_episodes")[0]?.textContent;
+
+          if (malId && statusText) {
+            const zenithStatus = mapMalToZenithStatus(statusText);
+            // Recover metadata from AniList
+            const animeDetails = await getAnimeByMalId(parseInt(malId));
+            
+            if (animeDetails) {
+              const enrichedItem = {
+                ...animeDetails,
+                currentEpisode: parseInt(watchedEpisodes || '0')
+              };
+              await addAnime(enrichedItem, zenithStatus);
+              successCount++;
+            }
           }
+          
+          // Small delay every 5 items to respect AniList rate limits
+          if (i % 5 === 0) await new Promise(r => setTimeout(r, 500));
         }
 
         setImportCount(successCount);
         toast({
           title: "Import Complete",
-          description: `Successfully restored ${successCount} anime records to your watchlist.`,
+          description: `Successfully restored ${successCount} records with full metadata recovery.`,
         });
       } catch (error: any) {
         toast({
           variant: "destructive",
           title: "Import Error",
-          description: error.message || "Failed to process the backup file.",
+          description: error.message || "Failed to process XML file.",
         });
       } finally {
         setProcessing(false);
@@ -109,63 +165,60 @@ export default function ImportExportPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center py-12 px-4 md:px-8">
       <div className="w-full max-w-3xl space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
         
-        {/* Header section */}
         <div className="text-center space-y-4">
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter uppercase text-glow">
             DATA <span className="text-primary">MIGRATION</span>
           </h2>
           <p className="text-xs md:text-sm text-muted-foreground font-medium italic uppercase tracking-widest">
-            Backup & Recovery Protocols
+            MAL XML Archive & Synchronization
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Export Section */}
           <div className="glass-panel rounded-[2.5rem] p-8 md:p-10 space-y-8 flex flex-col h-full">
             <div className="space-y-4 flex-1">
               <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
                 <Download className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Export Archive</h3>
+              <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Export XML</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Download your entire Zenith watchlist as a JSON file. This can be used for local backups or migrating to another account.
+                Generate a MyAnimeList compatible XML backup. Ideal for external archival or cross-platform migration.
               </p>
               <div className="pt-2">
-                <p className="text-[10px] font-mono uppercase text-primary/60">Current Records: {watchlist.length}</p>
+                <p className="text-[10px] font-mono uppercase text-primary/60">Active Records: {watchlist.length}</p>
               </div>
             </div>
             
             <Button 
               onClick={handleExport}
               disabled={watchlist.length === 0}
-              className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black italic rounded-full uppercase tracking-widest shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all hover:scale-[1.02]"
+              className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-full uppercase tracking-widest transition-all hover:scale-[1.02]"
             >
-              GENERATE BACKUP
+              GENERATE XML
             </Button>
           </div>
 
-          {/* Import Section */}
           <div className="glass-panel rounded-[2.5rem] p-8 md:p-10 space-y-8 flex flex-col h-full">
             <div className="space-y-4 flex-1">
               <div className="w-14 h-14 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
                 <Upload className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Restore Archive</h3>
+              <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Restore XML</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Upload a Zenith JSON backup to restore your watchlist. Existing records will be updated, and new ones will be added.
+                Upload a MAL export. Zenith will automatically recover titles and posters for every ID found in the archive.
               </p>
               
               <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-start gap-3">
                 <ShieldAlert className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
                 <p className="text-[9px] text-destructive font-bold uppercase tracking-wider leading-normal">
-                  Caution: Importing will overwrite existing metadata for series already in your library.
+                  Caution: Metadata recovery takes time. Please do not close the window during synchronization.
                 </p>
               </div>
             </div>
 
             <input 
               type="file" 
-              accept=".json" 
+              accept=".xml" 
               className="hidden" 
               ref={fileInputRef} 
               onChange={handleImport}
@@ -174,37 +227,35 @@ export default function ImportExportPage() {
             <Button 
               onClick={() => fileInputRef.current?.click()}
               disabled={processing}
-              className="w-full h-14 bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black italic rounded-full uppercase tracking-widest transition-all hover:scale-[1.02]"
+              className="w-full h-14 bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black rounded-full uppercase tracking-widest transition-all hover:scale-[1.02]"
             >
-              {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : 'UPLOAD BACKUP'}
+              {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : 'UPLOAD MAL XML'}
             </Button>
           </div>
         </div>
 
-        {/* Success / Status Section */}
         {importCount !== null && (
           <div className="animate-in zoom-in-95 duration-300">
             <div className="bg-accent/10 border border-accent/20 rounded-[2rem] p-6 flex items-center justify-center gap-4">
               <CheckCircle2 className="w-6 h-6 text-accent" />
               <div className="text-center">
-                <p className="text-xs font-black italic uppercase tracking-widest text-white">Data Integration Complete</p>
-                <p className="text-[10px] text-accent font-bold uppercase tracking-tighter">Synchronized {importCount} records to Zenith Cloud</p>
+                <p className="text-xs font-black italic uppercase tracking-widest text-white">Integration Successful</p>
+                <p className="text-[10px] text-accent font-bold uppercase tracking-tighter">Synchronized {importCount} records from MAL Archive</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Footer info */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-              <FileJson className="w-3.5 h-3.5" /> JSON Protocol V1.0
+              <FileCode className="w-3.5 h-3.5" /> XML PROTOCOL V2.0 (MAL)
             </div>
           </div>
           <Button 
             variant="ghost"
             onClick={() => router.push('/')}
-            className="font-black italic text-[11px] uppercase tracking-widest text-primary hover:text-white"
+            className="font-black text-[11px] uppercase tracking-widest text-primary hover:text-white"
           >
             <LayoutDashboard className="w-4 h-4 mr-2" /> Return to Command Center
           </Button>
