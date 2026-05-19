@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "WatchlistItem": {
@@ -9,7 +10,7 @@
         "id": { "type": "string", "description": "The AniList ID of the anime." },
         "title": { "type": "string" },
         "imageUrl": { "type": "string" },
-        "status": { "type": "string", "enum": ["PLAN_TO_WATCH", "WATCHING", "COMPLETED"] },
+        "status": { "type": "string", "enum": ["PLAN_TO_WATCH", "WATCHING", "COMPLETED", "ON_HOLD", "DROPPED"] },
         "currentEpisode": { "type": "number" },
         "totalEpisodes": { "type": "number" },
         "updatedAt": { "type": "string", "format": "date-time" }

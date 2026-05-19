@@ -1,5 +1,5 @@
 
-export type WatchStatus = 'PLAN_TO_WATCH' | 'WATCHING' | 'COMPLETED';
+export type WatchStatus = 'PLAN_TO_WATCH' | 'WATCHING' | 'COMPLETED' | 'ON_HOLD' | 'DROPPED';
 
 export interface Anime {
   id: string;

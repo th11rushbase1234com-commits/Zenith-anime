@@ -1,10 +1,32 @@
+
 'use client';
 
 import React from 'react';
 import Image from 'next/image';
 import { Anime, WatchStatus } from '@/app/types/anime';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, ChevronRight, Hash, Star, Settings2, CheckCircle2 } from 'lucide-react';
+import { 
+  Plus, 
+  Trash2, 
+  ChevronRight, 
+  Hash, 
+  Star, 
+  Settings2, 
+  CheckCircle2,
+  Play,
+  Clock,
+  PauseCircle,
+  XCircle,
+  MoreVertical
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface AnimeCardProps {
   anime: Anime;
@@ -24,6 +46,16 @@ export function AnimeCard({
   isSearchMode = false 
 }: AnimeCardProps) {
   const progress = anime.totalEpisodes > 0 ? (anime.currentEpisode / anime.totalEpisodes) * 100 : 0;
+
+  const STATUS_CONFIG: Record<WatchStatus, { label: string; icon: any; color: string }> = {
+    WATCHING: { label: 'ACTIVE', icon: Play, color: 'text-primary' },
+    PLAN_TO_WATCH: { label: 'QUEUED', icon: Clock, color: 'text-muted-foreground' },
+    COMPLETED: { label: 'MASTERED', icon: CheckCircle2, color: 'text-accent' },
+    ON_HOLD: { label: 'STALLED', icon: PauseCircle, color: 'text-yellow-500' },
+    DROPPED: { label: 'PURGED', icon: XCircle, color: 'text-destructive' },
+  };
+
+  const currentStatus = STATUS_CONFIG[anime.status] || STATUS_CONFIG.PLAN_TO_WATCH;
 
   return (
     <div className="group relative flex flex-col gap-3 w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -70,15 +102,39 @@ export function AnimeCard({
             ) : (
               <>
                 <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="secondary" 
-                    onClick={() => onUpdateStatus?.(anime.id, anime.status === 'COMPLETED' ? 'WATCHING' : 'COMPLETED')} 
-                    className="flex-1 bg-white/10 hover:bg-white/20 border border-white/10 text-white font-black italic rounded-xl h-10 text-[9px] backdrop-blur-sm"
-                  >
-                    {anime.status === 'COMPLETED' ? <Settings2 className="w-3.5 h-3.5 mr-1.5" /> : <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-accent" />}
-                    {anime.status === 'COMPLETED' ? 'MANAGE' : 'DONE'}
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        size="sm" 
+                        variant="secondary" 
+                        className="flex-1 bg-white/10 hover:bg-white/20 border border-white/10 text-white font-black italic rounded-xl h-10 text-[9px] backdrop-blur-sm"
+                      >
+                        <Settings2 className="w-3.5 h-3.5 mr-1.5" />
+                        STATUS
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="glass-panel border-white/10 w-48">
+                      <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-primary">MANAGE RECORD</DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-white/5" />
+                      {Object.entries(STATUS_CONFIG).map(([status, config]) => (
+                        <DropdownMenuItem 
+                          key={status}
+                          onClick={() => onUpdateStatus?.(anime.id, status as WatchStatus)}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-white/5 text-[9px] font-bold uppercase tracking-widest ${anime.status === status ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}
+                        >
+                          <config.icon className="w-3.5 h-3.5" /> {config.label}
+                        </DropdownMenuItem>
+                      ))}
+                      <DropdownMenuSeparator className="bg-white/5" />
+                      <DropdownMenuItem 
+                        onClick={() => onRemove?.(anime.id)}
+                        className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-destructive/10 text-[9px] font-bold uppercase tracking-widest text-destructive"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> PURGE RECORD
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
                   <Button 
                     size="sm" 
                     variant="secondary" 
@@ -88,14 +144,6 @@ export function AnimeCard({
                     <ChevronRight className="w-3.5 h-3.5 mr-1" /> EP +1
                   </Button>
                 </div>
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  onClick={() => onRemove?.(anime.id)} 
-                  className="w-full text-white/40 hover:text-destructive hover:bg-destructive/10 font-bold text-[9px] h-8 rounded-xl"
-                >
-                  <Trash2 className="w-3.5 h-3.5 mr-1.5" /> PURGE RECORD
-                </Button>
               </>
             )}
           </div>
@@ -119,7 +167,7 @@ export function AnimeCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
              <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest flex items-center gap-1.5">
-              <Hash className="w-3 h-3 text-primary" /> {anime.currentEpisode} / {anime.totalEpisodes || '?'}
+              <currentStatus.icon className={`w-3 h-3 ${currentStatus.color}`} /> {anime.currentEpisode} / {anime.totalEpisodes || '?'}
             </span>
           </div>
           <span className="text-[10px] text-white/40 font-bold uppercase">{anime.year || 'TBA'}</span>
