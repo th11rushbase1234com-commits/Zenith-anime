@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -35,7 +34,7 @@ export function ZenithNavbar() {
     e.preventDefault();
     if (searchQuery.trim()) {
       const query = searchQuery.trim();
-      // Clear input immediately to ensure a fresh experience every time
+      // Clear input immediately after search to keep results as the focus
       setSearchQuery('');
       searchInputRef.current?.blur();
       router.push(`/search?q=${encodeURIComponent(query)}`);
@@ -46,6 +45,14 @@ export function ZenithNavbar() {
     setSearchQuery('');
     router.push('/');
     searchInputRef.current?.blur();
+  };
+
+  const handleBlur = () => {
+    // If the user clicks away without searching, clear the "draft" text
+    // We use a small timeout to allow clicking the search icon button itself
+    setTimeout(() => {
+      setSearchQuery('');
+    }, 150);
   };
 
   const userName = user?.displayName || user?.email?.split('@')[0] || 'Zenith User';
@@ -77,6 +84,7 @@ export function ZenithNavbar() {
             className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-xs md:text-sm focus:ring-1 focus:ring-primary transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onBlur={handleBlur}
           />
           {searchQuery && (
             <button 
