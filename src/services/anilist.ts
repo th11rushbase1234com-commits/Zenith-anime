@@ -41,7 +41,7 @@ async function fetchAniList(query: string, variables: any = {}) {
 
     if (!response.ok) {
       if (response.status === 429) {
-        console.warn('AniList Rate Limit Hit. Cooling down...');
+        return { errors: [{ message: 'AniList Rate Limit Hit. Please wait a moment.' }] };
       }
       return { errors: [{ message: `HTTP Error: ${response.status}` }] };
     }
@@ -49,8 +49,8 @@ async function fetchAniList(query: string, variables: any = {}) {
     const json = await response.json();
     return json;
   } catch (error) {
-    console.error('Fetch error:', error);
-    return { errors: [{ message: error instanceof Error ? error.message : 'Network error' }] };
+    // Catch low-level fetch errors (TypeError: Failed to fetch)
+    return { errors: [{ message: error instanceof Error ? error.message : 'Connection failed' }] };
   }
 }
 
@@ -92,12 +92,11 @@ export async function searchAnime(query: string, page: number = 1): Promise<{ an
     if (data.errors) return { anime: [], hasNextPage: false, lastPage: 1 };
     
     return {
-      anime: data.Page.media.map(mapMediaToAnime),
-      hasNextPage: data.Page.pageInfo.hasNextPage,
-      lastPage: data.Page.pageInfo.lastPage
+      anime: data.data.Page.media.map(mapMediaToAnime),
+      hasNextPage: data.data.Page.pageInfo.hasNextPage,
+      lastPage: data.data.Page.pageInfo.lastPage
     };
   } catch (error) {
-    console.error('Search error:', error);
     return { anime: [], hasNextPage: false, lastPage: 1 };
   }
 }
@@ -117,7 +116,6 @@ export async function getAnimeByMalId(malId: number): Promise<Anime | null> {
     }
     return mapMediaToAnime(data.data.Media);
   } catch (error) {
-    console.error(`Metadata recovery failed for ID ${malId}:`, error);
     return null;
   }
 }
@@ -138,7 +136,6 @@ export async function getTrendingAnime(): Promise<Anime[]> {
     if (data.errors) return [];
     return data.data.Page.media.map(mapMediaToAnime);
   } catch (error) {
-    console.error('Trending error:', error);
     return [];
   }
 }
@@ -169,7 +166,6 @@ export async function getRecentAiring(): Promise<Anime[]> {
     });
     return Array.from(uniqueMedia.values());
   } catch (error) {
-    console.error('Recent airing error:', error);
     return [];
   }
 }

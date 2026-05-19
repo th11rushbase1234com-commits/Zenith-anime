@@ -122,29 +122,29 @@ export default function ImportExportPage() {
 
         for (let i = 0; i < total; i++) {
           const node = animeNodes[i];
-          const malId = node.getElementsByTagName("series_animedb_id")[0]?.textContent;
+          const malIdStr = node.getElementsByTagName("series_animedb_id")[0]?.textContent;
           const statusText = node.getElementsByTagName("my_status")[0]?.textContent;
           
-          if (malId && statusText) {
+          if (malIdStr && statusText) {
             try {
+              const malId = parseInt(malIdStr);
               const zenithStatus = mapMalToZenithStatus(statusText);
-              const animeDetails = await getAnimeByMalId(parseInt(malId));
+              
+              // 1200ms delay per request to safely stay under AniList's 90req/min limit
+              await new Promise(r => setTimeout(r, 1200));
+              
+              const animeDetails = await getAnimeByMalId(malId);
               
               if (animeDetails) {
                 await addAnime(animeDetails, zenithStatus);
                 successCount++;
               }
             } catch (innerError) {
-              console.warn(`Skipping ID ${malId} due to error:`, innerError);
+              console.warn(`Record skip [ID: ${malIdStr}]: Connection unstable.`);
             }
           }
           
           setCurrentProgress(Math.round(((i + 1) / total) * 100));
-          
-          // Moderate rate limiting: 800ms delay every 3 items to be safe with AniList (90 req/min)
-          if ((i + 1) % 3 === 0) {
-            await new Promise(r => setTimeout(r, 800));
-          }
         }
 
         setImportCount(successCount);
@@ -216,7 +216,7 @@ export default function ImportExportPage() {
               <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-start gap-3">
                 <ShieldAlert className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
                 <p className="text-[9px] text-destructive font-bold uppercase tracking-wider leading-normal">
-                  Caution: Metadata recovery takes time. Rate limiting is active to ensure connection stability.
+                  Caution: Metadata recovery is staggered to ensure stability. Please do not close this window.
                 </p>
               </div>
             </div>
