@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -6,7 +7,6 @@ import {
   Search, 
   Home, 
   X, 
-  Bell, 
   Bookmark, 
   Settings, 
   LogOut,
@@ -24,6 +24,7 @@ import {
 import { useAuth } from '@/context/auth-context';
 import Image from 'next/image';
 import Link from 'next/link';
+import { NotificationCenter } from './NotificationCenter';
 
 export function ZenithNavbar() {
   const { user, logout } = useAuth();
@@ -96,9 +97,7 @@ export function ZenithNavbar() {
         </form>
         
         <div className="flex items-center gap-2 md:gap-3 border-l border-white/10 pl-2 md:pl-4">
-          <button className="hidden sm:flex w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/5 border border-white/10 items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all">
-            <Bell className="w-4 h-4 md:w-5 md:h-5" />
-          </button>
+          <NotificationCenter />
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

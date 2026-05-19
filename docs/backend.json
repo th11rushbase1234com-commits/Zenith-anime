@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "WatchlistItem": {
@@ -19,6 +20,22 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "id", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "A broadcast alert for the user regarding their watchlist activity.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "animeId": { "type": "string" },
+        "animeTitle": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["EPISODE", "DUB", "NEWS"] },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "episodeNumber": { "type": "number" }
+      },
+      "required": ["userId", "message", "type", "isRead", "createdAt"]
     }
   },
   "auth": {
@@ -28,6 +45,10 @@
     "/watchlists/{animeId}": {
       "schema": "WatchlistItem",
       "description": "User watchlist collection where each document is keyed by the anime's ID."
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications for airing updates and news."
     }
   }
 }
