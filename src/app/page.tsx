@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -8,12 +7,11 @@ import { GenreVisualizer } from '@/components/GenreVisualizer';
 import { DiscoveryTool } from '@/components/DiscoveryTool';
 import { 
   Monitor, 
-  Zap, 
   Loader2, 
-  Play,
   Star,
   Plus,
-  History
+  History,
+  Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -77,6 +75,7 @@ export default function HomePage() {
   }
 
   const watchingAnime = watchlist.filter(a => a.status === 'WATCHING');
+  const getExistingItem = (id: string) => watchlist.find(a => a.id === id);
 
   return (
     <div className="bg-background text-foreground flex flex-col">
@@ -126,10 +125,10 @@ export default function HomePage() {
 
                         <div className="flex flex-wrap gap-4 pt-2 md:pt-4">
                           <Button 
-                            onClick={() => addAnime(anime)}
+                            onClick={() => router.push('/search?q=' + anime.title)}
                             className="bg-primary hover:bg-primary/90 text-primary-foreground font-black italic px-6 md:px-10 h-10 md:h-14 rounded-full gap-2 text-sm md:text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105"
                           >
-                            <Plus className="w-4 h-4 md:w-6 md:h-6" /> ADD TO WATCHLIST
+                            <Zap className="w-4 h-4 md:w-6 md:h-6" /> EXPLORE SERIES
                           </Button>
                         </div>
                       </div>
@@ -168,8 +167,10 @@ export default function HomePage() {
                       <AnimeCard 
                         key={`recent-${anime.id}`} 
                         anime={anime} 
-                        isSearchMode
-                        onAdd={() => addAnime(anime)}
+                        existingItem={getExistingItem(anime.id)}
+                        onAdd={addAnime}
+                        onUpdateStatus={updateAnimeStatus}
+                        onRemove={removeAnime}
                       />
                     ))}
                   </div>
@@ -193,42 +194,10 @@ export default function HomePage() {
                     ))}
                     {watchingAnime.length === 0 && (
                       <div className="col-span-full py-16 md:py-20 text-center bg-white/5 rounded-3xl border border-dashed border-white/10 flex flex-col items-center gap-4">
-                        <Play className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground/30" />
+                        <Monitor className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground/30" />
                         <p className="text-xs md:text-sm text-muted-foreground italic font-medium">Your active feed is currently offline.</p>
                       </div>
                     )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-full lg:w-80 shrink-0 space-y-8">
-                <div className="bg-card/60 backdrop-blur-xl border border-white/5 rounded-[2rem] p-6 md:p-8 space-y-6 md:space-y-8 sticky top-24">
-                  <h3 className="text-[10px] md:text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2 border-b border-white/5 pb-4">
-                    <Zap className="w-4 h-4 fill-current" /> Profile Telemetry
-                  </h3>
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-end">
-                        <span className="text-[10px] text-muted-foreground font-black uppercase">Archive Volume</span>
-                        <span className="font-bold text-base md:text-lg text-glow">{watchlist.reduce((acc, a) => acc + (a.currentEpisode || 0), 0)} EP</span>
-                      </div>
-                      <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary transition-all duration-1000" 
-                          style={{ width: `${Math.min(100, (watchlist.length * 10))}%` }} 
-                        />
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center p-3 md:p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/10">
-                      <span className="text-[10px] md:text-xs text-muted-foreground font-bold uppercase">Mastered</span>
-                      <span className="font-black text-lg md:text-xl text-accent">{watchlist.filter(a => a.status === 'COMPLETED').length}</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 md:p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/10">
-                      <span className="text-[10px] md:text-xs text-muted-foreground font-bold uppercase">Efficiency</span>
-                      <span className="font-black text-lg md:text-xl text-primary">
-                        {Math.round((watchlist.filter(a => a.status === 'COMPLETED').length / (watchlist.length || 1)) * 100)}%
-                      </span>
-                    </div>
                   </div>
                 </div>
               </div>

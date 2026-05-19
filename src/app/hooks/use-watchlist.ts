@@ -29,7 +29,6 @@ export function useWatchlist() {
 
     setIsLoaded(false);
 
-    // Ensure the query matches the security rules
     const q = query(
       collection(db, 'watchlists'), 
       where('userId', '==', user.uid)
@@ -43,9 +42,8 @@ export function useWatchlist() {
       setWatchlist(items);
       setIsLoaded(true);
     }, (error) => {
-      // Handle the permission error gracefully
       if (error.code === 'permission-denied') {
-        console.warn("Zenith Watchlist: Waiting for permissions or index sync...");
+        console.warn("Zenith Watchlist: Waiting for permissions...");
       } else {
         console.error("Zenith Watchlist Error:", error.message);
       }
@@ -55,17 +53,14 @@ export function useWatchlist() {
     return () => unsubscribe();
   }, [user]);
 
-  const addAnime = async (anime: Anime) => {
+  const addAnime = async (anime: Anime, status: WatchStatus = 'PLAN_TO_WATCH') => {
     if (!user) return;
     
-    // Check local state first to prevent unnecessary writes
-    if (watchlist.some(a => a.id === anime.id)) return;
-
     const animeRef = doc(db, 'watchlists', anime.id);
     setDoc(animeRef, {
       ...anime,
       userId: user.uid,
-      status: 'PLAN_TO_WATCH',
+      status: status,
       currentEpisode: 0,
       updatedAt: new Date().toISOString()
     }, { merge: true }).catch(err => {

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
@@ -17,7 +16,7 @@ function SearchResults() {
   const router = useRouter();
   const query = searchParams.get('q') || '';
   
-  const { addAnime, isLoaded } = useWatchlist();
+  const { addAnime, isLoaded, watchlist, updateAnimeStatus, removeAnime } = useWatchlist();
   const [results, setResults] = useState<Anime[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,6 +53,8 @@ function SearchResults() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const getExistingItem = (id: string) => watchlist.find(a => a.id === id);
+
   if (authLoading || !isLoaded || !user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
@@ -85,13 +86,14 @@ function SearchResults() {
                   <AnimeCard 
                     key={`search-${anime.id}-${idx}`}
                     anime={anime} 
-                    isSearchMode
-                    onAdd={() => addAnime(anime)}
+                    existingItem={getExistingItem(anime.id)}
+                    onAdd={addAnime}
+                    onUpdateStatus={updateAnimeStatus}
+                    onRemove={removeAnime}
                   />
                 ))}
               </div>
 
-              {/* Stabilized Pagination */}
               <div className="flex justify-center py-10 md:py-12">
                 <div className="inline-grid grid-cols-3 items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full h-9 md:h-10 px-1 shadow-2xl min-w-[180px] md:min-w-[200px] text-center">
                   <div className="flex justify-start">
