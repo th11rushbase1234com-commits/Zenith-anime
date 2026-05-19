@@ -14,14 +14,13 @@ function NavigationManager({ children }: { children: React.ReactNode }) {
   const showNavbar = pathname !== '/login';
 
   useEffect(() => {
-    // Force reset to home on page reload
-    const isReload = window.performance
-      .getEntriesByType('navigation')
-      .map((nav) => (nav as PerformanceNavigationTiming).type)
-      .includes('reload');
+    // Force reset to home on page reload regardless of current path
+    const navigationEntries = window.performance.getEntriesByType('navigation');
+    const isReload = navigationEntries.length > 0 && (navigationEntries[0] as PerformanceNavigationTiming).type === 'reload';
 
-    if (isReload && window.location.pathname !== '/') {
-      window.location.href = '/';
+    if (isReload) {
+      // Use window.location.replace to prevent back-button loops after reload
+      window.location.replace('/');
     }
   }, []);
 

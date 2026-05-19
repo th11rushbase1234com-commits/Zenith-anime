@@ -1,8 +1,8 @@
 
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Search, 
   Home, 
@@ -28,22 +28,17 @@ import Link from 'next/link';
 export function ZenithNavbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const urlQuery = searchParams.get('q') || '';
-  
-  const [searchQuery, setSearchQuery] = useState(urlQuery);
+  const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
-
-  // Sync state if URL changes (e.g. back button)
-  useEffect(() => {
-    setSearchQuery(urlQuery);
-  }, [urlQuery]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      const query = searchQuery.trim();
+      // Clear input immediately to ensure a fresh experience every time
+      setSearchQuery('');
       searchInputRef.current?.blur();
+      router.push(`/search?q=${encodeURIComponent(query)}`);
     }
   };
 
