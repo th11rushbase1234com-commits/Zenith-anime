@@ -87,11 +87,11 @@ export function AnimeCard({
         <div className="absolute top-3 left-3 md:top-4 md:left-4 flex flex-col gap-1.5 z-10">
           {currentStatus && (
             <div className={cn(
-              "px-2.5 py-1 rounded-lg backdrop-blur-md text-[8px] font-black uppercase tracking-widest border border-white/5 w-fit flex items-center gap-1.5",
+              "px-2 py-0.5 rounded-lg backdrop-blur-md text-[7px] font-black uppercase tracking-tight border border-white/5 w-fit flex items-center gap-1",
               currentStatus.bgColor,
               currentStatus.color
             )}>
-              <currentStatus.icon className="w-2.5 h-2.5" />
+              <currentStatus.icon className="w-2 h-2" />
               {currentStatus.label}
             </div>
           )}
@@ -99,45 +99,45 @@ export function AnimeCard({
 
         {/* Rating Badge */}
         {currentItem.rating > 0 && (
-          <div className="absolute top-3 right-3 md:top-4 md:right-4 px-2.5 py-1 rounded-lg bg-accent text-[9px] font-black text-black uppercase tracking-widest flex items-center gap-1 shadow-lg z-10">
-            <Star className="w-2.5 h-2.5 fill-current" /> {currentItem.rating.toFixed(1)}
+          <div className="absolute top-3 right-3 md:top-4 md:right-4 px-2 py-0.5 rounded-lg bg-accent text-[8px] font-black text-black uppercase tracking-tight flex items-center gap-1 shadow-lg z-10">
+            <Star className="w-2 h-2 fill-current" /> {currentItem.rating.toFixed(1)}
           </div>
         )}
 
         {/* Interaction Overlay */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-t from-black via-black/80 to-transparent p-5 flex flex-col justify-end gap-4 z-20">
-          <div className="space-y-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-t from-black via-black/80 to-transparent p-4 flex flex-col justify-end gap-3 z-20">
+          <div className="space-y-1 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
             <div className="flex items-center gap-2">
-              <Layers className="w-3 h-3 text-primary" />
-              <h4 className="text-[8px] font-black text-primary uppercase tracking-[0.2em] italic">ZENITH INTEL</h4>
+              <Layers className="w-2.5 h-2.5 text-primary" />
+              <h4 className="text-[7px] font-black text-primary uppercase tracking-widest">ZENITH INTEL</h4>
             </div>
-            <p className="text-[11px] text-white/70 line-clamp-3 leading-relaxed font-medium italic">
+            <p className="text-[9px] text-white/70 line-clamp-3 leading-tight font-medium">
               {currentItem.description}
             </p>
           </div>
           
-          <div className="flex flex-col gap-2 pt-2 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+          <div className="flex flex-col gap-2 pt-1 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button 
                   size="sm" 
                   className={cn(
-                    "w-full font-black rounded-xl text-[10px] h-11 transition-all uppercase tracking-widest flex items-center justify-center",
+                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-tight flex items-center justify-center px-1 shrink-0",
                     itemInWatchlist 
                       ? "bg-white/10 hover:bg-white/20 text-white border border-white/10" 
-                      : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(168,85,247,0.4)]"
+                      : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(168,85,247,0.4)]"
                   )}
                 >
                   {itemInWatchlist ? (
-                    <><Settings2 className="w-4 h-4 mr-2" /> EDIT WATCHLIST</>
+                    <><Settings2 className="w-3 h-3 mr-1.5 shrink-0" /> <span className="truncate">EDIT WATCHLIST</span></>
                   ) : (
-                    <><Plus className="w-4 h-4 mr-2" /> ADD TO WATCHLIST</>
+                    <><Plus className="w-3 h-3 mr-1.5 shrink-0" /> <span className="truncate">ADD TO WATCHLIST</span></>
                   )}
                 </Button>
               </DialogTrigger>
               <DialogContent className="glass-panel border-white/10 max-w-[320px] rounded-[2rem] p-6">
                 <DialogHeader>
-                  <DialogTitle className="text-sm font-black italic uppercase tracking-widest text-primary text-center">
+                  <DialogTitle className="text-sm font-black uppercase tracking-widest text-primary text-center">
                     {itemInWatchlist ? 'MANAGEMENT PORTAL' : 'INITIALIZATION PORTAL'}
                   </DialogTitle>
                 </DialogHeader>
@@ -180,16 +180,16 @@ export function AnimeCard({
       </div>
 
       {/* Content Info */}
-      <div className="px-2 flex flex-col gap-1">
-        <h3 className="font-black text-[14px] md:text-[15px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight italic uppercase">
+      <div className="px-2 flex flex-col gap-0.5">
+        <h3 className="font-black text-[12px] md:text-[13px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase">
           {currentItem.title}
         </h3>
         <div className="flex items-center justify-between opacity-60">
-          <span className="text-[8px] text-white/40 font-black uppercase italic flex items-center gap-1">
-            <Calendar className="w-2.5 h-2.5" /> {currentItem.year || 'TBA'}
+          <span className="text-[7px] text-white/40 font-black uppercase flex items-center gap-1">
+            <Calendar className="w-2 h-2" /> {currentItem.year || 'TBA'}
           </span>
           {currentItem.genres && currentItem.genres.length > 0 && (
-            <span className="text-[8px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[100px]">
+            <span className="text-[7px] text-primary/60 font-black uppercase tracking-tight truncate max-w-[80px]">
               {currentItem.genres[0]}
             </span>
           )}

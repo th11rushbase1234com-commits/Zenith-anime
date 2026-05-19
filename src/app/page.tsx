@@ -9,7 +9,6 @@ import {
   Loader2, 
   Star,
   History,
-  Zap,
   Plus,
   Settings2
 } from 'lucide-react';
@@ -44,7 +43,6 @@ export default function HomePage() {
   const [recentAiring, setRecentAiring] = useState<Anime[]>([]);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isHeroDialogOpen, setIsHeroDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -123,7 +121,7 @@ export default function HomePage() {
                         
                         <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 space-y-4 md:space-y-6 max-w-4xl">
                           <div className="flex items-center gap-3">
-                            <div className="px-2 py-0.5 md:px-3 md:py-1 bg-primary text-primary-foreground text-[8px] md:text-[10px] font-black italic rounded uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.5)]">
+                            <div className="px-2 py-0.5 md:px-3 md:py-1 bg-primary text-primary-foreground text-[8px] md:text-[10px] font-black rounded uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.5)]">
                               TRENDING NOW
                             </div>
                             <div className="flex items-center gap-1.5 px-2 py-0.5 md:px-3 md:py-1 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[8px] md:text-[10px] font-bold rounded uppercase tracking-widest">
@@ -131,7 +129,7 @@ export default function HomePage() {
                             </div>
                           </div>
                           
-                          <h2 className="text-3xl md:text-7xl font-black italic uppercase tracking-tighter text-glow leading-[0.9] line-clamp-2">
+                          <h2 className="text-3xl md:text-7xl font-black uppercase tracking-tighter text-glow leading-[0.9] line-clamp-2">
                             {anime.title.split(' ').map((word, i) => (
                               <span key={i} className={i % 2 === 1 ? 'text-primary' : 'text-white'}>
                                 {word}{' '}
@@ -150,15 +148,15 @@ export default function HomePage() {
                                   className="bg-primary hover:bg-primary/90 text-primary-foreground font-black px-6 md:px-10 h-10 md:h-14 rounded-full gap-2 text-sm md:text-lg shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-transform hover:scale-105 uppercase tracking-widest"
                                 >
                                   {existingItem ? (
-                                    <><Settings2 className="w-4 h-4 md:w-6 md:h-6" /> EDIT WATCHLIST</>
+                                    <><Settings2 className="w-4 h-4 md:w-6 md:h-6 shrink-0" /> EDIT WATCHLIST</>
                                   ) : (
-                                    <><Plus className="w-4 h-4 md:w-6 md:h-6" /> ADD TO WATCHLIST</>
+                                    <><Plus className="w-4 h-4 md:w-6 md:h-6 shrink-0" /> ADD TO WATCHLIST</>
                                   )}
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className="glass-panel border-white/10 max-w-[320px] rounded-[2rem] p-6">
                                 <DialogHeader>
-                                  <DialogTitle className="text-sm font-black italic uppercase tracking-widest text-primary text-center">
+                                  <DialogTitle className="text-sm font-black uppercase tracking-widest text-primary text-center">
                                     {existingItem ? 'MANAGEMENT PORTAL' : 'INITIALIZATION PORTAL'}
                                   </DialogTitle>
                                 </DialogHeader>
@@ -231,7 +229,7 @@ export default function HomePage() {
               <div className="flex-1 space-y-12 md:space-y-16">
                 <div className="space-y-6 md:space-y-8">
                   <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                    <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
+                    <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest flex items-center gap-3">
                       <History className="w-5 h-5 md:w-6 md:h-6 text-primary" /> Recently Aired
                     </h3>
                   </div>
@@ -251,7 +249,7 @@ export default function HomePage() {
 
                 <div className="space-y-6 md:space-y-8">
                   <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                    <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-widest flex items-center gap-3">
+                    <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest flex items-center gap-3">
                       <Monitor className="w-5 h-5 md:w-6 md:h-6 text-accent" /> Active Feed
                     </h3>
                   </div>
@@ -267,7 +265,7 @@ export default function HomePage() {
                     {watchingAnime.length === 0 && (
                       <div className="col-span-full py-16 md:py-20 text-center bg-white/5 rounded-3xl border border-dashed border-white/10 flex flex-col items-center gap-4">
                         <Monitor className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground/30" />
-                        <p className="text-xs md:text-sm text-muted-foreground italic font-medium">Your active feed is currently offline.</p>
+                        <p className="text-xs md:text-sm text-muted-foreground font-medium">Your active feed is currently offline.</p>
                       </div>
                     )}
                   </div>
@@ -277,7 +275,7 @@ export default function HomePage() {
 
             <section className="pt-8 pb-12">
               <div className="flex flex-col space-y-2 mb-8 md:mb-10">
-                <h2 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-glow">Analytic Insights</h2>
+                <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-glow">Analytic Insights</h2>
                 <div className="h-1 w-16 md:w-20 bg-primary rounded-full" />
               </div>
               <GenreVisualizer watchlist={watchlist} />
