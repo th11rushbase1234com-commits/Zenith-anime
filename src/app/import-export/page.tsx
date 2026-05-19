@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -9,7 +10,6 @@ import {
   Loader2, 
   Download, 
   Upload, 
-  ShieldAlert, 
   CheckCircle2, 
   FileCode,
   LayoutDashboard
@@ -65,7 +65,7 @@ export default function ImportExportPage() {
       
       watchlist.forEach(item => {
         xml += '  <anime>\n';
-        xml += `    <series_animedb_id>${item.id}</series_animedb_id>\n`;
+        xml += `    <series_animedb_id>${item.idMal || item.id}</series_animedb_id>\n`;
         xml += `    <my_watched_episodes>${item.currentEpisode || 0}</my_watched_episodes>\n`;
         xml += `    <my_status>${mapZenithToMalStatus(item.status)}</my_status>\n`;
         xml += `    <my_score>${item.rating ? Math.round(item.rating * 10) : 0}</my_score>\n`;
@@ -117,9 +117,9 @@ export default function ImportExportPage() {
         }
 
         const malData = animeNodes.map(node => ({
-          id: parseInt(node.getElementsByTagName("series_animedb_id")[0]?.textContent || '0'),
+          id: node.getElementsByTagName("series_animedb_id")[0]?.textContent || '0',
           status: mapMalToZenithStatus(node.getElementsByTagName("my_status")[0]?.textContent || '')
-        })).filter(item => item.id > 0);
+        })).filter(item => item.id !== '0');
 
         let successCount = 0;
         const total = malData.length;
@@ -127,14 +127,15 @@ export default function ImportExportPage() {
 
         for (let i = 0; i < total; i += BATCH_SIZE) {
           const batch = malData.slice(i, i + BATCH_SIZE);
-          const batchIds = batch.map(b => b.id);
+          const batchIds = batch.map(b => parseInt(b.id));
           
           try {
             const metadataBatch = await getAnimeByMalIds(batchIds);
             
-            // For each found metadata, add to watchlist with its correct status
             for (const metadata of metadataBatch) {
-              const originalItem = batch.find(b => String(b.id) === String((metadata as any).idMal || metadata.id));
+              const originalItem = batch.find(b => 
+                String(b.id) === String(metadata.idMal) || String(b.id) === String(metadata.id)
+              );
               if (originalItem) {
                 await addAnime(metadata, originalItem.status);
                 successCount++;
@@ -146,6 +147,11 @@ export default function ImportExportPage() {
           
           const progress = Math.min(Math.round(((i + BATCH_SIZE) / total) * 100), 100);
           setCurrentProgress(progress);
+          
+          // Small delay to avoid aggressive rate limiting and browser request abortion
+          if (i + BATCH_SIZE < total) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
         }
 
         setImportCount(successCount);
@@ -211,13 +217,13 @@ export default function ImportExportPage() {
               </div>
               <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Restore XML</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Upload a MAL export. Zenith will automatically recover titles and posters for every ID found in the archive using high-speed batching.
+                Upload a MAL export. Zenith Protocol V2.1 will automatically recover titles and posters for every ID found using staggered batching.
               </p>
               
               <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <p className="text-[9px] text-primary font-bold uppercase tracking-wider leading-normal">
-                  Sync Engine: V2.0 High-Speed Batch Protocol Enabled. Typical recovery: 50 records/sec.
+                  Sync Engine: V2.1 High-Speed Staggered Protocol Enabled. Optimized for 200+ record archives.
                 </p>
               </div>
             </div>
@@ -261,7 +267,7 @@ export default function ImportExportPage() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-              <FileCode className="w-3.5 h-3.5" /> BATCH PROTOCOL V2.0 (MAL)
+              <FileCode className="w-3.5 h-3.5" /> STAGGERED PROTOCOL V2.1 (MAL)
             </div>
           </div>
           <Button 

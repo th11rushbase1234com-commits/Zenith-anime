@@ -1,3 +1,4 @@
+
 import { Anime } from '@/app/types/anime';
 
 const ANILIST_URL = 'https://graphql.anilist.co';
@@ -57,6 +58,7 @@ async function fetchAniList(query: string, variables: any = {}) {
 function mapMediaToAnime(media: any): Anime {
   return {
     id: String(media.id),
+    idMal: media.idMal ? String(media.idMal) : undefined,
     title: media.title.english || media.title.romaji,
     genres: media.genres || [],
     themes: [], 
@@ -119,25 +121,6 @@ export async function getAnimeByMalIds(malIds: number[]): Promise<Anime[]> {
     return data.data.Page.media.map(mapMediaToAnime);
   } catch (error) {
     return [];
-  }
-}
-
-export async function getAnimeByMalId(malId: number): Promise<Anime | null> {
-  const query = `
-    query ($id: Int) {
-      Media(idMal: $id, type: ANIME) {
-        ${MEDIA_QUERY_FIELDS}
-      }
-    }
-  `;
-  try {
-    const data = await fetchAniList(query, { id: malId });
-    if (data.errors || !data.data?.Media) {
-      return null;
-    }
-    return mapMediaToAnime(data.data.Media);
-  } catch (error) {
-    return null;
   }
 }
 

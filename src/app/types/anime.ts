@@ -3,6 +3,7 @@ export type WatchStatus = 'PLAN_TO_WATCH' | 'WATCHING' | 'COMPLETED' | 'ON_HOLD'
 
 export interface Anime {
   id: string;
+  idMal?: string;
   title: string;
   genres: string[];
   themes: string[];
