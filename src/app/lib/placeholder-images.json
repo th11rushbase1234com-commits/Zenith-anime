@@ -3,7 +3,7 @@
   "placeholderImages": [
     {
       "id": "avatar-goku",
-      "description": "Goku from Dragon Ball",
+      "description": "Goku",
       "imageUrl": "https://picsum.photos/seed/anime-goku/200/200",
       "imageHint": "anime goku"
     },
@@ -15,7 +15,7 @@
     },
     {
       "id": "avatar-kaneki",
-      "description": "Ken Kaneki from Tokyo Ghoul",
+      "description": "Ken Kaneki",
       "imageUrl": "https://picsum.photos/seed/anime-kaneki/200/200",
       "imageHint": "anime kaneki"
     },
@@ -39,37 +39,37 @@
     },
     {
       "id": "avatar-zenitsu",
-      "description": "Zenitsu from Demon Slayer",
+      "description": "Zenitsu Agatsuma",
       "imageUrl": "https://picsum.photos/seed/anime-zenitsu/200/200",
       "imageHint": "anime zenitsu"
     },
     {
       "id": "avatar-nezuko",
-      "description": "Nezuko from Demon Slayer",
+      "description": "Nezuko Kamado",
       "imageUrl": "https://picsum.photos/seed/anime-nezuko/200/200",
       "imageHint": "anime nezuko"
     },
     {
       "id": "avatar-eren",
-      "description": "Eren Yeager from AOT",
+      "description": "Eren Yeager",
       "imageUrl": "https://picsum.photos/seed/anime-eren/200/200",
       "imageHint": "anime eren"
     },
     {
       "id": "avatar-mikasa",
-      "description": "Mikasa Ackerman from AOT",
+      "description": "Mikasa Ackerman",
       "imageUrl": "https://picsum.photos/seed/anime-mikasa/200/200",
       "imageHint": "anime mikasa"
     },
     {
       "id": "avatar-gojo",
-      "description": "Satoru Gojo from JJK",
+      "description": "Satoru Gojo",
       "imageUrl": "https://picsum.photos/seed/anime-gojo/200/200",
       "imageHint": "anime gojo"
     },
     {
       "id": "avatar-sukuna",
-      "description": "Ryomen Sukuna from JJK",
+      "description": "Ryomen Sukuna",
       "imageUrl": "https://picsum.photos/seed/anime-sukuna/200/200",
       "imageHint": "anime sukuna"
     }
