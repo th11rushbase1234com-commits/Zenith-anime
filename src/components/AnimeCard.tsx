@@ -26,7 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
-import { getEpisodeCounts } from '@/services/anify';
+import { scrapeLiveTelemetry } from '@/services/scraper-engine';
 
 interface AnimeCardProps {
   anime: Anime;
@@ -44,8 +44,7 @@ export function AnimeCard({
   onAdd
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
-  const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
+  const [telemetry, setTelemetry] = useState<{ sub: number; dub: number }>({ 
     sub: anime.subCount || anime.totalEpisodes || 0, 
     dub: 0 
   });
@@ -55,20 +54,19 @@ export function AnimeCard({
 
   useEffect(() => {
     let isMounted = true;
-    async function fetchLiveTelemetry() {
-      if (!currentItem.id || currentItem.id === '0' || currentItem.id === 'undefined') return;
-      
-      const counts = await getEpisodeCounts(currentItem.id);
+    async function fetchTelemetry() {
+      if (!currentItem.id || currentItem.id === '0') return;
+      const data = await scrapeLiveTelemetry(currentItem.id, currentItem.title);
       if (isMounted) {
-        setLiveCounts(prev => ({
-          sub: counts.sub > 0 ? counts.sub : prev.sub,
-          dub: counts.dub
+        setTelemetry(prev => ({
+          sub: data.sub > 0 ? data.sub : prev.sub,
+          dub: data.dub
         }));
       }
     }
-    fetchLiveTelemetry();
+    fetchTelemetry();
     return () => { isMounted = false; };
-  }, [currentItem.id]);
+  }, [currentItem.id, currentItem.title]);
 
   const STATUS_CONFIG: Record<WatchStatus, { label: string; icon: any; color: string; bgColor: string }> = {
     WATCHING: { label: 'WATCHING', icon: Play, color: 'text-primary', bgColor: 'bg-primary/20' },
@@ -147,7 +145,7 @@ export function AnimeCard({
                 <Button 
                   size="sm" 
                   className={cn(
-                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 whitespace-nowrap overflow-hidden shadow-none",
+                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 shadow-none",
                     itemInWatchlist 
                       ? "bg-white/10 hover:bg-white/20 text-white" 
                       : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(168,85,247,0.4)]"
@@ -204,35 +202,35 @@ export function AnimeCard({
         </div>
       </div>
 
-      {/* Info Section */}
+      {/* Info Section - Prim & Proper UI */}
       <div className="px-1 flex flex-col gap-2">
         <h3 className="font-black text-[11px] md:text-[12px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase">
           {currentItem.title}
         </h3>
         
-        {/* DUAL-CHANNEL DISPLAY: Simultaneous SUB and DUB monitoring */}
+        {/* DUAL-CHANNEL TELEMETRY */}
         <div className="flex flex-wrap items-center gap-1.5">
-          {/* SUB Channel (Grey) */}
+          {/* SUB CHANNEL (Grey) */}
           <div className="flex items-center bg-white/10 rounded-md px-2 py-1 border border-white/5 shrink-0 h-7">
             <Tv className="w-3 h-3 text-white/60 mr-1.5" />
             <span className="text-[8px] font-black text-white/80 uppercase tracking-wider leading-none">
-              SUB {liveCounts.sub || 0}
+              SUB {telemetry.sub}
             </span>
           </div>
           
-          {/* DUB Channel (Purple Archival Illumination) */}
+          {/* DUB CHANNEL (Purple) */}
           <div className={cn(
             "flex items-center rounded-md px-2 py-1 border shrink-0 transition-all duration-300 h-7",
-            liveCounts.dub > 0 
+            telemetry.dub > 0 
               ? "bg-primary/30 border-primary/40 opacity-100 shadow-[0_0_12px_rgba(168,85,247,0.4)]" 
               : "bg-white/5 border-white/5 opacity-30"
           )}>
-            <Tv className={cn("w-3 h-3 mr-1.5", liveCounts.dub > 0 ? "text-primary" : "text-white/40")} />
+            <Tv className={cn("w-3 h-3 mr-1.5", telemetry.dub > 0 ? "text-primary" : "text-white/40")} />
             <span className={cn(
               "text-[8px] font-black uppercase tracking-wider leading-none",
-              liveCounts.dub > 0 ? "text-primary" : "text-white/40"
+              telemetry.dub > 0 ? "text-primary" : "text-white/40"
             )}>
-              DUB {liveCounts.dub || 0}
+              DUB {telemetry.dub}
             </span>
           </div>
         </div>
