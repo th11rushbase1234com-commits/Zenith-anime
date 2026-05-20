@@ -1,7 +1,7 @@
 /**
  * Service to interact with the AnimeKai Archival Engine
- * Zenith Protocol V8.0: Ultra-Greedy detection for Dual-Channel archival telemetry.
- * Backed by the Anify metadata layer for mapped provider stability.
+ * Zenith Protocol V9.0: High-performance scraper integration.
+ * Source: leodevil334-eng/AnimeKai-API
  */
 
 export interface AnimeKaiEpisodeCounts {
@@ -11,7 +11,7 @@ export interface AnimeKaiEpisodeCounts {
 
 /**
  * Fetches "Live" sub and dub episode counts for an AniList ID.
- * Uses a greedy metadata resolution strategy to identify content across global release streams.
+ * Uses the AnimeKai lookup endpoint for precise metadata recovery.
  */
 export async function getEpisodeCounts(anilistId: string): Promise<AnimeKaiEpisodeCounts> {
   if (!anilistId || anilistId === '0' || anilistId === 'undefined') {
@@ -19,11 +19,12 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnimeKaiEpiso
   }
 
   try {
-    // Zenith Meta-Provider: Robust metadata recovery engine
+    // AnimeKai Meta-Provider: Modern scraping engine
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 7000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-    const response = await fetch(`https://api.anify.tv/info/${anilistId}`, {
+    // Using the official AnimeKai-API endpoint structure as documented
+    const response = await fetch(`https://anikai-api.vercel.app/api/anikai/${anilistId}`, {
       signal: controller.signal,
       next: { revalidate: 3600 } // Cache for 1 hour
     });
@@ -34,44 +35,42 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnimeKaiEpiso
       return { sub: 0, dub: 0 };
     }
 
-    const data = await response.json();
+    const json = await response.json();
     
-    let subMax = 0;
-    let dubMax = 0;
-
-    // GREEDY SCAN V8.0: Exhaustive data branch analysis
-    if (data && data.episodes) {
-      const episodesObj = data.episodes;
-
-      // 1. Direct summary fields
-      if (typeof episodesObj.sub === 'number') subMax = episodesObj.sub;
-      if (typeof episodesObj.dub === 'number') dubMax = episodesObj.dub;
-
-      // 2. Greedy Provider Scanning: Recovering counts from varied provider naming conventions
-      if (Array.isArray(episodesObj.data)) {
-        episodesObj.data.forEach((provider: any) => {
-          const episodes = provider.episodes || [];
-          const count = Array.isArray(episodes) ? episodes.length : (typeof episodes === 'number' ? episodes : 0);
-          
-          if (count === 0) return;
-
-          const type = String(provider.type || '').toLowerCase();
-          const pId = String(provider.providerId || '').toLowerCase();
-          
-          // Identify DUB via type flag or provider-specific ID (e.g., 'gogoanime-dub')
-          if (type === 'dub' || pId.includes('dub')) {
-            dubMax = Math.max(dubMax, count);
-          } else {
-            subMax = Math.max(subMax, count);
-          }
-        });
-      }
-
-      // 3. Fallback: If dubs exist in the array but count was missed
-      if (dubMax === 0 && Array.isArray(episodesObj.dub)) dubMax = episodesObj.dub.length;
+    if (json.status !== 'success' || !json.data) {
+      return { sub: 0, dub: 0 };
     }
 
-    return { sub: subMax, dub: dubMax };
+    const data = json.data;
+    let subCount = 0;
+    let dubCount = 0;
+
+    // Archival Logic: Extracting counts from the AnimeKai data structure
+    if (data.episodes && Array.isArray(data.episodes)) {
+      // AnimeKai typically returns a flat list or categorized episodes
+      // We perform a greedy scan for dub markers
+      const dubs = data.episodes.filter((ep: any) => {
+        const title = String(ep.title || '').toLowerCase();
+        const id = String(ep.id || ep.episode_id || '').toLowerCase();
+        return ep.isDub === true || title.includes('(dub)') || id.includes('-dub');
+      });
+
+      const subs = data.episodes.filter((ep: any) => {
+        const title = String(ep.title || '').toLowerCase();
+        const id = String(ep.id || ep.episode_id || '').toLowerCase();
+        const isDub = ep.isDub === true || title.includes('(dub)') || id.includes('-dub');
+        return !isDub;
+      });
+
+      subCount = subs.length || data.total_episodes || data.episodes.length;
+      dubCount = dubs.length;
+    } else if (data.sub_count || data.dub_count) {
+      // Fallback for direct summary fields if available
+      subCount = data.sub_count || 0;
+      dubCount = data.dub_count || 0;
+    }
+
+    return { sub: subCount, dub: dubCount };
   } catch (error) {
     // Silent recovery for archival stability
     return { sub: 0, dub: 0 };
