@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, Suspense } from 'react';
@@ -14,12 +13,16 @@ function NavigationManager({ children }: { children: React.ReactNode }) {
   const showNavbar = pathname !== '/login';
 
   useEffect(() => {
+    // Global Scroll Reset: Force top of page on any route change
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname]);
+
+  useEffect(() => {
     // Force reset to home on page reload regardless of current path
     const navigationEntries = window.performance.getEntriesByType('navigation');
     const isReload = navigationEntries.length > 0 && (navigationEntries[0] as PerformanceNavigationTiming).type === 'reload';
 
     if (isReload) {
-      // Use window.location.replace to prevent back-button loops after reload
       window.location.replace('/');
     }
   }, []);
@@ -48,7 +51,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased bg-background text-foreground">
         <AuthProvider>
