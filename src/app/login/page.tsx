@@ -72,13 +72,13 @@ export default function LoginPage() {
         {/* Header Section */}
         <div className="text-center space-y-6">
           <div className="flex flex-col items-center gap-3">
-            <h1 className="text-6xl md:text-7xl font-black italic tracking-tighter text-glow leading-none text-primary">
+            <h1 className="text-6xl md:text-7xl font-black tracking-tighter text-glow leading-none text-primary uppercase">
               ZENITH
             </h1>
             <div className="h-1.5 w-16 bg-primary rounded-full" />
           </div>
           
-          <h2 className="text-[10px] md:text-xs font-black italic tracking-[0.4em] uppercase text-white/40">
+          <h2 className="text-[10px] md:text-xs font-black tracking-[0.4em] uppercase text-white/40">
             {isLogin ? 'WELCOME' : 'SIGN UP'}
           </h2>
         </div>
@@ -91,7 +91,7 @@ export default function LoginPage() {
               <Input 
                 type="email" 
                 placeholder="email address" 
-                className="h-12 bg-white/5 border-white/10 rounded-full pl-14 pr-6 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-white/20 text-sm font-medium"
+                className="h-12 bg-white/5 border-white/10 rounded-full pl-14 pr-6 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-white/20 text-sm font-black uppercase"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -103,14 +103,14 @@ export default function LoginPage() {
               <Input 
                 type="password" 
                 placeholder="password" 
-                className="h-12 bg-white/5 border-white/10 rounded-full pl-14 pr-6 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-white/20 text-sm font-medium"
+                className="h-12 bg-white/5 border-white/10 rounded-full pl-14 pr-6 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-white/20 text-sm font-black uppercase"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
               {isLogin && (
                 <div className="flex justify-end pt-1">
-                  <button type="button" className="text-[10px] font-bold text-primary/60 hover:text-primary transition-colors uppercase tracking-widest">
+                  <button type="button" className="text-[10px] font-black text-primary/60 hover:text-primary transition-colors uppercase tracking-widest">
                     Recovery Needed?
                   </button>
                 </div>
@@ -139,7 +139,7 @@ export default function LoginPage() {
             <button 
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full max-w-[200px] h-11 rounded-full border border-white/10 flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 transition-all group font-bold text-xs uppercase tracking-widest text-white/80"
+              className="w-full max-w-[200px] h-11 rounded-full border border-white/10 flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 transition-all group font-black text-xs uppercase tracking-widest text-white/80"
             >
               <Chrome className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
               Google Sync
@@ -151,11 +151,11 @@ export default function LoginPage() {
         <div className="text-center pt-4">
           <button 
             type="button"
-            className="text-[11px] font-medium text-white/40 hover:text-white transition-colors group uppercase tracking-widest"
+            className="text-[11px] font-black text-white/40 hover:text-white transition-colors group uppercase tracking-widest"
             onClick={() => setIsLogin(!isLogin)}
           >
             {isLogin ? "New user discovered?" : "Existing uplink found?"} 
-            <span className="text-primary font-bold ml-1.5 group-hover:underline underline-offset-4">
+            <span className="text-primary font-black ml-1.5 group-hover:underline underline-offset-4">
               {isLogin ? "Sign Up" : "Log In"}
             </span>
           </button>

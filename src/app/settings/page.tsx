@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -79,7 +78,7 @@ export default function SettingsPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
         <Loader2 className="w-12 h-12 text-primary animate-spin" />
-        <p className="text-primary font-mono animate-pulse uppercase tracking-widest">Accessing Zenith Core...</p>
+        <p className="text-primary font-mono animate-pulse uppercase tracking-widest font-black">Accessing Zenith Core...</p>
       </div>
     );
   }
@@ -94,10 +93,10 @@ export default function SettingsPage() {
         
         {/* Header section */}
         <div className="text-center space-y-4">
-          <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter uppercase text-glow">
+          <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase text-glow">
             PROFILE <span className="text-primary">SETTINGS</span>
           </h2>
-          <p className="text-xs md:text-sm text-muted-foreground font-medium italic uppercase tracking-widest">
+          <p className="text-xs md:text-sm text-muted-foreground font-black uppercase tracking-widest">
             Identity Configuration & Aesthetic Selection
           </p>
         </div>
@@ -106,7 +105,7 @@ export default function SettingsPage() {
         <div className="flex flex-col items-center space-y-6">
           <div className="relative group">
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-2 border-primary/30 p-1.5 shadow-[0_0_30px_rgba(168,85,247,0.2)] transition-all group-hover:border-primary group-hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] overflow-hidden">
-              <div className="w-full h-full rounded-full overflow-hidden bg-white/5 flex items-center justify-center text-5xl font-black text-primary italic">
+              <div className="w-full h-full rounded-full overflow-hidden bg-white/5 flex items-center justify-center text-5xl font-black text-primary">
                 {photoURL ? (
                   <Image 
                     src={photoURL} 
@@ -130,7 +129,7 @@ export default function SettingsPage() {
               </DialogTrigger>
               <DialogContent className="glass-panel border-white/10 max-w-md overflow-hidden flex flex-col h-[80vh]">
                 <DialogHeader className="px-6 pt-6">
-                  <DialogTitle className="text-xl font-black italic uppercase tracking-widest text-primary">SELECT CORE AVATAR</DialogTitle>
+                  <DialogTitle className="text-xl font-black uppercase tracking-widest text-primary">SELECT CORE AVATAR</DialogTitle>
                 </DialogHeader>
                 <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-hide">
                   <div className="grid grid-cols-3 gap-4">
@@ -160,7 +159,7 @@ export default function SettingsPage() {
           </div>
           
           <div className="text-center space-y-1">
-            <h3 className="text-xl font-black italic uppercase tracking-tighter text-white">
+            <h3 className="text-xl font-black uppercase tracking-tighter text-white">
               {displayName || 'Zenith User'}
             </h3>
             <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-[0.2em]">{user.email}</p>
@@ -178,7 +177,7 @@ export default function SettingsPage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Enter display name"
-                className="h-12 bg-white/5 border-white/10 rounded-2xl px-6 focus:ring-1 focus:ring-primary focus:border-primary transition-all text-sm font-bold"
+                className="h-12 bg-white/5 border-white/10 rounded-2xl px-6 focus:ring-1 focus:ring-primary focus:border-primary transition-all text-sm font-black uppercase"
               />
             </div>
 
@@ -189,7 +188,7 @@ export default function SettingsPage() {
               <Input 
                 value={user.email || ''}
                 disabled
-                className="h-12 bg-white/5 border-white/10 rounded-2xl px-6 opacity-50 cursor-not-allowed text-sm font-bold"
+                className="h-12 bg-white/5 border-white/10 rounded-2xl px-6 opacity-50 cursor-not-allowed text-sm font-black uppercase"
               />
             </div>
             
@@ -197,7 +196,7 @@ export default function SettingsPage() {
               <Button 
                 onClick={handleSaveProfile}
                 disabled={saving}
-                className="flex-1 h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black italic rounded-full uppercase tracking-widest shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all hover:scale-[1.02]"
+                className="flex-1 h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-full uppercase tracking-widest shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all hover:scale-[1.02]"
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5 mr-2" />}
                 SYNCHRONIZE PROFILE
@@ -205,7 +204,7 @@ export default function SettingsPage() {
               <Button 
                 variant="outline"
                 onClick={() => router.push('/')}
-                className="h-14 border-white/10 hover:bg-white/5 font-black italic rounded-full uppercase tracking-widest text-xs px-8"
+                className="h-14 border-white/10 hover:bg-white/5 font-black rounded-full uppercase tracking-widest text-xs px-8"
               >
                 <LayoutDashboard className="w-4 h-4 mr-2" /> EXIT TO HUB
               </Button>

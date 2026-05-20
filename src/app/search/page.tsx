@@ -21,7 +21,10 @@ import { cn } from '@/lib/utils';
 const GENRES = [
   "Action", "Adventure", "Comedy", "Drama", "Fantasy", 
   "Horror", "Mecha", "Music", "Mystery", "Psychological", 
-  "Romance", "Sci-Fi", "Slice of Life", "Sports", "Supernatural", "Thriller"
+  "Romance", "Sci-Fi", "Slice of Life", "Sports", "Supernatural", 
+  "Thriller", "Cyberpunk", "Ecchi", "Mahou Shoujo", "Military", 
+  "Post-Apocalyptic", "Space", "Steampunk", "Super Power", "Vampire", 
+  "Josei", "Seinen", "Shoujo", "Shounen", "Gourmet", "Suspense"
 ];
 
 const STATUSES = [
@@ -112,7 +115,7 @@ function SearchResults() {
           <aside className="w-full lg:w-72 shrink-0 space-y-10 animate-in slide-in-from-left-4 duration-500">
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
               <SlidersHorizontal className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-black uppercase tracking-widest text-white">Filters</h3>
+              <h3 className="text-lg font-black uppercase tracking-widest text-white">Discovery Filters</h3>
             </div>
 
             <div className="space-y-8">
@@ -143,7 +146,7 @@ function SearchResults() {
               {/* Genre Section */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Genres</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Genre Matrix</p>
                   {selectedGenres.length > 0 && (
                     <button 
                       onClick={() => setSelectedGenres([])}
@@ -186,7 +189,7 @@ function SearchResults() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
                   <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-glow">
                     {initialQuery ? (
-                      <>Results for: <span className="text-primary">{initialQuery}</span></>
+                      <>Search Results for: <span className="text-primary">{initialQuery}</span></>
                     ) : (
                       <>{initialSort === 'airing' ? 'Recent Airing Telemetry' : 'Global Discovery Feed'}</>
                     )}
