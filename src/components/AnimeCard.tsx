@@ -45,7 +45,7 @@ export function AnimeCard({
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  // DUAL-CHANNEL TELEMETRY: Monitoring both channels simultaneously
+  // DUAL-CHANNEL TELEMETRY: Monitoring both channels simultaneously (SUB & DUB)
   const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
     sub: anime.subCount || anime.totalEpisodes || 0, 
     dub: 0 
@@ -213,7 +213,7 @@ export function AnimeCard({
         
         {/* DUAL-CHANNEL DISPLAY: Simultaneous SUB and DUB monitoring */}
         <div className="flex flex-wrap items-center gap-1.5">
-          {/* SUB Badge (Grey) */}
+          {/* SUB Channel (Grey) */}
           <div className="flex items-center bg-white/10 rounded-md px-2 py-1 border border-white/5 shrink-0 h-7">
             <Tv className="w-3 h-3 text-white/60 mr-1.5" />
             <span className="text-[8px] font-black text-white/80 uppercase tracking-wider leading-none not-italic">
@@ -221,7 +221,7 @@ export function AnimeCard({
             </span>
           </div>
           
-          {/* DUB Badge (Purple when active) */}
+          {/* DUB Channel (Purple Archival Illumination) */}
           <div className={cn(
             "flex items-center rounded-md px-2 py-1 border shrink-0 transition-all duration-300 h-7",
             liveCounts.dub > 0 
