@@ -1,6 +1,6 @@
 /**
  * Service to interact with the Consumet API (Meta AniList Provider)
- * Optimized for Zenith Protocol V4.0: Aggressive metadata recovery and multi-instance resilience.
+ * Zenith Protocol V5.0: Supreme greedy detection and dual-channel mapping.
  */
 
 export interface ConsumetEpisodeCounts {
@@ -13,7 +13,7 @@ export async function getEpisodeCounts(anilistId: string): Promise<ConsumetEpiso
     return { sub: 0, dub: 0 };
   }
 
-  // Multi-Instance Resilience: Try primary then secondary if first fails
+  // Dual-Node Resilience Strategy
   const instances = [
     `https://api.consumet.org/meta/anilist/info/${anilistId}`,
     `https://consumet-api-fawn.vercel.app/meta/anilist/info/${anilistId}`
@@ -22,53 +22,61 @@ export async function getEpisodeCounts(anilistId: string): Promise<ConsumetEpiso
   for (const url of instances) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-      const response = await fetch(url, { signal: controller.signal });
+      const response = await fetch(url, { 
+        signal: controller.signal,
+        next: { revalidate: 3600 } 
+      });
       clearTimeout(timeoutId);
 
       if (!response.ok) continue;
 
       const data = await response.json();
       
-      let subCount = 0;
-      let dubCount = 0;
+      let subFound = 0;
+      let dubFound = 0;
 
-      // ZENITH SCAN V4.0: Ultra-Greedy Metadata Resolution
+      // ZENITH GREEDY SCAN V5.0: Recursive Metadata Recovery
       if (data && Array.isArray(data.episodes)) {
-        // Many providers list sub and dub in a flat array
-        const subEpisodes = data.episodes.filter((ep: any) => {
+        const episodes = data.episodes;
+        
+        // 1. Explicit Check: Scanning for dedicated Dub episodes
+        const dubEpisodes = episodes.filter((ep: any) => {
           const id = String(ep.id || '').toLowerCase();
           const title = String(ep.title || '').toLowerCase();
-          // Filter OUT dub markers to count true subs
-          return !id.includes('-dub') && !id.includes('/dub') && !title.includes('(dub)') && ep.isDub !== true;
+          const isDubFlag = ep.isDub === true || ep.dub === true;
+          
+          return isDubFlag || 
+                 id.includes('-dub') || 
+                 id.includes('/dub') || 
+                 title.includes('(dub)') || 
+                 title.includes('[dub]');
         });
 
-        const dubEpisodes = data.episodes.filter((ep: any) => {
+        // 2. Explicit Check: Scanning for true Sub episodes (Baseline)
+        const subEpisodes = episodes.filter((ep: any) => {
           const id = String(ep.id || '').toLowerCase();
-          const title = String(ep.title || '').toLowerCase();
-          // Filter IN dub markers
-          return id.includes('-dub') || id.includes('/dub') || title.includes('(dub)') || title.includes('[dub]') || ep.isDub === true;
+          const isDub = id.includes('-dub') || id.includes('/dub') || ep.isDub === true;
+          return !isDub;
         });
 
-        subCount = subEpisodes.length || data.totalEpisodes || data.episodes.length;
-        dubCount = dubEpisodes.length;
+        subFound = subEpisodes.length || data.totalEpisodes || episodes.length;
+        dubFound = dubEpisodes.length;
 
-        // HEURISTIC: If array is flat and markers aren't explicit but hasDub is true
-        if (dubCount === 0 && (data.hasDub === true || data.dub === true)) {
-          dubCount = subCount;
+        // 3. HEURISTIC FALLBACK: If API has 'hasDub' flag but flat array
+        if (dubFound === 0 && (data.hasDub === true || data.dub === true)) {
+          dubFound = subFound; 
         }
       }
 
-      // Final fallback to top-level fields
-      if (subCount === 0 && data.totalEpisodes) subCount = data.totalEpisodes;
+      // Final top-level data synchronization
+      if (subFound === 0 && data.totalEpisodes) subFound = data.totalEpisodes;
       
-      // If we found any data, return it
-      if (subCount > 0 || dubCount > 0) {
-        return { sub: subCount, dub: dubCount };
+      if (subFound > 0 || dubFound > 0) {
+        return { sub: subFound, dub: dubFound };
       }
     } catch (error) {
-      // Instance failed, loop will try next one
       continue;
     }
   }

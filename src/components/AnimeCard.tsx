@@ -45,7 +45,7 @@ export function AnimeCard({
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  // PRIM & PROPER TELEMETRY: Baseline from AniList, augmented by Consumet Protocol V4.0
+  // DUAL-CHANNEL TELEMETRY: Monitoring both archives simultaneously
   const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
     sub: anime.subCount || anime.totalEpisodes || 0, 
     dub: anime.dubCount || 0 
@@ -60,10 +60,9 @@ export function AnimeCard({
       if (!currentItem.id || currentItem.id === '0') return;
       
       const counts = await getEpisodeCounts(currentItem.id);
-      // Ensure we only update if we found actual dubs or updated sub info
-      if (isMounted && (counts.sub > 0 || counts.dub > 0)) {
+      if (isMounted) {
         setLiveCounts(prev => ({
-          sub: Math.max(prev.sub, counts.sub),
+          sub: counts.sub > 0 ? counts.sub : prev.sub,
           dub: counts.dub
         }));
       }
@@ -208,6 +207,7 @@ export function AnimeCard({
           {currentItem.title}
         </h3>
         
+        {/* DUAL-CHANNEL DISPLAY: Showing both Sub and Dub simultaneously */}
         <div className="flex flex-wrap items-center gap-1.5">
           <div className="flex items-center bg-white/10 rounded-md px-2 py-1 border border-white/5 shrink-0">
             <Tv className="w-3 h-3 text-white/60 mr-1.5" />
@@ -215,14 +215,20 @@ export function AnimeCard({
               SUB {liveCounts.sub || '??'}
             </span>
           </div>
-          {liveCounts.dub > 0 && (
-            <div className="flex items-center bg-primary/20 rounded-md px-2 py-1 border border-primary/20 shrink-0">
-              <Tv className="w-3 h-3 text-primary mr-1.5" />
-              <span className="text-[8px] font-black text-primary uppercase not-italic tracking-wider leading-none">
-                DUB {liveCounts.dub}
-              </span>
-            </div>
-          )}
+          <div className={cn(
+            "flex items-center rounded-md px-2 py-1 border shrink-0 transition-opacity duration-300",
+            liveCounts.dub > 0 
+              ? "bg-primary/20 border-primary/20 opacity-100" 
+              : "bg-white/5 border-white/5 opacity-40"
+          )}>
+            <Tv className={cn("w-3 h-3 mr-1.5", liveCounts.dub > 0 ? "text-primary" : "text-white/40")} />
+            <span className={cn(
+              "text-[8px] font-black uppercase not-italic tracking-wider leading-none",
+              liveCounts.dub > 0 ? "text-primary" : "text-white/40"
+            )}>
+              DUB {liveCounts.dub || 0}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center justify-between opacity-50 mt-0.5">
