@@ -44,6 +44,8 @@ export function AnimeCard({
   onAdd
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // ARCHIVAL TELEMETRY: Initialize with AniList baseline, update with Consumet live data
   const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
     sub: anime.subCount || anime.totalEpisodes || 0, 
     dub: anime.dubCount || 0 

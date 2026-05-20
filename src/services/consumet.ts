@@ -15,6 +15,7 @@ export async function getEpisodeCounts(anilistId: string): Promise<ConsumetEpiso
 
   try {
     // Consumet Meta AniList Info Endpoint
+    // Use a stable mirror if the primary is unstable
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
@@ -33,28 +34,36 @@ export async function getEpisodeCounts(anilistId: string): Promise<ConsumetEpiso
     let subCount = 0;
     let dubCount = 0;
 
-    // CONSUMET SCAN V1.0: Analyze episode metadata for sub/dub flags
-    if (data && Array.isArray(data.episodes)) {
-      subCount = data.episodes.length;
+    // CONSUMET SCAN V2.1: Aggressive metadata resolution
+    if (data) {
+      // 1. Check the episodes array (standard Consumet structure)
+      if (Array.isArray(data.episodes) && data.episodes.length > 0) {
+        subCount = data.episodes.length;
 
-      // Filter episodes explicitly marked as DUB
-      const dubs = data.episodes.filter((ep: any) => 
-        ep.isDub === true || 
-        ep.dub === true || 
-        String(ep.id || '').toLowerCase().includes('-dub')
-      );
+        // Count episodes explicitly marked as DUB or containing dub markers in IDs
+        const dubs = data.episodes.filter((ep: any) => 
+          ep.isDub === true || 
+          ep.dub === true || 
+          String(ep.id || '').toLowerCase().includes('-dub') ||
+          String(ep.title || '').toLowerCase().includes('(dub)')
+        );
 
-      if (dubs.length > 0) {
-        dubCount = dubs.length;
-      } else if (data.hasDub === true) {
-        // Fallback: If Consumet confirms dub exists but hasn't mapped individual episodes,
-        // we assume full dub coverage for the released episodes.
-        dubCount = subCount;
+        if (dubs.length > 0) {
+          dubCount = dubs.length;
+        } else if (data.hasDub === true) {
+          // Fallback: If Consumet confirms dub exists but hasn't mapped individual episodes
+          dubCount = subCount;
+        }
+      } 
+      
+      // 2. Secondary check for top-level count overrides
+      if (data.totalEpisodes && data.totalEpisodes > subCount) {
+        subCount = data.totalEpisodes;
       }
     }
 
     return { 
-      sub: subCount || (data.totalEpisodes || 0), 
+      sub: subCount, 
       dub: dubCount 
     };
   } catch (error) {
