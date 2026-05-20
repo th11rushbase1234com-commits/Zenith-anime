@@ -45,7 +45,7 @@ export function AnimeCard({
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  // ARCHIVAL TELEMETRY: Initialize with AniList baseline, update with Consumet live data
+  // PRIM & PROPER TELEMETRY: Baseline from AniList, augmented by Consumet V3.0
   const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
     sub: anime.subCount || anime.totalEpisodes || 0, 
     dub: anime.dubCount || 0 
@@ -60,11 +60,11 @@ export function AnimeCard({
       if (!currentItem.id || currentItem.id === '0') return;
       
       const counts = await getEpisodeCounts(currentItem.id);
-      if (isMounted) {
-        setLiveCounts(prev => ({
-          sub: counts.sub > 0 ? counts.sub : prev.sub,
-          dub: counts.dub > 0 ? counts.dub : prev.dub
-        }));
+      if (isMounted && (counts.sub > 0 || counts.dub > 0)) {
+        setLiveCounts({
+          sub: counts.sub,
+          dub: counts.dub
+        });
       }
     }
     fetchLiveTelemetry();
@@ -116,7 +116,7 @@ export function AnimeCard({
               currentStatus.bgColor,
               currentStatus.color
             )}>
-              <currentStatus.icon className="w-2 h-2" />
+              <currentStatus.icon className="w-2.5 h-2.5" />
               {currentStatus.label}
             </div>
           )}
@@ -124,14 +124,14 @@ export function AnimeCard({
 
         {currentItem.rating > 0 && (
           <div className="absolute top-3 right-3 md:top-4 md:right-4 px-2 py-0.5 rounded-lg bg-accent text-[8px] font-black text-black uppercase tracking-tight flex items-center gap-1 shadow-lg z-10 not-italic">
-            <Star className="w-2 h-2 fill-current" /> {currentItem.rating.toFixed(1)}
+            <Star className="w-2.5 h-2.5 fill-current" /> {currentItem.rating.toFixed(1)}
           </div>
         )}
 
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-t from-black via-black/80 to-transparent p-4 flex flex-col justify-end gap-3 z-20">
           <div className="space-y-1 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
             <div className="flex items-center gap-2">
-              <Layers className="w-2.5 h-2.5 text-primary" />
+              <Layers className="w-3 h-3 text-primary" />
               <h4 className="text-[7px] font-black text-primary uppercase tracking-widest leading-none not-italic">ZENITH INTEL</h4>
             </div>
             <p className="text-[9px] text-white/70 line-clamp-3 leading-tight font-medium not-italic">
@@ -208,21 +208,25 @@ export function AnimeCard({
         </h3>
         
         <div className="flex flex-wrap items-center gap-1.5">
-          <div className="flex items-center bg-white/10 rounded px-1.5 py-0.5 border border-white/5 shrink-0">
-            <Tv className="w-2 h-2 text-white/60 mr-1" />
-            <span className="text-[8px] font-black text-white/80 uppercase not-italic">SUB {liveCounts.sub || currentItem.totalEpisodes || '??'}</span>
+          <div className="flex items-center bg-white/10 rounded-md px-2 py-1 border border-white/5 shrink-0">
+            <Tv className="w-3 h-3 text-white/60 mr-1.5" />
+            <span className="text-[8px] font-black text-white/80 uppercase not-italic tracking-wider leading-none">
+              SUB {liveCounts.sub || '??'}
+            </span>
           </div>
           {liveCounts.dub > 0 && (
-            <div className="flex items-center bg-primary/20 rounded px-1.5 py-0.5 border border-primary/20 shrink-0">
-              <Tv className="w-2 h-2 text-primary mr-1" />
-              <span className="text-[8px] font-black text-primary uppercase not-italic">DUB {liveCounts.dub}</span>
+            <div className="flex items-center bg-primary/20 rounded-md px-2 py-1 border border-primary/20 shrink-0">
+              <Tv className="w-3 h-3 text-primary mr-1.5" />
+              <span className="text-[8px] font-black text-primary uppercase not-italic tracking-wider leading-none">
+                DUB {liveCounts.dub}
+              </span>
             </div>
           )}
         </div>
 
         <div className="flex items-center justify-between opacity-50 mt-0.5">
-          <span className="text-[7px] text-white/40 font-black uppercase flex items-center gap-1 not-italic">
-            <Calendar className="w-2 h-2" /> {currentItem.year || 'TBA'}
+          <span className="text-[7px] text-white/40 font-black uppercase flex items-center gap-1 not-italic tracking-widest">
+            <Calendar className="w-2.5 h-2.5" /> {currentItem.year || 'TBA'}
           </span>
           {currentItem.genres && currentItem.genres.length > 0 && (
             <span className="text-[7px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[70px] text-right not-italic">
