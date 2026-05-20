@@ -13,16 +13,17 @@ function NavigationManager({ children }: { children: React.ReactNode }) {
   const showNavbar = pathname !== '/login';
 
   useEffect(() => {
-    // Global Scroll Reset: Force top of page on any route change
+    // Global Command Reset: Force top of page on any route change or navigation event
     window.scrollTo({ top: 0, behavior: 'instant' });
+    document.documentElement.scrollTo({ top: 0, behavior: 'instant' });
   }, [pathname]);
 
   useEffect(() => {
-    // Force reset to home on page reload regardless of current path
+    // Force reset to home on page reload regardless of current path to ensure clean archival state
     const navigationEntries = window.performance.getEntriesByType('navigation');
     const isReload = navigationEntries.length > 0 && (navigationEntries[0] as PerformanceNavigationTiming).type === 'reload';
 
-    if (isReload) {
+    if (isReload && window.location.pathname !== '/') {
       window.location.replace('/');
     }
   }, []);

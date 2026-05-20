@@ -19,12 +19,40 @@ import {
 import { useAuth } from '@/context/auth-context';
 import { cn } from '@/lib/utils';
 
-const GENRES = [
-  "Action", "Adventure", "Comedy", "Drama", "Ecchi", "Fantasy", 
-  "Gourmet", "Horror", "Josei", "Mahou Shoujo", "Mecha", "Military", 
-  "Music", "Mystery", "Psychological", "Romance", "Sci-Fi", "Seinen", 
-  "Shoujo", "Shounen", "Slice of Life", "Sports", "Supernatural", "Suspense", 
-  "Thriller", "Cyberpunk", "Post-Apocalyptic", "Space", "Steampunk", "Super Power", "Vampire"
+interface GenreInfo {
+  name: string;
+  color: string;
+  activeColor: string;
+}
+
+const GENRE_MATRIX: GenreInfo[] = [
+  { name: "Action", color: "border-red-500/20 text-red-400 bg-red-500/5", activeColor: "bg-red-500 text-white border-red-500" },
+  { name: "Adventure", color: "border-green-500/20 text-green-400 bg-green-500/5", activeColor: "bg-green-500 text-white border-green-500" },
+  { name: "Comedy", color: "border-yellow-500/20 text-yellow-400 bg-yellow-500/5", activeColor: "bg-yellow-500 text-white border-yellow-500" },
+  { name: "Drama", color: "border-blue-500/20 text-blue-400 bg-blue-500/5", activeColor: "bg-blue-500 text-white border-blue-500" },
+  { name: "Ecchi", color: "border-rose-500/20 text-rose-400 bg-rose-500/5", activeColor: "bg-rose-500 text-white border-rose-500" },
+  { name: "Fantasy", color: "border-purple-500/20 text-purple-400 bg-purple-500/5", activeColor: "bg-purple-500 text-white border-purple-500" },
+  { name: "Horror", color: "border-zinc-500/20 text-zinc-400 bg-zinc-500/5", activeColor: "bg-zinc-500 text-white border-zinc-500" },
+  { name: "Isekai", color: "border-amber-500/20 text-amber-400 bg-amber-500/5", activeColor: "bg-amber-500 text-white border-amber-500" },
+  { name: "Harem", color: "border-pink-500/20 text-pink-400 bg-pink-500/5", activeColor: "bg-pink-500 text-white border-pink-500" },
+  { name: "Mahou Shoujo", color: "border-pink-400/20 text-pink-300 bg-pink-400/5", activeColor: "bg-pink-400 text-white border-pink-400" },
+  { name: "Mecha", color: "border-orange-500/20 text-orange-400 bg-orange-500/5", activeColor: "bg-orange-500 text-white border-orange-500" },
+  { name: "Military", color: "border-slate-500/20 text-slate-400 bg-slate-500/5", activeColor: "bg-slate-500 text-white border-slate-500" },
+  { name: "Music", color: "border-emerald-500/20 text-emerald-400 bg-emerald-500/5", activeColor: "bg-emerald-500 text-white border-emerald-500" },
+  { name: "Mystery", color: "border-indigo-500/20 text-indigo-400 bg-indigo-500/5", activeColor: "bg-indigo-500 text-white border-indigo-500" },
+  { name: "Psychological", color: "border-violet-500/20 text-violet-400 bg-violet-500/5", activeColor: "bg-violet-500 text-white border-violet-500" },
+  { name: "Romance", color: "border-rose-400/20 text-rose-300 bg-rose-400/5", activeColor: "bg-rose-400 text-white border-rose-400" },
+  { name: "Sci-Fi", color: "border-cyan-500/20 text-cyan-400 bg-cyan-500/5", activeColor: "bg-cyan-500 text-white border-cyan-500" },
+  { name: "Slice of Life", color: "border-sky-500/20 text-sky-400 bg-sky-500/5", activeColor: "bg-sky-500 text-white border-sky-500" },
+  { name: "Sports", color: "border-lime-500/20 text-lime-400 bg-lime-500/5", activeColor: "bg-lime-500 text-white border-lime-500" },
+  { name: "Supernatural", color: "border-fuchsia-500/20 text-fuchsia-400 bg-fuchsia-500/5", activeColor: "bg-fuchsia-500 text-white border-fuchsia-500" },
+  { name: "Thriller", color: "border-red-600/20 text-red-500 bg-red-600/5", activeColor: "bg-red-600 text-white border-red-600" },
+  { name: "Seinen", color: "border-slate-400/20 text-slate-300 bg-slate-400/5", activeColor: "bg-slate-400 text-white border-slate-400" },
+  { name: "Shounen", color: "border-blue-600/20 text-blue-500 bg-blue-600/5", activeColor: "bg-blue-600 text-white border-blue-600" },
+  { name: "Shoujo", color: "border-pink-600/20 text-pink-500 bg-pink-600/5", activeColor: "bg-pink-600 text-white border-pink-600" },
+  { name: "Josei", color: "border-purple-600/20 text-purple-500 bg-purple-600/5", activeColor: "bg-purple-600 text-white border-purple-600" },
+  { name: "Cyberpunk", color: "border-teal-400/20 text-teal-300 bg-teal-400/5", activeColor: "bg-teal-400 text-white border-teal-400" },
+  { name: "Vampire", color: "border-red-900/20 text-red-700 bg-red-900/5", activeColor: "bg-red-900 text-white border-red-900" }
 ];
 
 const STATUSES = [
@@ -60,6 +88,9 @@ function SearchResults() {
   useEffect(() => {
     async function performSearch() {
       setIsSearching(true);
+      // Command Reset: Force top on telemetry update
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      
       try {
         const sortParam = initialSort === 'airing' ? ["START_DATE_DESC"] : ["SEARCH_MATCH", "TRENDING_DESC"];
         const { anime, hasNextPage: more, lastPage: total } = await searchAnime({
@@ -72,9 +103,6 @@ function SearchResults() {
         setResults(anime);
         setHasNextPage(more);
         setLastPage(total);
-        
-        // Command Reset: Scroll to top on telemetry update
-        window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (error) {
         console.error(error);
       } finally {
@@ -145,12 +173,12 @@ function SearchResults() {
               </div>
             </div>
 
-            {/* Genre Matrix - High Density 9 entries per line on XL */}
+            {/* Chromatic Genre Matrix */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <SlidersHorizontal className="w-4 h-4 text-primary" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white">GENRE MATRIX</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white">CHROMATIC GENRE MATRIX</p>
                 </div>
                 {selectedGenres.length > 0 && (
                   <button 
@@ -162,21 +190,24 @@ function SearchResults() {
                 )}
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-9 gap-2">
-                {GENRES.map((genre) => (
-                  <button
-                    key={genre}
-                    onClick={() => toggleGenre(genre)}
-                    className={cn(
-                      "h-9 px-3 rounded-xl text-[8px] font-black uppercase tracking-tight flex items-center justify-between border transition-all truncate",
-                      selectedGenres.includes(genre) 
-                        ? "bg-primary/20 border-primary/40 text-primary shadow-[0_0_15px_rgba(168,85,247,0.15)]" 
-                        : "bg-white/5 border-white/5 text-muted-foreground hover:bg-white/10"
-                    )}
-                  >
-                    <span className="truncate mr-1">{genre}</span>
-                    {selectedGenres.includes(genre) && <Check className="w-2.5 h-2.5 shrink-0" />}
-                  </button>
-                ))}
+                {GENRE_MATRIX.map((genre) => {
+                  const isActive = selectedGenres.includes(genre.name);
+                  return (
+                    <button
+                      key={genre.name}
+                      onClick={() => toggleGenre(genre.name)}
+                      className={cn(
+                        "h-9 px-3 rounded-xl text-[8px] font-black uppercase tracking-tight flex items-center justify-between border transition-all truncate",
+                        isActive 
+                          ? genre.activeColor 
+                          : `${genre.color} hover:brightness-125`
+                      )}
+                    >
+                      <span className="truncate mr-1">{genre.name}</span>
+                      {isActive && <Check className="w-2.5 h-2.5 shrink-0" />}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
