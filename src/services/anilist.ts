@@ -68,22 +68,28 @@ function mapMediaToAnime(media: any): Anime {
     currentEpisode: 0,
     status: 'PLAN_TO_WATCH',
     year: media.seasonYear || 0,
-    subCount: media.episodes || 0,
-    dubCount: 0, 
     externalLinks: media.externalLinks || [],
     nextAiringEpisode: media.nextAiringEpisode
   };
 }
 
-export async function searchAnime(query: string, page: number = 1): Promise<{ anime: Anime[], hasNextPage: boolean, lastPage: number }> {
+export async function searchAnime(params: {
+  query?: string,
+  page?: number,
+  status?: string,
+  genres?: string[],
+  sort?: string[]
+}): Promise<{ anime: Anime[], hasNextPage: boolean, lastPage: number }> {
+  const { query, page = 1, status, genres, sort } = params;
+
   const searchQuery = `
-    query ($search: String, $page: Int) {
-      Page(page: $page, perPage: 18) {
+    query ($search: String, $page: Int, $status: MediaStatus, $genres: [String], $sort: [MediaSort]) {
+      Page(page: $page, perPage: 24) {
         pageInfo {
           hasNextPage
           lastPage
         }
-        media(search: $search, type: ANIME) {
+        media(search: $search, status: $status, genre_in: $genres, sort: $sort, type: ANIME, isAdult: false) {
           ${MEDIA_QUERY_FIELDS}
         }
       }
@@ -91,7 +97,13 @@ export async function searchAnime(query: string, page: number = 1): Promise<{ an
   `;
   
   try {
-    const data = await fetchAniList(searchQuery, { search: query, page });
+    const data = await fetchAniList(searchQuery, { 
+      search: query || undefined, 
+      page,
+      status: status || undefined,
+      genres: genres && genres.length > 0 ? genres : undefined,
+      sort: sort || ["SEARCH_MATCH", "TRENDING_DESC"]
+    });
     if (data.errors) return { anime: [], hasNextPage: false, lastPage: 1 };
     
     return {
@@ -145,10 +157,10 @@ export async function getTrendingAnime(): Promise<Anime[]> {
   }
 }
 
-export async function getRecentAiring(): Promise<Anime[]> {
+export async function getRecentAiring(page: number = 1, perPage: number = 12): Promise<Anime[]> {
   const recentQuery = `
-    query {
-      Page(page: 1, perPage: 12) {
+    query ($page: Int, $perPage: Int) {
+      Page(page: $page, perPage: $perPage) {
         airingSchedules(notYetAired: false, sort: TIME_DESC) {
           media {
             ${MEDIA_QUERY_FIELDS}
@@ -160,7 +172,7 @@ export async function getRecentAiring(): Promise<Anime[]> {
   `;
   
   try {
-    const data = await fetchAniList(recentQuery);
+    const data = await fetchAniList(recentQuery, { page, perPage });
     if (data.errors) return [];
     
     const uniqueMedia = new Map();

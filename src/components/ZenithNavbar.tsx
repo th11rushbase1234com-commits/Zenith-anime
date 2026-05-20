@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -10,7 +9,8 @@ import {
   Bookmark, 
   Settings, 
   LogOut,
-  Database
+  Database,
+  SlidersHorizontal
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
@@ -63,37 +63,47 @@ export function ZenithNavbar() {
           <div className="p-1.5 md:p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]">
             <Home className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
-          <h1 className="text-xl md:text-2xl font-black italic tracking-tighter text-glow">
+          <h1 className="text-xl md:text-2xl font-black tracking-tighter text-glow">
             <span className="text-primary">ZENITH</span>
           </h1>
         </Link>
       </div>
 
       <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end max-w-xl">
-        <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-[280px]">
-          <button 
-            type="submit" 
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-          <Input 
-            ref={searchInputRef}
-            placeholder="Search anime" 
-            className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-xs md:text-sm focus:ring-1 focus:ring-primary transition-all"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onBlur={handleBlur}
-          />
-          {searchQuery && (
+        <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-[320px] flex items-center gap-2">
+          <div className="relative flex-1">
             <button 
-              type="button" 
-              onClick={handleClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors z-10"
+              type="submit" 
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
             >
-              <X className="w-4 h-4" />
+              <Search className="w-4 h-4" />
             </button>
-          )}
+            <Input 
+              ref={searchInputRef}
+              placeholder="Search anime" 
+              className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-xs md:text-sm focus:ring-1 focus:ring-primary transition-all font-black uppercase tracking-tight"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onBlur={handleBlur}
+            />
+            {searchQuery && (
+              <button 
+                type="button" 
+                onClick={handleClear}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors z-10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <button 
+            type="button"
+            onClick={() => router.push('/search')}
+            className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all shrink-0"
+            title="Discovery Filters"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+          </button>
         </form>
         
         <div className="flex items-center gap-2 md:gap-3 border-l border-white/10 pl-2 md:pl-4">
@@ -112,7 +122,7 @@ export function ZenithNavbar() {
               <DropdownMenuContent align="end" className="w-64 glass-panel border-white/10 mt-2 p-2">
                 <DropdownMenuLabel className="p-3">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-black italic uppercase tracking-tight text-white">{userName}</p>
+                    <p className="text-sm font-black uppercase tracking-tight text-white">{userName}</p>
                     <p className="text-[10px] text-muted-foreground font-mono truncate">{user.email}</p>
                   </div>
                 </DropdownMenuLabel>

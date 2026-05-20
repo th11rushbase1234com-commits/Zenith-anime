@@ -10,7 +10,8 @@ import {
   Star,
   History,
   Plus,
-  Settings2
+  Settings2,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
 import { Trash2, Play, Clock, PauseCircle, XCircle, CheckCircle2 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function HomePage() {
   const { user, loading: authLoading } = useAuth();
@@ -54,7 +56,7 @@ export default function HomePage() {
     async function loadInitialData() {
       const [trending, recent] = await Promise.all([
         getTrendingAnime(),
-        getRecentAiring()
+        getRecentAiring(1, 12)
       ]);
       setTrendingAnime(trending.slice(0, 5));
       setRecentAiring(recent);
@@ -77,7 +79,7 @@ export default function HomePage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
         <Loader2 className="w-12 h-12 text-primary animate-spin" />
-        <p className="text-primary font-mono animate-pulse uppercase tracking-widest">Initialising Zenith Core...</p>
+        <p className="text-primary font-mono animate-pulse uppercase tracking-widest font-black">Initialising Zenith Core...</p>
       </div>
     );
   }
@@ -92,9 +94,6 @@ export default function HomePage() {
     ON_HOLD: { label: 'ON HOLD', icon: PauseCircle },
     DROPPED: { label: 'DROPPED', icon: XCircle },
   };
-
-  const currentTrendingAnime = trendingAnime[currentSlide];
-  const existingTrendingItem = currentTrendingAnime ? getExistingItem(currentTrendingAnime.id) : null;
 
   return (
     <div className="bg-background text-foreground flex flex-col">
@@ -127,7 +126,7 @@ export default function HomePage() {
                             <div className="px-2 py-0.5 md:px-3 md:py-1 bg-primary text-primary-foreground text-[8px] md:text-[10px] font-black rounded uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.5)]">
                               TRENDING NOW
                             </div>
-                            <div className="flex items-center gap-1.5 px-2 py-0.5 md:px-3 md:py-1 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[8px] md:text-[10px] font-bold rounded uppercase tracking-widest">
+                            <div className="flex items-center gap-1.5 px-2 py-0.5 md:px-3 md:py-1 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[8px] md:text-[10px] font-black rounded uppercase tracking-widest">
                               <Star className="w-2.5 h-2.5 md:w-3 md:h-3 text-accent fill-current" /> {Math.round(anime.rating * 10)}%
                             </div>
                           </div>
@@ -140,7 +139,7 @@ export default function HomePage() {
                             ))}
                           </h2>
                           
-                          <p className="text-white/70 text-xs md:text-lg max-w-2xl line-clamp-2 md:line-clamp-3 font-medium italic">
+                          <p className="text-white/70 text-xs md:text-lg max-w-2xl line-clamp-2 md:line-clamp-3 font-black uppercase tracking-tight">
                             {anime.description}
                           </p>
 
@@ -230,13 +229,21 @@ export default function HomePage() {
           <div className="px-4 md:px-12 space-y-16 md:space-y-20">
             <div className="flex flex-col lg:flex-row gap-12">
               <div className="flex-1 space-y-12 md:space-y-16">
+                
+                {/* Recently Aired Section */}
                 <div className="space-y-6 md:space-y-8">
                   <div className="flex items-center justify-between border-b border-white/5 pb-4">
                     <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest flex items-center gap-3">
                       <History className="w-5 h-5 md:w-6 md:h-6 text-primary" /> Recently Aired
                     </h3>
+                    <Link 
+                      href="/search?sort=airing"
+                      className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      Show More <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
                     {recentAiring.map(anime => (
                       <AnimeCard 
                         key={`recent-${anime.id}`} 
@@ -256,8 +263,8 @@ export default function HomePage() {
                       <Monitor className="w-5 h-5 md:w-6 md:h-6 text-accent" /> Active Feed
                     </h3>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-                    {watchingAnime.slice(0, 5).map(anime => (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
+                    {watchingAnime.slice(0, 6).map(anime => (
                       <AnimeCard 
                         key={anime.id} 
                         anime={anime} 
@@ -268,7 +275,7 @@ export default function HomePage() {
                     {watchingAnime.length === 0 && (
                       <div className="col-span-full py-16 md:py-20 text-center bg-white/5 rounded-3xl border border-dashed border-white/10 flex flex-col items-center gap-4">
                         <Monitor className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground/30" />
-                        <p className="text-xs md:text-sm text-muted-foreground font-medium">Your active feed is currently offline.</p>
+                        <p className="text-xs md:text-sm text-muted-foreground font-black uppercase">Your active feed is currently offline.</p>
                       </div>
                     )}
                   </div>
