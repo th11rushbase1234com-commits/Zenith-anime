@@ -1,6 +1,7 @@
 /**
  * Service to interact with the AnimeKai Archival Engine
  * Zenith Protocol V8.0: Ultra-Greedy detection for Dual-Channel archival telemetry.
+ * Backed by the Anify metadata layer for mapped provider stability.
  */
 
 export interface AnimeKaiEpisodeCounts {
@@ -50,7 +51,7 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnimeKaiEpiso
       if (Array.isArray(episodesObj.data)) {
         episodesObj.data.forEach((provider: any) => {
           const episodes = provider.episodes || [];
-          const count = Array.isArray(episodes) ? episodes.length : 0;
+          const count = Array.isArray(episodes) ? episodes.length : (typeof episodes === 'number' ? episodes : 0);
           
           if (count === 0) return;
 
@@ -70,7 +71,6 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnimeKaiEpiso
       if (dubMax === 0 && Array.isArray(episodesObj.dub)) dubMax = episodesObj.dub.length;
     }
 
-    // Ensure we don't report 0 subs if AniList knows about episodes
     return { sub: subMax, dub: dubMax };
   } catch (error) {
     // Silent recovery for archival stability

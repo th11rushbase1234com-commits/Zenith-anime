@@ -48,7 +48,7 @@ export function AnimeCard({
   // DUAL-CHANNEL TELEMETRY: Monitoring both channels simultaneously
   const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
     sub: anime.subCount || anime.totalEpisodes || 0, 
-    dub: anime.dubCount || 0 
+    dub: 0 
   });
   
   const itemInWatchlist = existingItem || (anime.status !== undefined && (anime as any).userId ? anime : undefined);
