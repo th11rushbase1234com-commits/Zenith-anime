@@ -45,7 +45,6 @@ export function AnimeCard({
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  // DUAL-CHANNEL TELEMETRY: Monitoring both channels simultaneously (SUB & DUB)
   const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
     sub: anime.subCount || anime.totalEpisodes || 0, 
     dub: 0 
@@ -137,7 +136,7 @@ export function AnimeCard({
               <Layers className="w-3 h-3 text-primary" />
               <h4 className="text-[7px] font-black text-primary uppercase tracking-widest leading-none not-italic">ZENITH INTEL</h4>
             </div>
-            <p className="text-[9px] text-white/70 line-clamp-3 leading-tight font-medium not-italic">
+            <p className="text-[9px] text-white/70 line-clamp-3 leading-tight font-black uppercase not-italic">
               {currentItem.description}
             </p>
           </div>
@@ -217,7 +216,7 @@ export function AnimeCard({
           <div className="flex items-center bg-white/10 rounded-md px-2 py-1 border border-white/5 shrink-0 h-7">
             <Tv className="w-3 h-3 text-white/60 mr-1.5" />
             <span className="text-[8px] font-black text-white/80 uppercase tracking-wider leading-none not-italic">
-              SUB {liveCounts.sub || '??'}
+              SUB {liveCounts.sub || 0}
             </span>
           </div>
           

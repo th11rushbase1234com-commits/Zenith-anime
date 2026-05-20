@@ -1,6 +1,6 @@
 /**
  * Service to interact with the Anixplay Archival Engine
- * Zenith Protocol V11.0: Advanced dual-channel metadata recovery.
+ * Zenith Protocol V12.0: Optimized dual-channel metadata recovery.
  */
 
 export interface AnixplayEpisodeCounts {
@@ -10,7 +10,7 @@ export interface AnixplayEpisodeCounts {
 
 /**
  * Fetches "Live" sub and dub episode counts for an AniList ID.
- * Uses the Anixplay meta-provider for precise situational awareness.
+ * Protocol V12.0: Prioritizes summary fields with recursive array fallback.
  */
 export async function getEpisodeCounts(anilistId: string): Promise<AnixplayEpisodeCounts> {
   if (!anilistId || anilistId === '0' || anilistId === 'undefined') {
@@ -38,15 +38,18 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnixplayEpiso
     let subCount = 0;
     let dubCount = 0;
 
-    // GREEDY ARCHIVAL SCAN V11.0: Recursive Metadata Recovery
-    if (data && data.episodes && Array.isArray(data.episodes)) {
+    // CHANNEL 1: DIRECT FIELD RECOVERY (Highest Priority)
+    // Most Anixplay-compatible APIs return 'sub' and 'dub' as numbers in the root object.
+    if (typeof data.sub === 'number') subCount = data.sub;
+    if (typeof data.dub === 'number') dubCount = data.dub;
+
+    // CHANNEL 2: GREEDY HEURISTIC SCAN (Fallback if direct fields are missing or 0)
+    if ((subCount === 0 || dubCount === 0) && data.episodes && Array.isArray(data.episodes)) {
       const episodes = data.episodes;
       
-      // 1. DUB DETECTION: Exhaustive heuristic analysis of ID patterns and flags
       const dubs = episodes.filter((ep: any) => {
         const id = String(ep.id || '').toLowerCase();
         const title = String(ep.title || '').toLowerCase();
-        // Check for explicit flags OR naming conventions common in archival streams
         return ep.isDub === true || 
                id.includes('-dub') || 
                id.includes('/dub') || 
@@ -54,7 +57,6 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnixplayEpiso
                title.includes('[Dub]');
       });
 
-      // 2. SUB DETECTION: Baseline SITREP (Total episodes minus duplicates or flagged subs)
       const subs = episodes.filter((ep: any) => {
         const id = String(ep.id || '').toLowerCase();
         const title = String(ep.title || '').toLowerCase();
@@ -62,18 +64,13 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnixplayEpiso
         return !isDub;
       });
 
-      subCount = subs.length || data.totalEpisodes || episodes.length;
-      dubCount = dubs.length;
-
-      // 3. HEURISTIC RECOVERY: If API has 'hasDub' flag but flat array
-      if (dubCount === 0 && (data.hasDub === true || data.dub === true)) {
-        dubCount = subCount; 
-      }
-    } else {
-      // Direct summary field fallback if episode array is missing
-      subCount = data.totalEpisodes || 0;
-      dubCount = data.hasDub ? subCount : 0;
+      if (subCount === 0) subCount = subs.length || data.totalEpisodes || episodes.length;
+      if (dubCount === 0) dubCount = dubs.length;
     }
+
+    // CHANNEL 3: BASELINE VALIDATION
+    if (subCount === 0 && data.totalEpisodes) subCount = data.totalEpisodes;
+    if (dubCount === 0 && (data.hasDub === true || data.dub === true)) dubCount = subCount;
 
     return { sub: subCount, dub: dubCount };
   } catch (error) {
