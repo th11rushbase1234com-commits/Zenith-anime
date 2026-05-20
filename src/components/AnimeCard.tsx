@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Anime, WatchStatus } from '@/app/types/anime';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   Calendar,
   Layers,
-  Tv
+  Activity
 } from 'lucide-react';
 import {
   Dialog,
@@ -26,7 +26,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
-import { scrapeLiveTelemetry } from '@/services/scraper-engine';
 
 interface AnimeCardProps {
   anime: Anime;
@@ -44,30 +43,15 @@ export function AnimeCard({
   onAdd
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [telemetry, setTelemetry] = useState<{ sub: number; dub: number }>({ 
-    sub: anime.subCount || anime.totalEpisodes || 0, 
-    dub: anime.dubCount || 0 
-  });
   
   const itemInWatchlist = existingItem || (anime.status !== undefined && (anime as any).userId ? anime : undefined);
   const currentItem = itemInWatchlist || anime;
 
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchTelemetry() {
-      if (!currentItem.id || currentItem.id === '0') return;
-      // AnixTV/Anify Greedy Protocol V14.0
-      const data = await scrapeLiveTelemetry(currentItem.id, currentItem.title);
-      if (isMounted) {
-        setTelemetry({
-          sub: data.sub > 0 ? data.sub : (currentItem.totalEpisodes || 0),
-          dub: data.dub
-        });
-      }
-    }
-    fetchTelemetry();
-    return () => { isMounted = false; };
-  }, [currentItem.id, currentItem.title, currentItem.totalEpisodes]);
+  // Calculate Live Episode Count from AniList GraphQL Data
+  // If airing, current released is nextEpisode - 1
+  const currentReleased = currentItem.nextAiringEpisode 
+    ? currentItem.nextAiringEpisode.episode - 1 
+    : (currentItem.totalEpisodes || '??');
 
   const STATUS_CONFIG: Record<WatchStatus, { label: string; icon: any; color: string; bgColor: string }> = {
     WATCHING: { label: 'WATCHING', icon: Play, color: 'text-primary', bgColor: 'bg-primary/20' },
@@ -209,29 +193,20 @@ export function AnimeCard({
           {currentItem.title}
         </h3>
         
-        {/* DUAL-CHANNEL TELEMETRY */}
+        {/* SINGLE-CHANNEL LIVE TELEMETRY (PURE ANILIST) */}
         <div className="flex flex-wrap items-center gap-1.5">
-          {/* SUB CHANNEL (Grey) */}
-          <div className="flex items-center bg-white/10 rounded-md px-2 py-1 border border-white/5 shrink-0 h-7">
-            <Tv className="w-3 h-3 text-white/60 mr-1.5" />
-            <span className="text-[8px] font-black text-white/80 uppercase tracking-wider leading-none">
-              SUB {telemetry.sub}
-            </span>
-          </div>
-          
-          {/* DUB CHANNEL (Purple) */}
           <div className={cn(
-            "flex items-center rounded-md px-2 py-1 border shrink-0 transition-all duration-300 h-7",
-            telemetry.dub > 0 
-              ? "bg-primary/20 border-primary/30 opacity-100 shadow-[0_0_12px_rgba(168,85,247,0.3)]" 
-              : "bg-white/5 border-white/5 opacity-30"
+            "flex items-center rounded-md px-2.5 py-1 border shrink-0 transition-all duration-300 h-7",
+            currentItem.nextAiringEpisode 
+              ? "bg-primary/20 border-primary/30 shadow-[0_0_12px_rgba(168,85,247,0.3)]" 
+              : "bg-white/10 border-white/5"
           )}>
-            <Tv className={cn("w-3 h-3 mr-1.5", telemetry.dub > 0 ? "text-primary" : "text-white/40")} />
+            <Activity className={cn("w-3 h-3 mr-1.5", currentItem.nextAiringEpisode ? "text-primary animate-pulse" : "text-white/40")} />
             <span className={cn(
               "text-[8px] font-black uppercase tracking-wider leading-none",
-              telemetry.dub > 0 ? "text-primary" : "text-white/40"
+              currentItem.nextAiringEpisode ? "text-primary" : "text-white/80"
             )}>
-              DUB {telemetry.dub}
+              {currentItem.nextAiringEpisode ? 'AIRING' : 'RELEASED'} {currentReleased} EPS
             </span>
           </div>
         </div>
@@ -242,7 +217,7 @@ export function AnimeCard({
             <Calendar className="w-2.5 h-2.5" /> {currentItem.year || 'TBA'}
           </span>
           {currentItem.genres && currentItem.genres.length > 0 && (
-            <span className="text-[7px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[70px] text-right">
+            <span className="text-[7px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[80px] text-right">
               {currentItem.genres[0]}
             </span>
           )}

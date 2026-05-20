@@ -14,8 +14,6 @@ export interface Anime {
   status: WatchStatus;
   year: number;
   emotionalImpact?: string;
-  subCount?: number;
-  dubCount?: number;
   externalLinks?: { site: string; url: string }[];
   nextAiringEpisode?: {
     episode: number;
