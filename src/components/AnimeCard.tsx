@@ -26,7 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
-import { getEpisodeCounts } from '@/services/animekai';
+import { getEpisodeCounts } from '@/services/anixplay';
 
 interface AnimeCardProps {
   anime: Anime;
