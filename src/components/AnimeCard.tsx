@@ -59,10 +59,11 @@ export function AnimeCard({
       
       const counts = await getEpisodeCounts(currentItem.id);
       if (isMounted) {
-        // Only update if we found valid counts to avoid flickering with defaults
-        if (counts.sub > 0 || counts.dub > 0) {
-          setLiveCounts(counts);
-        }
+        // Update if we found any data, or ensure we have at least the AniList baseline
+        setLiveCounts(prev => ({
+          sub: counts.sub > 0 ? counts.sub : prev.sub,
+          dub: counts.dub > 0 ? counts.dub : prev.dub
+        }));
       }
     }
     fetchLiveTelemetry();
