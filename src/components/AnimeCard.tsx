@@ -56,6 +56,7 @@ export function AnimeCard({
     let isMounted = true;
     async function fetchTelemetry() {
       if (!currentItem.id || currentItem.id === '0') return;
+      // AnixTV/Anify Greedy Protocol V14.0
       const data = await scrapeLiveTelemetry(currentItem.id, currentItem.title);
       if (isMounted) {
         setTelemetry({
@@ -222,7 +223,7 @@ export function AnimeCard({
           <div className={cn(
             "flex items-center rounded-md px-2 py-1 border shrink-0 transition-all duration-300 h-7",
             telemetry.dub > 0 
-              ? "bg-primary/30 border-primary/40 opacity-100 shadow-[0_0_12px_rgba(168,85,247,0.4)]" 
+              ? "bg-primary/20 border-primary/30 opacity-100 shadow-[0_0_12px_rgba(168,85,247,0.3)]" 
               : "bg-white/5 border-white/5 opacity-30"
           )}>
             <Tv className={cn("w-3 h-3 mr-1.5", telemetry.dub > 0 ? "text-primary" : "text-white/40")} />
