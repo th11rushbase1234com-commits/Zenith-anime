@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import { Anime, RecommendedAnime } from '@/app/types/anime';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Sparkles, Loader2, RefreshCw, Zap, BrainCircuit, Target } from 'lucide-react';
+import { Sparkles, Loader2, RefreshCw, BrainCircuit, Target } from 'lucide-react';
 import { recommendAnime } from '@/ai/flows/anime-recommendation-flow';
 
 interface DiscoveryToolProps {
@@ -50,9 +49,9 @@ export function DiscoveryTool({ watchlist }: DiscoveryToolProps) {
           </div>
           
           <div className="space-y-2">
-            <h3 className="text-3xl font-black italic uppercase tracking-tighter text-glow">Zenith Core Analysis</h3>
-            <p className="text-muted-foreground text-sm max-w-lg mx-auto leading-relaxed">
-              We process your consumption history through our neural network to predict high-resonance series tailored for your profile.
+            <h3 className="text-3xl font-black uppercase tracking-tighter text-glow">Zenith Core Analysis</h3>
+            <p className="text-muted-foreground text-sm max-w-lg mx-auto leading-relaxed uppercase font-black tracking-tight">
+              Processing consumption history through neural networks to predict high-resonance series.
             </p>
           </div>
 
@@ -60,7 +59,7 @@ export function DiscoveryTool({ watchlist }: DiscoveryToolProps) {
             <Button 
               onClick={handleDiscovery} 
               disabled={loading || watchlist.length === 0} 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-black italic rounded-full h-14 px-10 gap-3 shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-all hover:scale-105"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-full h-14 px-10 gap-3 shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-all hover:scale-105 uppercase tracking-widest"
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-5 h-5" />}
               INITIALIZE NEURAL PROBE
@@ -70,23 +69,25 @@ export function DiscoveryTool({ watchlist }: DiscoveryToolProps) {
               {recommendations.map((rec, i) => (
                 <div key={i} className="group p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-primary/50 transition-all hover:-translate-y-1 space-y-4">
                   <div className="flex justify-between items-start">
-                    <h4 className="font-black italic uppercase text-primary text-lg leading-tight group-hover:text-glow">{rec.title}</h4>
+                    <h4 className="font-black uppercase text-primary text-lg leading-tight group-hover:text-glow">{rec.title}</h4>
                     <Target className="w-5 h-5 text-accent opacity-50" />
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {rec.genres.slice(0, 3).map(g => (
-                      <span key={g} className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white font-bold uppercase tracking-widest">{g}</span>
+                      <span key={g} className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white font-black uppercase tracking-widest">{g}</span>
                     ))}
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed italic">"{rec.reason}"</p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed font-black uppercase tracking-tight">
+                    {rec.reason}
+                  </p>
                   <div className="pt-3 border-t border-white/5 space-y-1">
                     <span className="text-[9px] font-black text-accent uppercase tracking-widest">Resonance Profile</span>
-                    <p className="text-[10px] text-muted-foreground line-clamp-2">{rec.expectedEmotionalImpact}</p>
+                    <p className="text-[10px] text-muted-foreground line-clamp-2 uppercase font-black">{rec.expectedEmotionalImpact}</p>
                   </div>
                 </div>
               ))}
               <div className="col-span-full flex justify-center pt-6">
-                <Button variant="outline" onClick={handleDiscovery} disabled={loading} className="rounded-full border-white/10 h-12 px-8 font-black italic text-xs uppercase tracking-widest hover:bg-white/5">
+                <Button variant="outline" onClick={handleDiscovery} disabled={loading} className="rounded-full border-white/10 h-12 px-8 font-black text-xs uppercase tracking-widest hover:bg-white/5">
                   {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
                   REGENERATE ANALYTICS
                 </Button>

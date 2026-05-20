@@ -32,7 +32,7 @@ export default function LibraryPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
         <Loader2 className="w-12 h-12 text-primary animate-spin" />
-        <p className="text-primary font-mono animate-pulse uppercase tracking-widest">Accessing Zenith Archives...</p>
+        <p className="text-primary font-mono animate-pulse uppercase tracking-widest font-black">Accessing Zenith Archives...</p>
       </div>
     );
   }
@@ -56,17 +56,16 @@ export default function LibraryPage() {
           {/* Watchlist Header */}
           <div className="flex flex-col gap-2 border-b border-white/10 pb-6">
             <div className="space-y-0.5">
-              <h2 className="text-xl md:text-2xl font-black italic tracking-tighter uppercase text-glow leading-tight">
+              <h2 className="text-xl md:text-2xl font-black tracking-tighter uppercase text-glow leading-tight">
                 WATCHLIST <span className="text-primary">ARCHIVES</span>
               </h2>
-              <p className="text-[7px] md:text-[8px] text-muted-foreground/60 font-black italic uppercase tracking-[0.4em]">
+              <p className="text-[7px] md:text-[8px] text-muted-foreground/60 font-black uppercase tracking-[0.4em]">
                 Anime Records & Zenith Nexus
               </p>
             </div>
           </div>
           
           <Tabs defaultValue="all" className="w-full space-y-8">
-            {/* Category Grid - 3 on Left, 3 on Right */}
             <div className="sticky top-16 z-30 bg-background/95 backdrop-blur-md py-4 -mx-4 px-4 border-b border-white/5">
               <TabsList className="bg-white/5 rounded-2xl p-1.5 h-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-1.5 border border-white/5 w-full max-w-4xl mx-auto">
                 {TABS.map((tab) => (
@@ -100,8 +99,8 @@ export default function LibraryPage() {
                         <Bookmark className="w-10 h-10 text-muted-foreground/20" />
                       </div>
                       <div className="space-y-2">
-                        <p className="text-xs text-muted-foreground italic font-black uppercase tracking-[0.2em]">Sector Offline</p>
-                        <p className="text-[9px] text-muted-foreground/40 font-mono uppercase">Status: No records found</p>
+                        <p className="text-xs text-muted-foreground font-black uppercase tracking-[0.2em]">Sector Offline</p>
+                        <p className="text-[9px] text-muted-foreground/40 font-black uppercase">Status: No records found</p>
                       </div>
                     </div>
                   )}
