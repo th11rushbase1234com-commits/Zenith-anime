@@ -19,11 +19,10 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnimeKaiEpiso
   }
 
   try {
-    // AnimeKai Meta-Provider: Modern scraping engine
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-    // Using the official AnimeKai-API endpoint structure as documented
+    // Using the AnimeKai-API endpoint structure as documented in README
     const response = await fetch(`https://anikai-api.vercel.app/api/anikai/${anilistId}`, {
       signal: controller.signal,
       next: { revalidate: 3600 } // Cache for 1 hour
@@ -45,28 +44,40 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnimeKaiEpiso
     let subCount = 0;
     let dubCount = 0;
 
-    // Archival Logic: Extracting counts from the AnimeKai data structure
+    // GREEDY ARCHIVAL SCAN V9.0: Exhaustive search for sub/dub markers
     if (data.episodes && Array.isArray(data.episodes)) {
-      // AnimeKai typically returns a flat list or categorized episodes
-      // We perform a greedy scan for dub markers
+      // 1. Scan for explicit dub markers in IDs and titles
       const dubs = data.episodes.filter((ep: any) => {
-        const title = String(ep.title || '').toLowerCase();
         const id = String(ep.id || ep.episode_id || '').toLowerCase();
-        return ep.isDub === true || title.includes('(dub)') || id.includes('-dub');
+        const title = String(ep.title || '').toLowerCase();
+        const isDub = ep.isDub === true || 
+                     id.includes('-dub') || 
+                     id.includes('/dub') || 
+                     title.includes('(dub)') || 
+                     title.includes('[dub]');
+        return isDub;
       });
 
+      // 2. Scan for sub markers (baseline)
       const subs = data.episodes.filter((ep: any) => {
-        const title = String(ep.title || '').toLowerCase();
         const id = String(ep.id || ep.episode_id || '').toLowerCase();
-        const isDub = ep.isDub === true || title.includes('(dub)') || id.includes('-dub');
+        const title = String(ep.title || '').toLowerCase();
+        const isDub = ep.isDub === true || 
+                     id.includes('-dub') || 
+                     title.includes('(dub)');
         return !isDub;
       });
 
       subCount = subs.length || data.total_episodes || data.episodes.length;
       dubCount = dubs.length;
-    } else if (data.sub_count || data.dub_count) {
-      // Fallback for direct summary fields if available
-      subCount = data.sub_count || 0;
+
+      // 3. HEURISTIC RECOVERY: If API has flat structure but is known dubbed
+      if (dubCount === 0 && (data.has_dub === true || data.dub_count > 0)) {
+        dubCount = data.dub_count || subCount;
+      }
+    } else {
+      // Direct summary field fallback
+      subCount = data.sub_count || data.total_episodes || 0;
       dubCount = data.dub_count || 0;
     }
 

@@ -113,7 +113,7 @@ export function AnimeCard({
         <div className="absolute top-3 left-3 md:top-4 md:left-4 flex flex-col gap-1.5 z-10">
           {currentStatus && (
             <div className={cn(
-              "px-2 py-0.5 rounded-lg backdrop-blur-md text-[7px] font-black uppercase tracking-tight border border-white/5 w-fit flex items-center gap-1",
+              "px-2 py-0.5 rounded-lg backdrop-blur-md text-[7px] font-black uppercase tracking-tight border border-white/5 w-fit flex items-center gap-1 not-italic",
               currentStatus.bgColor,
               currentStatus.color
             )}>
@@ -125,7 +125,7 @@ export function AnimeCard({
 
         {/* Rating Badge */}
         {currentItem.rating > 0 && (
-          <div className="absolute top-3 right-3 md:top-4 md:right-4 px-2 py-0.5 rounded-lg bg-accent text-[8px] font-black text-black uppercase tracking-tight flex items-center gap-1 shadow-lg z-10">
+          <div className="absolute top-3 right-3 md:top-4 md:right-4 px-2 py-0.5 rounded-lg bg-accent text-[8px] font-black text-black uppercase tracking-tight flex items-center gap-1 shadow-lg z-10 not-italic">
             <Star className="w-2.5 h-2.5 fill-current" /> {currentItem.rating.toFixed(1)}
           </div>
         )}
@@ -135,9 +135,9 @@ export function AnimeCard({
           <div className="space-y-1 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
             <div className="flex items-center gap-2">
               <Layers className="w-3 h-3 text-primary" />
-              <h4 className="text-[7px] font-black text-primary uppercase tracking-widest leading-none">ZENITH INTEL</h4>
+              <h4 className="text-[7px] font-black text-primary uppercase tracking-widest leading-none not-italic">ZENITH INTEL</h4>
             </div>
-            <p className="text-[9px] text-white/70 line-clamp-3 leading-tight font-medium">
+            <p className="text-[9px] text-white/70 line-clamp-3 leading-tight font-medium not-italic">
               {currentItem.description}
             </p>
           </div>
@@ -148,7 +148,7 @@ export function AnimeCard({
                 <Button 
                   size="sm" 
                   className={cn(
-                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 whitespace-nowrap overflow-hidden shadow-none",
+                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 whitespace-nowrap overflow-hidden shadow-none not-italic",
                     itemInWatchlist 
                       ? "bg-white/10 hover:bg-white/20 text-white" 
                       : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(168,85,247,0.4)]"
@@ -163,19 +163,19 @@ export function AnimeCard({
               </DialogTrigger>
               <DialogContent className="glass-panel border-white/10 max-w-[320px] rounded-[2rem] p-6">
                 <DialogHeader>
-                  <DialogTitle className="text-sm font-black uppercase tracking-widest text-primary text-center">
+                  <DialogTitle className="text-sm font-black uppercase tracking-widest text-primary text-center not-italic">
                     {itemInWatchlist ? 'MANAGEMENT PORTAL' : 'INITIALIZATION PORTAL'}
                   </DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-2 pt-4">
-                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest text-center mb-2">Select Sector</p>
+                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest text-center mb-2 not-italic">Select Sector</p>
                   {Object.entries(STATUS_CONFIG).map(([status, config]) => (
                     <Button
                       key={status}
                       variant="ghost"
                       onClick={() => handleStatusSelect(status as WatchStatus)}
                       className={cn(
-                        "h-12 justify-start gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest border border-transparent transition-all",
+                        "h-12 justify-start gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest border border-transparent transition-all not-italic",
                         itemInWatchlist?.status === status 
                           ? "bg-primary/10 border-primary/20 text-primary" 
                           : "hover:bg-white/5 text-muted-foreground hover:text-white"
@@ -191,7 +191,7 @@ export function AnimeCard({
                       <Button
                         variant="ghost"
                         onClick={handleRemove}
-                        className="w-full h-12 justify-center gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        className="w-full h-12 justify-center gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive not-italic"
                       >
                         <Trash2 className="w-4 h-4" />
                         PURGE RECORD
@@ -207,7 +207,7 @@ export function AnimeCard({
 
       {/* Info Section */}
       <div className="px-1 flex flex-col gap-2">
-        <h3 className="font-black text-[11px] md:text-[12px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase">
+        <h3 className="font-black text-[11px] md:text-[12px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase not-italic">
           {currentItem.title}
         </h3>
         
@@ -216,7 +216,7 @@ export function AnimeCard({
           {/* SUB Badge (Grey) */}
           <div className="flex items-center bg-white/10 rounded-md px-2 py-1 border border-white/5 shrink-0 h-7">
             <Tv className="w-3 h-3 text-white/60 mr-1.5" />
-            <span className="text-[8px] font-black text-white/80 uppercase tracking-wider leading-none">
+            <span className="text-[8px] font-black text-white/80 uppercase tracking-wider leading-none not-italic">
               SUB {liveCounts.sub || '??'}
             </span>
           </div>
@@ -225,12 +225,12 @@ export function AnimeCard({
           <div className={cn(
             "flex items-center rounded-md px-2 py-1 border shrink-0 transition-all duration-300 h-7",
             liveCounts.dub > 0 
-              ? "bg-primary/20 border-primary/20 opacity-100 shadow-[0_0_10px_rgba(168,85,247,0.3)]" 
+              ? "bg-primary/30 border-primary/40 opacity-100 shadow-[0_0_12px_rgba(168,85,247,0.4)]" 
               : "bg-white/5 border-white/5 opacity-30"
           )}>
             <Tv className={cn("w-3 h-3 mr-1.5", liveCounts.dub > 0 ? "text-primary" : "text-white/40")} />
             <span className={cn(
-              "text-[8px] font-black uppercase tracking-wider leading-none",
+              "text-[8px] font-black uppercase tracking-wider leading-none not-italic",
               liveCounts.dub > 0 ? "text-primary" : "text-white/40"
             )}>
               DUB {liveCounts.dub || 0}
@@ -240,11 +240,11 @@ export function AnimeCard({
 
         {/* Metadata Footer */}
         <div className="flex items-center justify-between opacity-50 mt-0.5">
-          <span className="text-[7px] text-white/40 font-black uppercase flex items-center gap-1 tracking-widest">
+          <span className="text-[7px] text-white/40 font-black uppercase flex items-center gap-1 tracking-widest not-italic">
             <Calendar className="w-2.5 h-2.5" /> {currentItem.year || 'TBA'}
           </span>
           {currentItem.genres && currentItem.genres.length > 0 && (
-            <span className="text-[7px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[70px] text-right">
+            <span className="text-[7px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[70px] text-right not-italic">
               {currentItem.genres[0]}
             </span>
           )}
