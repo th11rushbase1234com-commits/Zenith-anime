@@ -147,7 +147,7 @@ export function AnimeCard({
                 <Button 
                   size="sm" 
                   className={cn(
-                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 whitespace-nowrap overflow-hidden",
+                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 whitespace-nowrap overflow-hidden italic-none",
                     itemInWatchlist 
                       ? "bg-white/10 hover:bg-white/20 text-white" 
                       : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(168,85,247,0.4)]"
@@ -211,11 +211,12 @@ export function AnimeCard({
         </h3>
         
         <div className="flex flex-wrap items-center gap-1.5">
-          {/* Sub/Dub Badges */}
+          {/* Grey SUB Badge */}
           <div className="flex items-center bg-white/10 rounded px-1.5 py-0.5 border border-white/5 shrink-0">
             <Tv className="w-2 h-2 text-white/60 mr-1" />
             <span className="text-[8px] font-black text-white/80 uppercase">SUB {liveCounts.sub || currentItem.totalEpisodes || '??'}</span>
           </div>
+          {/* Purple DUB Badge (if present) */}
           {liveCounts.dub > 0 && (
             <div className="flex items-center bg-primary/20 rounded px-1.5 py-0.5 border border-primary/20 shrink-0">
               <Tv className="w-2 h-2 text-primary mr-1" />

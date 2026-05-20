@@ -20,7 +20,8 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnifyEpisodeC
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
     const response = await fetch(`https://api.anify.tv/info/${anilistId}`, {
-      signal: controller.signal
+      signal: controller.signal,
+      next: { revalidate: 3600 } // Cache for 1 hour
     });
     
     clearTimeout(timeoutId);
@@ -34,11 +35,11 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnifyEpisodeC
     let subMax = 0;
     let dubMax = 0;
 
-    // EXHAUSTIVE SCAN: Anify data structures can vary by provider and anime type
-    if (data.episodes) {
+    // GREEDY SCAN V3.0: Exhaustively search all data branches for sub/dub markers
+    if (data && data.episodes) {
       const episodesObj = data.episodes;
 
-      // 1. Check for direct sub/dub summary counts
+      // 1. Direct summary fields (numbers)
       if (typeof episodesObj.sub === 'number') subMax = Math.max(subMax, episodesObj.sub);
       if (typeof episodesObj.dub === 'number') dubMax = Math.max(dubMax, episodesObj.dub);
 
@@ -46,25 +47,29 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnifyEpisodeC
       if (Array.isArray(episodesObj.data)) {
         episodesObj.data.forEach((provider: any) => {
           const episodes = provider.episodes || [];
-          const count = episodes.length;
+          const count = Array.isArray(episodes) ? episodes.length : (typeof episodes === 'number' ? episodes : 0);
+          
+          if (count === 0) return;
+
           const type = String(provider.type || '').toLowerCase();
           const pId = String(provider.providerId || '').toLowerCase();
           
-          // Heuristic detection: check explicit type flag OR provider naming convention
+          // Pattern: Explicit DUB type OR provider ID containing "dub"
           if (type === 'dub' || pId.includes('dub')) {
             dubMax = Math.max(dubMax, count);
-          } else if (type === 'sub' || pId.includes('sub') || type === 'softsub' || pId.includes('zoro') || pId.includes('gogo')) {
+          } else {
+            // Default everything else to SUB (sub, softsub, etc)
             subMax = Math.max(subMax, count);
           }
         });
       }
 
-      // 3. Fallback to array length check if sub/dub are direct arrays
+      // 3. Last resort: check sub/dub as arrays directly
       if (Array.isArray(episodesObj.sub)) subMax = Math.max(subMax, episodesObj.sub.length);
       if (Array.isArray(episodesObj.dub)) dubMax = Math.max(dubMax, episodesObj.dub.length);
     }
 
-    // Top-level fallbacks
+    // Top-level fallbacks (sometimes Anify puts these outside the episodes object)
     if (typeof data.sub === 'number') subMax = Math.max(subMax, data.sub);
     if (typeof data.dub === 'number') dubMax = Math.max(dubMax, data.dub);
 
