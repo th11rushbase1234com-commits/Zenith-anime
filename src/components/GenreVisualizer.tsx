@@ -58,7 +58,8 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
                   border: '1px solid hsl(var(--primary) / 0.2)', 
                   borderRadius: '16px', 
                   backdropFilter: 'blur(10px)',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                  color: '#ffffff'
                 }}
                 itemStyle={{ color: 'hsl(var(--primary))', fontWeight: '900', textTransform: 'uppercase', fontSize: '10px' }}
                 cursor={{ fill: 'rgba(255,255,255,0.05)' }}
@@ -97,13 +98,14 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
                   border: '1px solid hsl(var(--primary) / 0.2)', 
                   borderRadius: '16px', 
                   backdropFilter: 'blur(10px)',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                  color: '#ffffff'
                 }}
-                itemStyle={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '10px' }}
+                itemStyle={{ color: '#ffffff', fontWeight: '900', textTransform: 'uppercase', fontSize: '10px' }}
                 labelStyle={{ color: 'hsl(var(--primary))', marginBottom: '4px', fontWeight: '900' }}
                 formatter={(value: number, name: string) => [`${value} ENTRIES`, name.toUpperCase()]}
               />
-              <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', paddingTop: '20px' }} />
+              <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', paddingTop: '20px', color: '#ffffff' }} />
             </PieChart>
           </ResponsiveContainer>
         </div>
