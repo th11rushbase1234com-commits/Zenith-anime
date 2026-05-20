@@ -98,7 +98,7 @@ export function AnimeCard({
   };
 
   return (
-    <div className="group relative flex flex-col gap-3 w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="group relative flex flex-col gap-3 w-full animate-in fade-in slide-in-from-bottom-2 duration-500 font-body">
       {/* Poster Section */}
       <div className="relative aspect-[3/4.2] rounded-[1.5rem] md:rounded-[2rem] overflow-hidden bg-white/5 shadow-2xl transition-all duration-500 hover:scale-[1.04] hover:shadow-[0_25px_50px_rgba(0,0,0,0.8)] border border-white/5">
         <Image 
@@ -225,7 +225,7 @@ export function AnimeCard({
           <div className={cn(
             "flex items-center rounded-md px-2 py-1 border shrink-0 transition-all duration-300 h-7",
             liveCounts.dub > 0 
-              ? "bg-primary/20 border-primary/20 opacity-100" 
+              ? "bg-primary/20 border-primary/20 opacity-100 shadow-[0_0_10px_rgba(168,85,247,0.3)]" 
               : "bg-white/5 border-white/5 opacity-30"
           )}>
             <Tv className={cn("w-3 h-3 mr-1.5", liveCounts.dub > 0 ? "text-primary" : "text-white/40")} />

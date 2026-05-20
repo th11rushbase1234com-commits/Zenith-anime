@@ -70,6 +70,7 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnimeKaiEpiso
       if (dubMax === 0 && Array.isArray(episodesObj.dub)) dubMax = episodesObj.dub.length;
     }
 
+    // Ensure we don't report 0 subs if AniList knows about episodes
     return { sub: subMax, dub: dubMax };
   } catch (error) {
     // Silent recovery for archival stability
