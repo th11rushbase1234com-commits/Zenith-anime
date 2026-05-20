@@ -44,7 +44,7 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
       <div className="bg-card/40 backdrop-blur-xl border border-white/5 rounded-3xl p-6 space-y-6">
         <div className="space-y-1">
           <h3 className="text-lg font-black uppercase tracking-widest text-white">Genre Spectrum</h3>
-          <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Density of narrative archetypes</p>
+          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Density of narrative archetypes</p>
         </div>
         <div className="h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -53,7 +53,13 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
               <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} tick={{ fill: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }} />
               <YAxis hide />
               <Tooltip 
-                contentStyle={{ backgroundColor: 'rgba(0,0,0,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(10px)' }}
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))', 
+                  border: '1px solid hsl(var(--primary) / 0.2)', 
+                  borderRadius: '16px', 
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                }}
                 itemStyle={{ color: 'hsl(var(--primary))', fontWeight: '900', textTransform: 'uppercase', fontSize: '10px' }}
                 cursor={{ fill: 'rgba(255,255,255,0.05)' }}
               />
@@ -66,7 +72,7 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
       <div className="bg-card/40 backdrop-blur-xl border border-white/5 rounded-3xl p-6 space-y-6">
         <div className="space-y-1">
           <h3 className="text-lg font-black uppercase tracking-widest text-white">Archive Status</h3>
-          <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Global library distribution</p>
+          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Global library distribution</p>
         </div>
         <div className="h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -86,11 +92,18 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
                 ))}
               </Pie>
               <Tooltip 
-                contentStyle={{ backgroundColor: 'rgba(0,0,0,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(10px)' }}
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))', 
+                  border: '1px solid hsl(var(--primary) / 0.2)', 
+                  borderRadius: '16px', 
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                }}
                 itemStyle={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '10px' }}
+                labelStyle={{ color: 'hsl(var(--primary))', marginBottom: '4px', fontWeight: '900' }}
                 formatter={(value: number, name: string) => [`${value} ENTRIES`, name.toUpperCase()]}
               />
-              <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px' }} />
+              <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', paddingTop: '20px' }} />
             </PieChart>
           </ResponsiveContainer>
         </div>
