@@ -46,7 +46,7 @@ export function AnimeCard({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [telemetry, setTelemetry] = useState<{ sub: number; dub: number }>({ 
     sub: anime.subCount || anime.totalEpisodes || 0, 
-    dub: 0 
+    dub: anime.dubCount || 0 
   });
   
   const itemInWatchlist = existingItem || (anime.status !== undefined && (anime as any).userId ? anime : undefined);
@@ -58,15 +58,15 @@ export function AnimeCard({
       if (!currentItem.id || currentItem.id === '0') return;
       const data = await scrapeLiveTelemetry(currentItem.id, currentItem.title);
       if (isMounted) {
-        setTelemetry(prev => ({
-          sub: data.sub > 0 ? data.sub : prev.sub,
+        setTelemetry({
+          sub: data.sub > 0 ? data.sub : (currentItem.totalEpisodes || 0),
           dub: data.dub
-        }));
+        });
       }
     }
     fetchTelemetry();
     return () => { isMounted = false; };
-  }, [currentItem.id, currentItem.title]);
+  }, [currentItem.id, currentItem.title, currentItem.totalEpisodes]);
 
   const STATUS_CONFIG: Record<WatchStatus, { label: string; icon: any; color: string; bgColor: string }> = {
     WATCHING: { label: 'WATCHING', icon: Play, color: 'text-primary', bgColor: 'bg-primary/20' },
