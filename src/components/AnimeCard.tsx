@@ -45,7 +45,7 @@ export function AnimeCard({
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  // PRIM & PROPER TELEMETRY: Baseline from AniList, augmented by Consumet V3.0
+  // PRIM & PROPER TELEMETRY: Baseline from AniList, augmented by Consumet Protocol V4.0
   const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
     sub: anime.subCount || anime.totalEpisodes || 0, 
     dub: anime.dubCount || 0 
@@ -60,11 +60,12 @@ export function AnimeCard({
       if (!currentItem.id || currentItem.id === '0') return;
       
       const counts = await getEpisodeCounts(currentItem.id);
+      // Ensure we only update if we found actual dubs or updated sub info
       if (isMounted && (counts.sub > 0 || counts.dub > 0)) {
-        setLiveCounts({
-          sub: counts.sub,
+        setLiveCounts(prev => ({
+          sub: Math.max(prev.sub, counts.sub),
           dub: counts.dub
-        });
+        }));
       }
     }
     fetchLiveTelemetry();
@@ -124,7 +125,7 @@ export function AnimeCard({
 
         {currentItem.rating > 0 && (
           <div className="absolute top-3 right-3 md:top-4 md:right-4 px-2 py-0.5 rounded-lg bg-accent text-[8px] font-black text-black uppercase tracking-tight flex items-center gap-1 shadow-lg z-10 not-italic">
-            <Star className="w-2.5 h-2.5 fill-current" /> {currentItem.rating.toFixed(1)}
+            < Star className="w-2.5 h-2.5 fill-current" /> {currentItem.rating.toFixed(1)}
           </div>
         )}
 

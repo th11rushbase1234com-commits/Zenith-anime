@@ -1,6 +1,6 @@
 /**
  * Service to interact with the Consumet API (Meta AniList Provider)
- * Optimized for aggressive metadata recovery of sub/dub counts.
+ * Optimized for Zenith Protocol V4.0: Aggressive metadata recovery and multi-instance resilience.
  */
 
 export interface ConsumetEpisodeCounts {
@@ -13,62 +13,65 @@ export async function getEpisodeCounts(anilistId: string): Promise<ConsumetEpiso
     return { sub: 0, dub: 0 };
   }
 
-  try {
-    // Consumet Meta AniList Info Endpoint
-    // We use a shorter timeout to ensure the UI remains responsive
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+  // Multi-Instance Resilience: Try primary then secondary if first fails
+  const instances = [
+    `https://api.consumet.org/meta/anilist/info/${anilistId}`,
+    `https://consumet-api-fawn.vercel.app/meta/anilist/info/${anilistId}`
+  ];
 
-    const response = await fetch(`https://api.consumet.org/meta/anilist/info/${anilistId}`, {
-      signal: controller.signal,
-    });
-    
-    clearTimeout(timeoutId);
+  for (const url of instances) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    if (!response.ok) {
-      return { sub: 0, dub: 0 };
-    }
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
 
-    const data = await response.json();
-    
-    let subCount = 0;
-    let dubCount = 0;
+      if (!response.ok) continue;
 
-    // ZENITH SCAN V3.0: Exhaustive Metadata Resolution
-    if (data && Array.isArray(data.episodes)) {
-      subCount = data.episodes.length;
+      const data = await response.json();
+      
+      let subCount = 0;
+      let dubCount = 0;
 
-      // HEURISTIC 1: Check explicit boolean flags
-      const explicitDubs = data.episodes.filter((ep: any) => 
-        ep.isDub === true || ep.dub === true
-      );
+      // ZENITH SCAN V4.0: Ultra-Greedy Metadata Resolution
+      if (data && Array.isArray(data.episodes)) {
+        // Many providers list sub and dub in a flat array
+        const subEpisodes = data.episodes.filter((ep: any) => {
+          const id = String(ep.id || '').toLowerCase();
+          const title = String(ep.title || '').toLowerCase();
+          // Filter OUT dub markers to count true subs
+          return !id.includes('-dub') && !id.includes('/dub') && !title.includes('(dub)') && ep.isDub !== true;
+        });
 
-      // HEURISTIC 2: String analysis of IDs and Titles (The most reliable for Consumet)
-      const stringDubs = data.episodes.filter((ep: any) => {
-        const id = String(ep.id || '').toLowerCase();
-        const title = String(ep.title || '').toLowerCase();
-        return id.includes('-dub') || id.includes('/dub') || title.includes('(dub)') || title.includes('[dub]');
-      });
+        const dubEpisodes = data.episodes.filter((ep: any) => {
+          const id = String(ep.id || '').toLowerCase();
+          const title = String(ep.title || '').toLowerCase();
+          // Filter IN dub markers
+          return id.includes('-dub') || id.includes('/dub') || title.includes('(dub)') || title.includes('[dub]') || ep.isDub === true;
+        });
 
-      // HEURISTIC 3: Sub-provider check
-      // Consumet often lists dubs as separate entries in the array
-      const uniqueDubs = new Set([...explicitDubs, ...stringDubs]);
-      dubCount = uniqueDubs.size;
+        subCount = subEpisodes.length || data.totalEpisodes || data.episodes.length;
+        dubCount = dubEpisodes.length;
 
-      // CROSS-CHECK: If metadata confirms dub exists but array is flat
-      if (dubCount === 0 && data.hasDub === true) {
-        dubCount = subCount;
+        // HEURISTIC: If array is flat and markers aren't explicit but hasDub is true
+        if (dubCount === 0 && (data.hasDub === true || data.dub === true)) {
+          dubCount = subCount;
+        }
       }
-    }
 
-    // Fallback to top-level episode count if subCount resolved to 0
-    if (subCount === 0 && data.totalEpisodes) {
-      subCount = data.totalEpisodes;
+      // Final fallback to top-level fields
+      if (subCount === 0 && data.totalEpisodes) subCount = data.totalEpisodes;
+      
+      // If we found any data, return it
+      if (subCount > 0 || dubCount > 0) {
+        return { sub: subCount, dub: dubCount };
+      }
+    } catch (error) {
+      // Instance failed, loop will try next one
+      continue;
     }
-
-    return { sub: subCount, dub: dubCount };
-  } catch (error) {
-    // Silently return zero-state on network or API failures
-    return { sub: 0, dub: 0 };
   }
+
+  return { sub: 0, dub: 0 };
 }
