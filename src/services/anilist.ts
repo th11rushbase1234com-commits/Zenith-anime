@@ -43,14 +43,14 @@ async function fetchAniList(query: string, variables: any = {}) {
 
     if (!response.ok) {
       if (response.status === 429) {
-        return { errors: [{ message: 'AniList Rate Limit Hit. Please wait a moment.' }] };
+        return { errors: [{ message: 'AniList Rate Limit Hit.' }] };
       }
       return { errors: json.errors || [{ message: `HTTP Error: ${response.status}` }] };
     }
 
     return json;
   } catch (error) {
-    return { errors: [{ message: error instanceof Error ? error.message : 'Connection failed' }] };
+    return { errors: [{ message: 'Connection failed' }] };
   }
 }
 
@@ -69,7 +69,7 @@ function mapMediaToAnime(media: any): Anime {
     status: 'PLAN_TO_WATCH',
     year: media.seasonYear || 0,
     subCount: media.episodes || 0,
-    dubCount: 0, // Note: AniList doesn't provide specific dub counts. Consider Anify or Consumet API for this.
+    dubCount: 0, 
     externalLinks: media.externalLinks || [],
     nextAiringEpisode: media.nextAiringEpisode
   };
