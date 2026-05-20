@@ -43,7 +43,15 @@ const GENRE_MATRIX: GenreInfo[] = [
   { name: "Slice of Life", color: "border-sky-500/20 text-sky-400 bg-sky-500/5", activeColor: "bg-sky-500 text-white border-sky-500" },
   { name: "Sports", color: "border-lime-500/20 text-lime-400 bg-lime-500/5", activeColor: "bg-lime-500 text-white border-lime-500" },
   { name: "Supernatural", color: "border-fuchsia-500/20 text-fuchsia-400 bg-fuchsia-500/5", activeColor: "bg-fuchsia-500 text-white border-fuchsia-500" },
-  { name: "Thriller", color: "border-red-600/20 text-red-500 bg-red-600/5", activeColor: "bg-red-600 text-white border-red-600" }
+  { name: "Thriller", color: "border-red-600/20 text-red-500 bg-red-600/5", activeColor: "bg-red-600 text-white border-red-600" },
+  { name: "Isekai", color: "border-amber-500/20 text-amber-400 bg-amber-500/5", activeColor: "bg-amber-500 text-white border-amber-500" },
+  { name: "Harem", color: "border-pink-500/20 text-pink-400 bg-pink-500/5", activeColor: "bg-pink-500 text-white border-pink-500" },
+  { name: "Seinen", color: "border-slate-500/20 text-slate-400 bg-slate-500/5", activeColor: "bg-slate-500 text-white border-slate-500" },
+  { name: "Shounen", color: "border-orange-600/20 text-orange-500 bg-orange-600/5", activeColor: "bg-orange-600 text-white border-orange-600" },
+  { name: "Shoujo", color: "border-pink-300/20 text-pink-200 bg-pink-300/5", activeColor: "bg-pink-300 text-white border-pink-300" },
+  { name: "Josei", color: "border-purple-300/20 text-purple-200 bg-purple-300/5", activeColor: "bg-purple-300 text-white border-purple-300" },
+  { name: "Military", color: "border-olive-500/20 text-olive-400 bg-olive-500/5", activeColor: "bg-olive-500 text-white border-olive-500" },
+  { name: "Space", color: "border-blue-700/20 text-blue-600 bg-blue-700/5", activeColor: "bg-blue-700 text-white border-blue-700" }
 ];
 
 const STATUSES = [
@@ -79,7 +87,7 @@ function SearchResults() {
   useEffect(() => {
     async function performSearch() {
       setIsSearching(true);
-      // Command Reset: Force origin on any telemetry update
+      // Global Command Reset: Force origin on any telemetry update
       window.scrollTo({ top: 0, behavior: 'instant' });
       
       try {

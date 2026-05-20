@@ -28,6 +28,14 @@ const MEDIA_QUERY_FIELDS = `
   }
 `;
 
+// List of official AniList Genres to separate from Tags
+const OFFICIAL_GENRES = [
+  "Action", "Adventure", "Comedy", "Drama", "Ecchi", "Fantasy", 
+  "Horror", "Mahou Shoujo", "Mecha", "Music", "Mystery", 
+  "Psychological", "Romance", "Sci-Fi", "Slice of Life", 
+  "Sports", "Supernatural", "Thriller"
+];
+
 async function fetchAniList(query: string, variables: any = {}) {
   try {
     const response = await fetch(ANILIST_URL, {
@@ -82,14 +90,18 @@ export async function searchAnime(params: {
 }): Promise<{ anime: Anime[], hasNextPage: boolean, lastPage: number }> {
   const { query, page = 1, status, genres, sort } = params;
 
+  // Split input into genres and tags for accurate AniList filtration
+  const genreInput = genres?.filter(g => OFFICIAL_GENRES.includes(g));
+  const tagInput = genres?.filter(g => !OFFICIAL_GENRES.includes(g));
+
   const searchQuery = `
-    query ($search: String, $page: Int, $status: MediaStatus, $genres: [String], $sort: [MediaSort]) {
+    query ($search: String, $page: Int, $status: MediaStatus, $genres: [String], $tags: [String], $sort: [MediaSort]) {
       Page(page: $page, perPage: 24) {
         pageInfo {
           hasNextPage
           lastPage
         }
-        media(search: $search, status: $status, genre_in: $genres, sort: $sort, type: ANIME, isAdult: false) {
+        media(search: $search, status: $status, genre_in: $genres, tag_in: $tags, sort: $sort, type: ANIME, isAdult: false) {
           ${MEDIA_QUERY_FIELDS}
         }
       }
@@ -101,7 +113,8 @@ export async function searchAnime(params: {
       search: query || undefined, 
       page,
       status: status || undefined,
-      genres: genres && genres.length > 0 ? genres : undefined,
+      genres: genreInput && genreInput.length > 0 ? genreInput : undefined,
+      tags: tagInput && tagInput.length > 0 ? tagInput : undefined,
       sort: sort || ["SEARCH_MATCH", "TRENDING_DESC"]
     });
     if (data.errors) return { anime: [], hasNextPage: false, lastPage: 1 };
