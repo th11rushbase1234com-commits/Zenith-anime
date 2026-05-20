@@ -33,11 +33,8 @@ const GENRE_MATRIX: GenreInfo[] = [
   { name: "Ecchi", color: "border-rose-500/20 text-rose-400 bg-rose-500/5", activeColor: "bg-rose-500 text-white border-rose-500" },
   { name: "Fantasy", color: "border-purple-500/20 text-purple-400 bg-purple-500/5", activeColor: "bg-purple-500 text-white border-purple-500" },
   { name: "Horror", color: "border-zinc-500/20 text-zinc-400 bg-zinc-500/5", activeColor: "bg-zinc-500 text-white border-zinc-500" },
-  { name: "Isekai", color: "border-amber-500/20 text-amber-400 bg-amber-500/5", activeColor: "bg-amber-500 text-white border-amber-500" },
-  { name: "Harem", color: "border-pink-500/20 text-pink-400 bg-pink-500/5", activeColor: "bg-pink-500 text-white border-pink-500" },
   { name: "Mahou Shoujo", color: "border-pink-400/20 text-pink-300 bg-pink-400/5", activeColor: "bg-pink-400 text-white border-pink-400" },
   { name: "Mecha", color: "border-orange-500/20 text-orange-400 bg-orange-500/5", activeColor: "bg-orange-500 text-white border-orange-500" },
-  { name: "Military", color: "border-slate-500/20 text-slate-400 bg-slate-500/5", activeColor: "bg-slate-500 text-white border-slate-500" },
   { name: "Music", color: "border-emerald-500/20 text-emerald-400 bg-emerald-500/5", activeColor: "bg-emerald-500 text-white border-emerald-500" },
   { name: "Mystery", color: "border-indigo-500/20 text-indigo-400 bg-indigo-500/5", activeColor: "bg-indigo-500 text-white border-indigo-500" },
   { name: "Psychological", color: "border-violet-500/20 text-violet-400 bg-violet-500/5", activeColor: "bg-violet-500 text-white border-violet-500" },
@@ -46,13 +43,7 @@ const GENRE_MATRIX: GenreInfo[] = [
   { name: "Slice of Life", color: "border-sky-500/20 text-sky-400 bg-sky-500/5", activeColor: "bg-sky-500 text-white border-sky-500" },
   { name: "Sports", color: "border-lime-500/20 text-lime-400 bg-lime-500/5", activeColor: "bg-lime-500 text-white border-lime-500" },
   { name: "Supernatural", color: "border-fuchsia-500/20 text-fuchsia-400 bg-fuchsia-500/5", activeColor: "bg-fuchsia-500 text-white border-fuchsia-500" },
-  { name: "Thriller", color: "border-red-600/20 text-red-500 bg-red-600/5", activeColor: "bg-red-600 text-white border-red-600" },
-  { name: "Seinen", color: "border-slate-400/20 text-slate-300 bg-slate-400/5", activeColor: "bg-slate-400 text-white border-slate-400" },
-  { name: "Shounen", color: "border-blue-600/20 text-blue-500 bg-blue-600/5", activeColor: "bg-blue-600 text-white border-blue-600" },
-  { name: "Shoujo", color: "border-pink-600/20 text-pink-500 bg-pink-600/5", activeColor: "bg-pink-600 text-white border-pink-600" },
-  { name: "Josei", color: "border-purple-600/20 text-purple-500 bg-purple-600/5", activeColor: "bg-purple-600 text-white border-purple-600" },
-  { name: "Cyberpunk", color: "border-teal-400/20 text-teal-300 bg-teal-400/5", activeColor: "bg-teal-400 text-white border-teal-400" },
-  { name: "Vampire", color: "border-red-900/20 text-red-700 bg-red-900/5", activeColor: "bg-red-900 text-white border-red-900" }
+  { name: "Thriller", color: "border-red-600/20 text-red-500 bg-red-600/5", activeColor: "bg-red-600 text-white border-red-600" }
 ];
 
 const STATUSES = [
@@ -88,7 +79,7 @@ function SearchResults() {
   useEffect(() => {
     async function performSearch() {
       setIsSearching(true);
-      // Command Reset: Force top on telemetry update
+      // Command Reset: Force origin on any telemetry update
       window.scrollTo({ top: 0, behavior: 'instant' });
       
       try {
@@ -130,7 +121,7 @@ function SearchResults() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
         <Loader2 className="w-12 h-12 text-primary animate-spin" />
-        <p className="text-primary font-mono animate-pulse uppercase tracking-widest font-black">INITIALIZING ZENITH CORE...</p>
+        <p className="text-primary font-black uppercase tracking-widest">INITIALIZING ZENITH CORE...</p>
       </div>
     );
   }
@@ -140,7 +131,6 @@ function SearchResults() {
       <main className="flex-1 w-full max-w-[1920px] mx-auto px-4 md:px-12 py-12">
         <div className="space-y-12 animate-in fade-in duration-700">
           
-          {/* Discovery Filter Header */}
           <div className="space-y-10 border-b border-white/5 pb-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-1">
@@ -150,7 +140,6 @@ function SearchResults() {
                 <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.4em]">Sector Selection & Archive Telemetry</p>
               </div>
               
-              {/* Status Chips */}
               <div className="flex flex-wrap gap-2 md:justify-end">
                 {STATUSES.map((status) => (
                   <button
@@ -173,7 +162,6 @@ function SearchResults() {
               </div>
             </div>
 
-            {/* Chromatic Genre Matrix */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -212,12 +200,11 @@ function SearchResults() {
             </div>
           </div>
 
-          {/* Results Area */}
           <div className="space-y-12">
             {isSearching ? (
               <div className="flex flex-col items-center justify-center py-24 md:py-32 gap-6">
                 <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                <p className="text-primary font-mono animate-pulse uppercase tracking-[0.2em] font-black text-xs md:text-sm">SCANNING ARCHIVES...</p>
+                <p className="text-primary font-black uppercase tracking-[0.2em] text-xs md:text-sm">SCANNING ARCHIVES...</p>
               </div>
             ) : results.length > 0 ? (
               <div className="space-y-10">
@@ -247,7 +234,6 @@ function SearchResults() {
                   ))}
                 </div>
 
-                {/* Pagination */}
                 <div className="flex justify-center py-10">
                   <div className="inline-grid grid-cols-3 items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full h-11 px-1 shadow-2xl min-w-[220px] text-center">
                     <div className="flex justify-start">
