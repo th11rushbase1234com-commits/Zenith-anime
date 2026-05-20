@@ -34,16 +34,30 @@ export async function getEpisodeCounts(anilistId: string): Promise<AnifyEpisodeC
     let subMax = 0;
     let dubMax = 0;
 
-    if (data.episodes && data.episodes.data) {
-      data.episodes.data.forEach((provider: any) => {
-        const episodeCount = provider.episodes?.length || 0;
-        if (provider.type === 'sub') {
-          subMax = Math.max(subMax, episodeCount);
-        } else if (provider.type === 'dub') {
-          dubMax = Math.max(dubMax, episodeCount);
-        }
-      });
+    // Deep Scan of the episodes object
+    if (data.episodes) {
+      // 1. Scan providers array (the most common structure)
+      if (Array.isArray(data.episodes.data)) {
+        data.episodes.data.forEach((provider: any) => {
+          const episodeCount = provider.episodes?.length || 0;
+          const type = String(provider.type || '').toLowerCase();
+          
+          if (type === 'sub') {
+            subMax = Math.max(subMax, episodeCount);
+          } else if (type === 'dub') {
+            dubMax = Math.max(dubMax, episodeCount);
+          }
+        });
+      }
+
+      // 2. Check for direct counts (some API versions provide these as summary fields)
+      if (typeof data.episodes.sub === 'number') subMax = Math.max(subMax, data.episodes.sub);
+      if (typeof data.episodes.dub === 'number') dubMax = Math.max(dubMax, data.episodes.dub);
     }
+
+    // 3. Fallback to top-level fields if present
+    if (typeof data.sub === 'number') subMax = Math.max(subMax, data.sub);
+    if (typeof data.dub === 'number') dubMax = Math.max(dubMax, data.dub);
 
     return { sub: subMax, dub: dubMax };
   } catch (error) {
