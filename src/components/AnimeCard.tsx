@@ -47,8 +47,6 @@ export function AnimeCard({
   const itemInWatchlist = existingItem || (anime.status !== undefined && (anime as any).userId ? anime : undefined);
   const currentItem = itemInWatchlist || anime;
 
-  // Calculate Live Episode Count from AniList GraphQL Data
-  // If airing, current released is nextEpisode - 1
   const currentReleased = currentItem.nextAiringEpisode 
     ? currentItem.nextAiringEpisode.episode - 1 
     : (currentItem.totalEpisodes || '??');
@@ -81,7 +79,6 @@ export function AnimeCard({
 
   return (
     <div className="group relative flex flex-col gap-3 w-full animate-in fade-in slide-in-from-bottom-2 duration-500 font-body">
-      {/* Poster Section */}
       <div className="relative aspect-[3/4.2] rounded-[1.5rem] md:rounded-[2rem] overflow-hidden bg-white/5 shadow-2xl transition-all duration-500 hover:scale-[1.04] hover:shadow-[0_25px_50px_rgba(0,0,0,0.8)] border border-white/5">
         <Image 
           src={currentItem.imageUrl} 
@@ -91,7 +88,6 @@ export function AnimeCard({
           className="object-cover transition-transform duration-1000 group-hover:scale-110 brightness-[0.8] group-hover:brightness-[0.4]"
         />
         
-        {/* Status Badge */}
         <div className="absolute top-3 left-3 md:top-4 md:left-4 flex flex-col gap-1.5 z-10">
           {currentStatus && (
             <div className={cn(
@@ -105,21 +101,19 @@ export function AnimeCard({
           )}
         </div>
 
-        {/* Rating Badge */}
         {currentItem.rating > 0 && (
           <div className="absolute top-3 right-3 md:top-4 md:right-4 px-2 py-0.5 rounded-lg bg-accent text-[8px] font-black text-black uppercase tracking-tight flex items-center gap-1 shadow-lg z-10">
             <Star className="w-2.5 h-2.5 fill-current" /> {currentItem.rating.toFixed(1)}
           </div>
         )}
 
-        {/* Hover Overlay */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-t from-black via-black/80 to-transparent p-4 flex flex-col justify-end gap-3 z-20">
           <div className="space-y-1 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
             <div className="flex items-center gap-2">
               <Layers className="w-3 h-3 text-primary" />
               <h4 className="text-[7px] font-black text-primary uppercase tracking-widest leading-none">ZENITH INTEL</h4>
             </div>
-            <p className="text-[9px] text-white/70 line-clamp-3 leading-tight font-black uppercase">
+            <p className="text-[9px] text-white/70 italic line-clamp-4 leading-tight font-medium">
               {currentItem.description}
             </p>
           </div>
@@ -187,13 +181,11 @@ export function AnimeCard({
         </div>
       </div>
 
-      {/* Info Section - Prim & Proper UI */}
       <div className="px-1 flex flex-col gap-2">
         <h3 className="font-black text-[11px] md:text-[12px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase">
           {currentItem.title}
         </h3>
         
-        {/* SINGLE-CHANNEL LIVE TELEMETRY (PURE ANILIST) */}
         <div className="flex flex-wrap items-center gap-1.5">
           <div className={cn(
             "flex items-center rounded-md px-2.5 py-1 border shrink-0 transition-all duration-300 h-7",
@@ -211,7 +203,6 @@ export function AnimeCard({
           </div>
         </div>
 
-        {/* Metadata Footer */}
         <div className="flex items-center justify-between opacity-50 mt-0.5">
           <span className="text-[7px] text-white/40 font-black uppercase flex items-center gap-1 tracking-widest">
             <Calendar className="w-2.5 h-2.5" /> {currentItem.year || 'TBA'}

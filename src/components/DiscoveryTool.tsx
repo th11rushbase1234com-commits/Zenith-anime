@@ -39,7 +39,6 @@ export function DiscoveryTool({ watchlist }: DiscoveryToolProps) {
   return (
     <div className="w-full space-y-8">
       <div className="bg-card/30 backdrop-blur-2xl border border-white/5 rounded-[40px] p-8 md:p-12 relative overflow-hidden">
-        {/* Animated background elements */}
         <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[100px] rounded-full animate-pulse" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-accent/10 blur-[100px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
 
@@ -50,8 +49,8 @@ export function DiscoveryTool({ watchlist }: DiscoveryToolProps) {
           
           <div className="space-y-2">
             <h3 className="text-3xl font-black uppercase tracking-tighter text-glow">Zenith Core Analysis</h3>
-            <p className="text-muted-foreground text-sm max-w-lg mx-auto leading-relaxed uppercase font-black tracking-tight">
-              Processing consumption history through neural networks to predict high-resonance series.
+            <p className="text-muted-foreground text-xs md:text-[13px] max-w-lg mx-auto leading-relaxed italic font-medium">
+              Processing consumption history through neural networks to predict high-resonance series for your profile.
             </p>
           </div>
 
@@ -77,12 +76,12 @@ export function DiscoveryTool({ watchlist }: DiscoveryToolProps) {
                       <span key={g} className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white font-black uppercase tracking-widest">{g}</span>
                     ))}
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed font-black uppercase tracking-tight">
+                  <p className="text-[10px] text-muted-foreground leading-relaxed italic font-medium">
                     {rec.reason}
                   </p>
                   <div className="pt-3 border-t border-white/5 space-y-1">
                     <span className="text-[9px] font-black text-accent uppercase tracking-widest">Resonance Profile</span>
-                    <p className="text-[10px] text-muted-foreground line-clamp-2 uppercase font-black">{rec.expectedEmotionalImpact}</p>
+                    <p className="text-[9px] text-muted-foreground line-clamp-2 italic font-medium">{rec.expectedEmotionalImpact}</p>
                   </div>
                 </div>
               ))}

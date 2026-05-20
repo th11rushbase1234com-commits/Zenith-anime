@@ -11,7 +11,13 @@ import {
   History,
   Plus,
   Settings2,
-  ChevronRight
+  ChevronRight,
+  Play,
+  Clock,
+  PauseCircle,
+  XCircle,
+  CheckCircle2,
+  Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,7 +39,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
-import { Trash2, Play, Clock, PauseCircle, XCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -139,7 +144,7 @@ export default function HomePage() {
                             ))}
                           </h2>
                           
-                          <p className="text-white/70 text-[10px] md:text-base max-w-2xl line-clamp-2 md:line-clamp-3 font-medium uppercase tracking-tight leading-relaxed">
+                          <p className="text-white/70 text-[10px] md:text-sm max-w-2xl line-clamp-2 md:line-clamp-3 font-medium italic tracking-tight leading-relaxed">
                             {anime.description}
                           </p>
 
@@ -230,7 +235,6 @@ export default function HomePage() {
             <div className="flex flex-col lg:flex-row gap-12">
               <div className="flex-1 space-y-12 md:space-y-16">
                 
-                {/* Recently Aired Section */}
                 <div className="space-y-6 md:space-y-8">
                   <div className="flex items-center justify-between border-b border-white/5 pb-4">
                     <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest flex items-center gap-3">

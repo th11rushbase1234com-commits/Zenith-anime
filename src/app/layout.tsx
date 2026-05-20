@@ -5,18 +5,19 @@ import './globals.css';
 import { AuthProvider } from '@/context/auth-context';
 import { Toaster } from '@/components/ui/toaster';
 import { ZenithNavbar } from '@/components/ZenithNavbar';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 function NavigationManager({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const showNavbar = pathname !== '/login';
 
   useEffect(() => {
-    // Global Command Reset: Force top of page on any route change or navigation event
+    // Global Command Reset: Force top of page on any route change, search query update, or navigation event
     window.scrollTo({ top: 0, behavior: 'instant' });
     document.documentElement.scrollTo({ top: 0, behavior: 'instant' });
-  }, [pathname]);
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     // Force reset to home on page reload regardless of current path to ensure clean archival state
@@ -52,13 +53,15 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased bg-background text-foreground">
         <AuthProvider>
-          <NavigationManager>
-            {children}
-          </NavigationManager>
+          <Suspense fallback={null}>
+            <NavigationManager>
+              {children}
+            </NavigationManager>
+          </Suspense>
           <Toaster />
         </AuthProvider>
       </body>
