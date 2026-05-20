@@ -45,7 +45,7 @@ export function AnimeCard({
 }: AnimeCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  // DUAL-CHANNEL TELEMETRY: Monitoring both archives simultaneously
+  // DUAL-CHANNEL TELEMETRY: Monitoring both channels simultaneously
   const [liveCounts, setLiveCounts] = useState<{ sub: number; dub: number }>({ 
     sub: anime.subCount || anime.totalEpisodes || 0, 
     dub: anime.dubCount || 0 
@@ -57,7 +57,7 @@ export function AnimeCard({
   useEffect(() => {
     let isMounted = true;
     async function fetchLiveTelemetry() {
-      if (!currentItem.id || currentItem.id === '0') return;
+      if (!currentItem.id || currentItem.id === '0' || currentItem.id === 'undefined') return;
       
       const counts = await getEpisodeCounts(currentItem.id);
       if (isMounted) {
@@ -145,7 +145,7 @@ export function AnimeCard({
                 <Button 
                   size="sm" 
                   className={cn(
-                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 whitespace-nowrap overflow-hidden not-italic",
+                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 whitespace-nowrap overflow-hidden not-italic shadow-none",
                     itemInWatchlist 
                       ? "bg-white/10 hover:bg-white/20 text-white" 
                       : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(168,85,247,0.4)]"
@@ -207,19 +207,19 @@ export function AnimeCard({
           {currentItem.title}
         </h3>
         
-        {/* DUAL-CHANNEL DISPLAY: Showing both Sub and Dub simultaneously */}
+        {/* DUAL-CHANNEL DISPLAY: Simultaneous SUB and DUB monitoring */}
         <div className="flex flex-wrap items-center gap-1.5">
-          <div className="flex items-center bg-white/10 rounded-md px-2 py-1 border border-white/5 shrink-0">
+          <div className="flex items-center bg-white/10 rounded-md px-2 py-1 border border-white/5 shrink-0 h-7">
             <Tv className="w-3 h-3 text-white/60 mr-1.5" />
             <span className="text-[8px] font-black text-white/80 uppercase not-italic tracking-wider leading-none">
               SUB {liveCounts.sub || '??'}
             </span>
           </div>
           <div className={cn(
-            "flex items-center rounded-md px-2 py-1 border shrink-0 transition-opacity duration-300",
+            "flex items-center rounded-md px-2 py-1 border shrink-0 transition-all duration-300 h-7",
             liveCounts.dub > 0 
               ? "bg-primary/20 border-primary/20 opacity-100" 
-              : "bg-white/5 border-white/5 opacity-40"
+              : "bg-white/5 border-white/5 opacity-30"
           )}>
             <Tv className={cn("w-3 h-3 mr-1.5", liveCounts.dub > 0 ? "text-primary" : "text-white/40")} />
             <span className={cn(

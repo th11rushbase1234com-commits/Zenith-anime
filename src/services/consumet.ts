@@ -1,6 +1,6 @@
 /**
  * Service to interact with the Consumet API (Meta AniList Provider)
- * Zenith Protocol V5.0: Supreme greedy detection and dual-channel mapping.
+ * Zenith Protocol V6.0: Supreme greedy detection and dual-channel mapping.
  */
 
 export interface ConsumetEpisodeCounts {
@@ -13,7 +13,7 @@ export async function getEpisodeCounts(anilistId: string): Promise<ConsumetEpiso
     return { sub: 0, dub: 0 };
   }
 
-  // Dual-Node Resilience Strategy
+  // Dual-Node Resilience Strategy: Multi-instance fallback
   const instances = [
     `https://api.consumet.org/meta/anilist/info/${anilistId}`,
     `https://consumet-api-fawn.vercel.app/meta/anilist/info/${anilistId}`
@@ -37,11 +37,11 @@ export async function getEpisodeCounts(anilistId: string): Promise<ConsumetEpiso
       let subFound = 0;
       let dubFound = 0;
 
-      // ZENITH GREEDY SCAN V5.0: Recursive Metadata Recovery
+      // ZENITH GREEDY SCAN V6.0: Recursive Metadata Recovery
       if (data && Array.isArray(data.episodes)) {
         const episodes = data.episodes;
         
-        // 1. Explicit Check: Scanning for dedicated Dub episodes
+        // 1. DUB DETECTION: Exhaustive string heuristics and metadata flags
         const dubEpisodes = episodes.filter((ep: any) => {
           const id = String(ep.id || '').toLowerCase();
           const title = String(ep.title || '').toLowerCase();
@@ -50,22 +50,27 @@ export async function getEpisodeCounts(anilistId: string): Promise<ConsumetEpiso
           return isDubFlag || 
                  id.includes('-dub') || 
                  id.includes('/dub') || 
+                 id.includes('_dub') ||
                  title.includes('(dub)') || 
-                 title.includes('[dub]');
+                 title.includes('[dub]') ||
+                 title.includes(' dub');
         });
 
-        // 2. Explicit Check: Scanning for true Sub episodes (Baseline)
+        // 2. SUB DETECTION: Baseline episodes (Usually all episodes minus explicit dub duplicates)
         const subEpisodes = episodes.filter((ep: any) => {
           const id = String(ep.id || '').toLowerCase();
-          const isDub = id.includes('-dub') || id.includes('/dub') || ep.isDub === true;
+          const title = String(ep.title || '').toLowerCase();
+          const isDub = id.includes('-dub') || id.includes('/dub') || id.includes('_dub') || 
+                       title.includes('(dub)') || title.includes('[dub]') || ep.isDub === true;
           return !isDub;
         });
 
         subFound = subEpisodes.length || data.totalEpisodes || episodes.length;
         dubFound = dubEpisodes.length;
 
-        // 3. HEURISTIC FALLBACK: If API has 'hasDub' flag but flat array
+        // 3. HEURISTIC FALLBACK: If API has 'hasDub' flag but flat array, or if it's a known dubbed series
         if (dubFound === 0 && (data.hasDub === true || data.dub === true)) {
+          // If we know it has a dub but the array is flat, usually the sub count matches the dub count
           dubFound = subFound; 
         }
       }
