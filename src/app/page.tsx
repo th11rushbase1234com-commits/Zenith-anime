@@ -139,7 +139,7 @@ export default function HomePage() {
                             ))}
                           </h2>
                           
-                          <p className="text-white/70 text-xs md:text-lg max-w-2xl line-clamp-2 md:line-clamp-3 font-black uppercase tracking-tight">
+                          <p className="text-white/70 text-[10px] md:text-base max-w-2xl line-clamp-2 md:line-clamp-3 font-medium uppercase tracking-tight leading-relaxed">
                             {anime.description}
                           </p>
 

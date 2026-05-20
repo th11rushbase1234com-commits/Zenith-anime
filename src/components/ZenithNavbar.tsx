@@ -80,8 +80,8 @@ export function ZenithNavbar() {
             </button>
             <Input 
               ref={searchInputRef}
-              placeholder="Search anime" 
-              className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-xs md:text-sm focus:ring-1 focus:ring-primary transition-all font-black uppercase tracking-tight"
+              placeholder="Search anime records..." 
+              className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-[10px] md:text-xs focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-normal placeholder:text-white/20 uppercase tracking-tight"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onBlur={handleBlur}
