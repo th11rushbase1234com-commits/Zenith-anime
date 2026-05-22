@@ -16,7 +16,7 @@ Zenith AI analyzes your consumption history and emotional resonance profile to p
 A high-fidelity management system for your personal library. Track progress, status, and historical data with zero-flicker, hardware-accelerated UI components.
 
 ### 📡 **Broadcast Center**
-Receive real-time alerts for new episode releases. The Zenith Persistence Protocol ensures you never miss a beat in the airing cycle with state-locked notifications.
+Receive real-time alerts for new episode releases. The Zenith Persistence Protocol (V37.0) ensures you never miss a beat in the airing cycle with state-locked notifications that persist even after deletion.
 
 ---
 
@@ -32,6 +32,8 @@ Receive real-time alerts for new episode releases. The Zenith Persistence Protoc
 ---
 
 ## 🚀 Deployment & Archival Setup
+
+For a detailed, step-by-step walkthrough, please refer to [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md).
 
 ### 1. Repository Initialization
 Clone the nexus and install the required dependencies:
