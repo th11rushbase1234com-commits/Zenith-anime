@@ -177,7 +177,7 @@ export default function SettingsPage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Enter display name"
-                className="h-12 bg-white/5 border-white/10 rounded-2xl px-6 focus:ring-1 focus:ring-primary focus:border-primary transition-all text-sm font-black uppercase"
+                className="h-12 bg-white/5 border-white/10 rounded-2xl px-6 focus:ring-1 focus:ring-primary focus:border-primary transition-all text-sm font-medium"
               />
             </div>
 
@@ -188,7 +188,7 @@ export default function SettingsPage() {
               <Input 
                 value={user.email || ''}
                 disabled
-                className="h-12 bg-white/5 border-white/10 rounded-2xl px-6 opacity-50 cursor-not-allowed text-sm font-black uppercase"
+                className="h-12 bg-white/5 border-white/10 rounded-2xl px-6 opacity-50 cursor-not-allowed text-sm font-medium"
               />
             </div>
             

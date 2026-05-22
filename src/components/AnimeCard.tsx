@@ -79,7 +79,8 @@ export function AnimeCard({
 
   return (
     <div className="group relative flex flex-col gap-3 w-full animate-in fade-in slide-in-from-bottom-2 duration-500 font-body">
-      <div className="relative aspect-[3/4.2] rounded-[1.5rem] md:rounded-[2rem] overflow-hidden bg-white/5 shadow-2xl transition-all duration-500 hover:scale-[1.04] hover:shadow-[0_25px_50px_rgba(0,0,0,0.8)] border border-white/5">
+      {/* Container with isolate and transform-gpu to prevent border-radius flickering */}
+      <div className="relative aspect-[3/4.2] rounded-[1.5rem] md:rounded-[2rem] overflow-hidden bg-white/5 shadow-2xl transition-all duration-500 hover:scale-[1.04] hover:shadow-[0_25px_50px_rgba(0,0,0,0.8)] border border-white/5 isolate transform-gpu">
         <Image 
           src={currentItem.imageUrl} 
           alt={currentItem.title} 
