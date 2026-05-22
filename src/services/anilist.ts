@@ -18,6 +18,7 @@ const MEDIA_QUERY_FIELDS = `
   averageScore
   episodes
   seasonYear
+  isAdult
   externalLinks {
     site
     url
@@ -190,8 +191,8 @@ export async function getRecentAiring(page: number = 1, perPage: number = 12): P
     
     const uniqueMedia = new Map();
     data.data.Page.airingSchedules.forEach((item: any) => {
-      // Apply manual filter for airing schedules as some might leak adult content if not handled
-      if (item.media && !item.media.isAdult) {
+      // Apply strict manual filter for airing schedules as they don't support a top-level isAdult argument
+      if (item.media && item.media.isAdult === false) {
         if (!uniqueMedia.has(item.media.id)) {
           uniqueMedia.set(item.media.id, mapMediaToAnime(item.media));
         }
