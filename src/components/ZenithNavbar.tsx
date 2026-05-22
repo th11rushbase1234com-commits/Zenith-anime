@@ -126,8 +126,8 @@ export function ZenithNavbar() {
               </button>
               <Input 
                 ref={searchInputRef}
-                placeholder="Discovery engine..." 
-                className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-xs focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-medium placeholder:text-white/20 tracking-tight"
+                placeholder="discovery engine..." 
+                className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-[11px] focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-medium placeholder:text-white/20 tracking-tight"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
@@ -206,7 +206,7 @@ export function ZenithNavbar() {
                   onClick={handleSearchSubmit}
                   className="w-full p-2.5 flex items-center justify-center gap-2 text-[9px] font-black text-primary uppercase tracking-widest hover:bg-primary/10 transition-colors border-t border-white/5 mt-1"
                 >
-                  <Search className="w-3 h-3" /> View all results for "{searchQuery}"
+                  <Search className="w-3 h-3" /> view all results for "{searchQuery}"
                 </button>
               </div>
             </div>

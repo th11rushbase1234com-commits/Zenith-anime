@@ -144,7 +144,7 @@ export default function HomePage() {
                             ))}
                           </h2>
                           
-                          <p className="text-white/70 text-[10px] md:text-sm max-w-2xl line-clamp-2 md:line-clamp-3 font-medium italic tracking-tight leading-relaxed">
+                          <p className="text-white/70 text-[10px] md:text-xs max-w-2xl line-clamp-2 md:line-clamp-3 font-medium italic tracking-tight leading-relaxed">
                             {anime.description}
                           </p>
 
@@ -244,7 +244,7 @@ export default function HomePage() {
                       href="/search?sort=airing"
                       className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
                     >
-                      Show More <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      show more <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
