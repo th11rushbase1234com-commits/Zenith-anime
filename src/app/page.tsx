@@ -247,7 +247,7 @@ export default function HomePage() {
                       show more <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-8">
                     {recentAiring.map(anime => (
                       <AnimeCard 
                         key={`recent-${anime.id}`} 
@@ -267,7 +267,7 @@ export default function HomePage() {
                       <Monitor className="w-5 h-5 md:w-6 md:h-6 text-accent" /> Active Feed
                     </h3>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-8">
                     {watchingAnime.slice(0, 6).map(anime => (
                       <AnimeCard 
                         key={anime.id} 
