@@ -87,7 +87,6 @@ function SearchResults() {
   useEffect(() => {
     async function performSearch() {
       setIsSearching(true);
-      // Global Command Reset: Force origin on any telemetry update
       window.scrollTo({ top: 0, behavior: 'instant' });
       
       try {
@@ -142,10 +141,10 @@ function SearchResults() {
           <div className="space-y-10 border-b border-white/5 pb-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-1">
-                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-glow">
+                <h2 className="text-2xl md:text-5xl font-black uppercase tracking-tighter text-glow">
                   DISCOVERY <span className="text-primary">COMMAND</span>
                 </h2>
-                <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.4em]">Sector Selection & Archive Telemetry</p>
+                <p className="text-[8px] md:text-[9px] text-muted-foreground font-black uppercase tracking-[0.4em]">Sector Selection & Archive Telemetry</p>
               </div>
               
               <div className="flex flex-wrap gap-2 md:justify-end">
@@ -157,13 +156,13 @@ function SearchResults() {
                       setCurrentPage(1);
                     }}
                     className={cn(
-                      "px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all h-10 flex items-center gap-2",
+                      "px-4 md:px-5 py-2 md:py-2.5 rounded-2xl text-[9px] md:text-[10px] font-black uppercase tracking-widest border transition-all h-9 md:h-10 flex items-center gap-2",
                       selectedStatus === status.value 
                         ? "bg-primary border-primary text-primary-foreground shadow-[0_0_20px_rgba(168,85,247,0.4)]" 
                         : "bg-white/5 border-white/10 text-muted-foreground hover:border-white/20 hover:text-white"
                     )}
                   >
-                    <Filter className="w-3.5 h-3.5" />
+                    <Filter className="w-3 md:w-3.5 h-3 md:w-3.5" />
                     {status.label}
                   </button>
                 ))}
@@ -173,13 +172,13 @@ function SearchResults() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <SlidersHorizontal className="w-4 h-4 text-primary" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white">CHROMATIC GENRE MATRIX</p>
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-primary" />
+                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-white">CHROMATIC GENRE MATRIX</p>
                 </div>
                 {selectedGenres.length > 0 && (
                   <button 
                     onClick={() => setSelectedGenres([])}
-                    className="text-[9px] font-black uppercase text-primary hover:text-white transition-colors"
+                    className="text-[8px] md:text-[9px] font-black uppercase text-primary hover:text-white transition-colors"
                   >
                     PURGE SELECTION
                   </button>
@@ -193,14 +192,14 @@ function SearchResults() {
                       key={genre.name}
                       onClick={() => toggleGenre(genre.name)}
                       className={cn(
-                        "h-9 px-3 rounded-xl text-[8px] font-black uppercase tracking-tight flex items-center justify-between border transition-all truncate",
+                        "h-8 md:h-9 px-2 md:px-3 rounded-xl text-[7px] md:text-[8px] font-black uppercase tracking-tight flex items-center justify-between border transition-all truncate",
                         isActive 
                           ? genre.activeColor 
                           : `${genre.color} hover:brightness-125`
                       )}
                     >
                       <span className="truncate mr-1">{genre.name}</span>
-                      {isActive && <Check className="w-2.5 h-2.5 shrink-0" />}
+                      {isActive && <Check className="w-2 md:w-2.5 h-2 md:h-2.5 shrink-0" />}
                     </button>
                   );
                 })}
@@ -217,11 +216,11 @@ function SearchResults() {
             ) : results.length > 0 ? (
               <div className="space-y-10">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <h2 className="text-xl md:text-2xl font-black tracking-tighter text-glow">
+                  <h2 className="text-lg md:text-2xl font-black tracking-tighter text-glow">
                     <span className="uppercase mr-2">RESULTS:</span>
                     <span className="text-primary italic font-medium">{initialQuery || 'GLOBAL DISCOVERY'}</span>
                   </h2>
-                  <div className="text-[9px] text-muted-foreground font-black uppercase tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/10">
+                  <div className="text-[8px] md:text-[9px] text-muted-foreground font-black uppercase tracking-widest bg-white/5 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-white/10 w-fit">
                     SECTOR: {results.length} RECORDS LOADED
                   </div>
                 </div>
@@ -240,22 +239,22 @@ function SearchResults() {
                 </div>
 
                 <div className="flex justify-center py-10">
-                  <div className="inline-grid grid-cols-3 items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full h-11 px-1 shadow-2xl min-w-[220px] text-center">
+                  <div className="inline-grid grid-cols-3 items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full h-10 md:h-11 px-1 shadow-2xl min-w-[200px] md:min-w-[220px] text-center">
                     <div className="flex justify-start">
                       <Button 
                         variant="ghost" 
                         size="sm"
                         onClick={() => handlePageChange(currentPage - 1)}
                         className={cn(
-                          "h-9 px-4 rounded-full hover:bg-white/10 text-[10px] font-black tracking-widest text-primary",
+                          "h-8 md:h-9 px-3 md:px-4 rounded-full hover:bg-white/10 text-[9px] md:text-[10px] font-black tracking-widest text-primary",
                           currentPage <= 1 && "invisible pointer-events-none"
                         )}
                       >
-                        <ChevronLeft className="w-4 h-4 mr-0.5" /> PREV
+                        <ChevronLeft className="w-3.5 md:w-4 h-3.5 md:h-4 mr-0.5" /> PREV
                       </Button>
                     </div>
                     
-                    <div className="px-2 font-black text-[10px] uppercase tracking-tighter text-glow whitespace-nowrap">
+                    <div className="px-1 md:px-2 font-black text-[9px] md:text-[10px] uppercase tracking-tighter text-glow whitespace-nowrap">
                       PAGE <span className="text-primary ml-0.5">{currentPage}</span>
                     </div>
 
@@ -265,22 +264,22 @@ function SearchResults() {
                         size="sm"
                         onClick={() => handlePageChange(currentPage + 1)}
                         className={cn(
-                          "h-9 px-4 rounded-full hover:bg-white/10 text-[10px] font-black tracking-widest text-primary",
+                          "h-8 md:h-9 px-3 md:px-4 rounded-full hover:bg-white/10 text-[9px] md:text-[10px] font-black tracking-widest text-primary",
                           !hasNextPage && "invisible pointer-events-none"
                         )}
                       >
-                        NEXT <ChevronRight className="w-4 h-4 ml-0.5" />
+                        NEXT <ChevronRight className="w-3.5 md:w-4 h-3.5 md:h-4 ml-0.5" />
                       </Button>
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-32 gap-6 text-center bg-white/5 rounded-[3rem] border border-dashed border-white/10">
-                <X className="w-16 h-16 text-muted-foreground/20" />
+              <div className="flex flex-col items-center justify-center py-24 md:py-32 gap-6 text-center bg-white/5 rounded-[2.5rem] md:rounded-[3rem] border border-dashed border-white/10 px-4">
+                <X className="w-12 md:w-16 h-12 md:h-16 text-muted-foreground/20" />
                 <div className="space-y-2">
-                  <p className="text-muted-foreground font-black uppercase tracking-[0.2em] text-sm">SECTOR OFFLINE</p>
-                  <p className="text-[10px] text-muted-foreground/40 font-black uppercase">NO RECORDS FOUND IN CURRENT ARCHIVE</p>
+                  <p className="text-muted-foreground font-black uppercase tracking-[0.2em] text-xs md:text-sm">SECTOR OFFLINE</p>
+                  <p className="text-[8px] md:text-[10px] text-muted-foreground/40 font-black uppercase">NO RECORDS FOUND IN CURRENT ARCHIVE</p>
                 </div>
                 <Button 
                   variant="outline" 
@@ -289,7 +288,7 @@ function SearchResults() {
                     setSelectedGenres([]);
                     router.push('/search');
                   }} 
-                  className="rounded-full border-white/10 font-black uppercase tracking-widest h-14 px-12"
+                  className="rounded-full border-white/10 font-black uppercase tracking-widest h-12 md:h-14 px-8 md:px-12 text-[10px] md:text-xs"
                 >
                   RESET PROTOCOL
                 </Button>

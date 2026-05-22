@@ -79,36 +79,36 @@ export function AnimeCard({
 
   return (
     <div className="group relative flex flex-col gap-3 w-full animate-in fade-in slide-in-from-bottom-2 duration-500 font-body">
-      <div className="relative aspect-[3/4.2] rounded-[1.5rem] md:rounded-[2rem] overflow-hidden bg-white/5 shadow-2xl transition-all duration-500 hover:scale-[1.04] hover:shadow-[0_25px_50px_rgba(0,0,0,0.8)] border border-white/5 isolate transform-gpu [backface-visibility:hidden] [transform:translateZ(0)] [-webkit-mask-image:-webkit-radial-gradient(white,black)]">
+      <div className="relative aspect-[3/4.2] rounded-[1.25rem] md:rounded-[2rem] overflow-hidden bg-white/5 shadow-2xl transition-all duration-500 md:hover:scale-[1.04] md:hover:shadow-[0_25px_50px_rgba(0,0,0,0.8)] border border-white/5 isolate transform-gpu [backface-visibility:hidden] [transform:translateZ(0)] [-webkit-mask-image:-webkit-radial-gradient(white,black)]">
         <Image 
           src={currentItem.imageUrl} 
           alt={currentItem.title} 
           fill 
           sizes="(max-width: 768px) 50vw, 20vw"
-          className="object-cover transition-transform duration-1000 group-hover:scale-110 brightness-[0.8] group-hover:brightness-[0.4]"
+          className="object-cover transition-transform duration-1000 md:group-hover:scale-110 brightness-[0.85] md:group-hover:brightness-[0.4]"
         />
         
-        <div className="absolute top-3 left-3 md:top-4 md:left-4 flex flex-col gap-1.5 z-10">
+        <div className="absolute top-2.5 left-2.5 md:top-4 md:left-4 flex flex-col gap-1.5 z-10">
           {currentStatus && (
             <div className={cn(
-              "px-2 py-0.5 rounded-lg backdrop-blur-md text-[7px] font-black uppercase tracking-tight border border-white/5 w-fit flex items-center gap-1",
+              "px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-lg backdrop-blur-md text-[6px] md:text-[7px] font-black uppercase tracking-tight border border-white/5 w-fit flex items-center gap-1",
               currentStatus.bgColor,
               currentStatus.color
             )}>
-              <currentStatus.icon className="w-2.5 h-2.5" />
+              <currentStatus.icon className="w-2 h-2 md:w-2.5 md:h-2.5" />
               {currentStatus.label}
             </div>
           )}
         </div>
 
         {currentItem.rating > 0 && (
-          <div className="absolute top-3 right-3 md:top-4 md:right-4 px-2 py-0.5 rounded-lg bg-accent text-[8px] font-black text-black uppercase tracking-tight flex items-center gap-1 shadow-lg z-10">
-            <Star className="w-2.5 h-2.5 fill-current" /> {currentItem.rating.toFixed(1)}
+          <div className="absolute top-2.5 right-2.5 md:top-4 md:right-4 px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-lg bg-accent text-[7px] md:text-[8px] font-black text-black uppercase tracking-tight flex items-center gap-1 shadow-lg z-10">
+            <Star className="w-2 h-2 md:w-2.5 md:h-2.5 fill-current" /> {currentItem.rating.toFixed(1)}
           </div>
         )}
 
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-t from-black via-black/80 to-transparent p-4 flex flex-col justify-end gap-3 z-20">
-          <div className="space-y-1 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+        <div className="absolute inset-0 opacity-0 md:group-hover:opacity-100 transition-all duration-300 bg-gradient-to-t from-black via-black/80 to-transparent p-4 flex flex-col justify-end gap-3 z-20 pointer-events-none md:pointer-events-auto">
+          <div className="hidden md:flex flex-col gap-1 space-y-1 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
             <div className="flex items-center gap-2">
               <Layers className="w-3 h-3 text-primary" />
               <h4 className="text-[7px] font-black text-primary uppercase tracking-widest leading-none">ZENITH INTEL</h4>
@@ -117,85 +117,148 @@ export function AnimeCard({
               {currentItem.description}
             </p>
           </div>
-          
-          <div className="flex flex-col gap-2 pt-1 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  size="sm" 
-                  className={cn(
-                    "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 shadow-none",
-                    itemInWatchlist 
-                      ? "bg-white/10 hover:bg-white/20 text-white" 
-                      : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(168,85,247,0.4)]"
-                  )}
-                >
-                  {itemInWatchlist ? (
-                    <><Settings2 className="w-3.5 h-3.5 mr-1.5 shrink-0" /> EDIT WATCHLIST</>
-                  ) : (
-                    <><Plus className="w-3.5 h-3.5 mr-1.5 shrink-0" /> ADD TO WATCHLIST</>
-                  )}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="glass-panel border-white/10 max-w-[320px] rounded-[2rem] p-6">
-                <DialogHeader>
-                  <DialogTitle className="text-sm font-black uppercase tracking-widest text-primary text-center">
-                    {itemInWatchlist ? 'MANAGEMENT PORTAL' : 'INITIALIZATION PORTAL'}
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-2 pt-4">
-                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest text-center mb-2">Select Sector</p>
-                  {Object.entries(STATUS_CONFIG).map(([status, config]) => (
+        </div>
+
+        {/* Interaction Layer for Mobile/Desktop */}
+        <div className="absolute bottom-2 left-2 right-2 md:hidden z-30">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                size="sm" 
+                className={cn(
+                  "w-full font-black rounded-lg text-[7px] h-8 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 shadow-none",
+                  itemInWatchlist 
+                    ? "bg-white/10 text-white" 
+                    : "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+                )}
+              >
+                {itemInWatchlist ? (
+                  <Settings2 className="w-3 h-3" />
+                ) : (
+                  <Plus className="w-3 h-3" />
+                )}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="glass-panel border-white/10 max-w-[320px] rounded-[2rem] p-6">
+              <DialogHeader>
+                <DialogTitle className="text-sm font-black uppercase tracking-widest text-primary text-center">
+                  {itemInWatchlist ? 'MANAGEMENT PORTAL' : 'INITIALIZATION PORTAL'}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-2 pt-4">
+                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest text-center mb-2">Select Sector</p>
+                {Object.entries(STATUS_CONFIG).map(([status, config]) => (
+                  <Button
+                    key={status}
+                    variant="ghost"
+                    onClick={() => handleStatusSelect(status as WatchStatus)}
+                    className={cn(
+                      "h-12 justify-start gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest border border-transparent transition-all",
+                      itemInWatchlist?.status === status 
+                        ? "bg-primary/10 border-primary/20 text-primary" 
+                        : "hover:bg-white/5 text-muted-foreground hover:text-white"
+                    )}
+                  >
+                    <config.icon className="w-4 h-4" />
+                    {config.label}
+                  </Button>
+                ))}
+                
+                {itemInWatchlist && (
+                  <div className="mt-4 pt-4 border-t border-white/5">
                     <Button
-                      key={status}
                       variant="ghost"
-                      onClick={() => handleStatusSelect(status as WatchStatus)}
-                      className={cn(
-                        "h-12 justify-start gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest border border-transparent transition-all",
-                        itemInWatchlist?.status === status 
-                          ? "bg-primary/10 border-primary/20 text-primary" 
-                          : "hover:bg-white/5 text-muted-foreground hover:text-white"
-                      )}
+                      onClick={handleRemove}
+                      className="w-full h-12 justify-center gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive"
                     >
-                      <config.icon className="w-4 h-4" />
-                      {config.label}
+                      <Trash2 className="w-4 h-4" />
+                      PURGE RECORD
                     </Button>
-                  ))}
-                  
-                  {itemInWatchlist && (
-                    <div className="mt-4 pt-4 border-t border-white/5">
-                      <Button
-                        variant="ghost"
-                        onClick={handleRemove}
-                        className="w-full h-12 justify-center gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        PURGE RECORD
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Desktop Hidden Interaction */}
+        <div className="absolute bottom-4 left-4 right-4 hidden md:flex z-30 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                size="sm" 
+                className={cn(
+                  "w-full font-black rounded-lg text-[8px] h-9 transition-all uppercase tracking-widest flex items-center justify-center px-1 shrink-0 border border-white/5 shadow-none",
+                  itemInWatchlist 
+                    ? "bg-white/10 hover:bg-white/20 text-white" 
+                    : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+                )}
+              >
+                {itemInWatchlist ? (
+                  <><Settings2 className="w-3.5 h-3.5 mr-1.5 shrink-0" /> EDIT WATCHLIST</>
+                ) : (
+                  <><Plus className="w-3.5 h-3.5 mr-1.5 shrink-0" /> ADD TO WATCHLIST</>
+                )}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="glass-panel border-white/10 max-w-[320px] rounded-[2rem] p-6">
+              <DialogHeader>
+                <DialogTitle className="text-sm font-black uppercase tracking-widest text-primary text-center">
+                  {itemInWatchlist ? 'MANAGEMENT PORTAL' : 'INITIALIZATION PORTAL'}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-2 pt-4">
+                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest text-center mb-2">Select Sector</p>
+                {Object.entries(STATUS_CONFIG).map(([status, config]) => (
+                  <Button
+                    key={status}
+                    variant="ghost"
+                    onClick={() => handleStatusSelect(status as WatchStatus)}
+                    className={cn(
+                      "h-12 justify-start gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest border border-transparent transition-all",
+                      itemInWatchlist?.status === status 
+                        ? "bg-primary/10 border-primary/20 text-primary" 
+                        : "hover:bg-white/5 text-muted-foreground hover:text-white"
+                    )}
+                  >
+                    <config.icon className="w-4 h-4" />
+                    {config.label}
+                  </Button>
+                ))}
+                
+                {itemInWatchlist && (
+                  <div className="mt-4 pt-4 border-t border-white/5">
+                    <Button
+                      variant="ghost"
+                      onClick={handleRemove}
+                      className="w-full h-12 justify-center gap-4 rounded-2xl px-4 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      PURGE RECORD
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
-      <div className="px-1 flex flex-col gap-2">
-        <h3 className="font-black text-[11px] md:text-[12px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase">
+      <div className="px-1 flex flex-col gap-1.5">
+        <h3 className="font-black text-[10px] md:text-[12px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase">
           {currentItem.title}
         </h3>
         
         <div className="flex flex-wrap items-center gap-1.5">
           <div className={cn(
-            "flex items-center rounded-md px-2.5 py-1 border shrink-0 transition-all duration-300 h-7",
+            "flex items-center rounded-md px-2 py-0.5 md:px-2.5 md:py-1 border shrink-0 transition-all duration-300 h-6 md:h-7",
             currentItem.nextAiringEpisode 
               ? "bg-primary/20 border-primary/30 shadow-[0_0_12px_rgba(168,85,247,0.3)]" 
               : "bg-white/10 border-white/5"
           )}>
-            <Activity className={cn("w-3 h-3 mr-1.5", currentItem.nextAiringEpisode ? "text-primary animate-pulse" : "text-white/40")} />
+            <Activity className={cn("w-2.5 h-2.5 md:w-3 md:h-3 mr-1 md:mr-1.5", currentItem.nextAiringEpisode ? "text-primary animate-pulse" : "text-white/40")} />
             <span className={cn(
-              "text-[8px] font-black uppercase tracking-wider leading-none",
+              "text-[7px] md:text-[8px] font-black uppercase tracking-wider leading-none",
               currentItem.nextAiringEpisode ? "text-primary" : "text-white/80"
             )}>
               {currentItem.nextAiringEpisode ? 'AIRING' : 'RELEASED'} {currentReleased} EPS
@@ -203,12 +266,12 @@ export function AnimeCard({
           </div>
         </div>
 
-        <div className="flex items-center justify-between opacity-50 mt-0.5">
-          <span className="text-[7px] text-white/40 font-black uppercase flex items-center gap-1 tracking-widest">
+        <div className="flex items-center justify-between opacity-50">
+          <span className="text-[6px] md:text-[7px] text-white/40 font-black uppercase flex items-center gap-1 tracking-widest">
             <Calendar className="w-2.5 h-2.5" /> {currentItem.year || 'TBA'}
           </span>
           {currentItem.genres && currentItem.genres.length > 0 && (
-            <span className="text-[7px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[80px] text-right">
+            <span className="text-[6px] md:text-[7px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[60px] md:max-w-[80px] text-right">
               {currentItem.genres[0]}
             </span>
           )}

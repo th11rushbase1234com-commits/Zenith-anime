@@ -110,33 +110,37 @@ export function ZenithNavbar() {
 
   const userName = user?.displayName || user?.email?.split('@')[0] || 'Zenith User';
 
+  if (!mounted) return (
+    <nav className="sticky top-0 z-50 w-full h-16 bg-background/95 border-b border-white/5 px-4 md:px-8 flex items-center justify-between" />
+  );
+
   return (
-    <nav className="sticky top-0 z-50 w-full h-16 bg-background/95 backdrop-blur-md border-b border-white/5 px-4 md:px-8 flex items-center justify-between">
-      <div className="flex items-center gap-4 md:gap-8">
-        <Link href="/" className="flex items-center gap-2 md:gap-3 group">
-          <div className="p-1.5 md:p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+    <nav className="sticky top-0 z-50 w-full h-16 bg-background/95 backdrop-blur-md border-b border-white/5 px-4 md:px-8 flex items-center justify-between gap-4">
+      <div className="flex items-center">
+        <Link href="/" className="flex items-center gap-2 md:gap-3 group shrink-0">
+          <div className="p-1.5 md:p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)]">
             <Home className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
-          <h1 className="text-xl md:text-2xl font-black tracking-tighter text-glow">
+          <h1 className="text-lg md:text-2xl font-black tracking-tighter text-glow hidden sm:block">
             <span className="text-primary">ZENITH</span>
           </h1>
         </Link>
       </div>
 
-      <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end max-w-xl">
-        <div className="relative flex-1 max-w-[320px]">
+      <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end max-w-2xl">
+        <div className="relative flex-1 max-w-[400px]">
           <form onSubmit={handleSearchSubmit} className="relative flex items-center gap-2">
             <div className="relative flex-1">
               <button 
                 type="submit" 
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
               >
-                <Search className="w-4 h-4" />
+                <Search className="w-3.5 h-3.5 md:w-4 md:h-4" />
               </button>
               <Input 
                 ref={searchInputRef}
                 placeholder="Discovery engine..." 
-                className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-[11px] focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-medium placeholder:text-white/30 tracking-tight"
+                className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-[10px] md:text-[11px] focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-medium placeholder:text-white/30 tracking-tight"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
@@ -152,7 +156,7 @@ export function ZenithNavbar() {
                   onClick={handleClear}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors z-10"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
@@ -169,7 +173,7 @@ export function ZenithNavbar() {
           {showSuggestions && suggestions.length > 0 && (
             <div 
               ref={suggestionsRef}
-              className="absolute top-full left-0 right-0 mt-2 bg-card/95 backdrop-blur-3xl border border-white/10 rounded-[1.5rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 duration-300 z-[100]"
+              className="absolute top-full left-0 right-0 mt-2 bg-card/95 backdrop-blur-3xl border border-white/10 rounded-[1.5rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 duration-300 z-[100] w-[calc(100vw-2rem)] sm:w-full sm:left-0 sm:right-0 fixed sm:absolute left-4"
             >
               <div className="p-2 space-y-1">
                 <div className="px-3 py-1.5 flex items-center gap-2">
@@ -187,7 +191,7 @@ export function ZenithNavbar() {
                         src={anime.imageUrl} 
                         alt={anime.title} 
                         fill 
-                        className="object-cover transition-transform group-hover:scale-110"
+                        className="object-cover transition-transform md:group-hover:scale-110"
                         sizes="40px"
                       />
                     </div>
@@ -214,7 +218,7 @@ export function ZenithNavbar() {
                   onClick={handleSearchSubmit}
                   className="w-full p-2.5 flex items-center justify-center gap-2 text-[9px] font-black text-primary uppercase tracking-widest hover:bg-primary/10 transition-colors border-t border-white/5 mt-1"
                 >
-                  <Search className="w-3 h-3" /> View all results for "{searchQuery}"
+                  <Search className="w-3 h-3" /> View all for "{searchQuery}"
                 </button>
               </div>
             </div>
@@ -223,7 +227,7 @@ export function ZenithNavbar() {
         
         <div className="flex items-center gap-2 md:gap-3 border-l border-white/10 pl-2 md:pl-4">
           <NotificationCenter />
-          {mounted && user && (
+          {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold cursor-pointer hover:bg-primary/30 transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] overflow-hidden shrink-0 outline-none">
