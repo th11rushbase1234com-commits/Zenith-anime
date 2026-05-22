@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Search, 
@@ -10,7 +10,10 @@ import {
   Settings, 
   LogOut,
   Database,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Loader2,
+  ChevronRight,
+  Star
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
@@ -25,33 +28,75 @@ import { useAuth } from '@/context/auth-context';
 import Image from 'next/image';
 import Link from 'next/link';
 import { NotificationCenter } from './NotificationCenter';
+import { searchAnime } from '@/services/anilist';
+import { Anime } from '@/app/types/anime';
+import { cn } from '@/lib/utils';
 
 export function ZenithNavbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<Anime[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node) && 
+          searchInputRef.current && !searchInputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (searchQuery.trim().length >= 2) {
+        setIsLoading(true);
+        try {
+          const { anime } = await searchAnime({ query: searchQuery, page: 1 });
+          setSuggestions(anime.slice(0, 6));
+          setShowSuggestions(true);
+        } catch (error) {
+          console.error("Predictive search failure", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       const query = searchQuery.trim();
       setSearchQuery('');
+      setShowSuggestions(false);
       searchInputRef.current?.blur();
       router.push(`/search?q=${encodeURIComponent(query)}`);
     }
   };
 
-  const handleClear = () => {
+  const handleSuggestionClick = (title: string) => {
     setSearchQuery('');
-    router.push('/');
-    searchInputRef.current?.blur();
+    setShowSuggestions(false);
+    router.push(`/search?q=${encodeURIComponent(title)}`);
   };
 
-  const handleBlur = () => {
-    setTimeout(() => {
-      setSearchQuery('');
-    }, 150);
+  const handleClear = () => {
+    setSearchQuery('');
+    setShowSuggestions(false);
+    router.push('/');
+    searchInputRef.current?.blur();
   };
 
   const userName = user?.displayName || user?.email?.split('@')[0] || 'Zenith User';
@@ -70,41 +115,103 @@ export function ZenithNavbar() {
       </div>
 
       <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end max-w-xl">
-        <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-[320px] flex items-center gap-2">
-          <div className="relative flex-1">
-            <button 
-              type="submit" 
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
-            >
-              <Search className="w-4 h-4" />
-            </button>
-            <Input 
-              ref={searchInputRef}
-              placeholder="Discovery engine..." 
-              className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-[9px] md:text-[10px] focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-medium placeholder:text-white/20 uppercase tracking-tight"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onBlur={handleBlur}
-            />
-            {searchQuery && (
+        <div className="relative flex-1 max-w-[320px]">
+          <form onSubmit={handleSearchSubmit} className="relative flex items-center gap-2">
+            <div className="relative flex-1">
               <button 
-                type="button" 
-                onClick={handleClear}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors z-10"
+                type="submit" 
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
               >
-                <X className="w-4 h-4" />
+                <Search className="w-4 h-4" />
               </button>
-            )}
-          </div>
-          <button 
-            type="button"
-            onClick={() => router.push('/search')}
-            className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all shrink-0"
-            title="Discovery Filters"
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-          </button>
-        </form>
+              <Input 
+                ref={searchInputRef}
+                placeholder="Discovery engine..." 
+                className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-[10px] focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-medium placeholder:text-white/20 uppercase tracking-tight"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
+              />
+              {isLoading && (
+                <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                  <Loader2 className="w-3 h-3 text-primary animate-spin" />
+                </div>
+              )}
+              {searchQuery && (
+                <button 
+                  type="button" 
+                  onClick={handleClear}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors z-10"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <button 
+              type="button"
+              onClick={() => router.push('/search')}
+              className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all shrink-0"
+              title="Discovery Filters"
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+            </button>
+          </form>
+
+          {/* Predictive Search Results Dropdown */}
+          {showSuggestions && suggestions.length > 0 && (
+            <div 
+              ref={suggestionsRef}
+              className="absolute top-full left-0 right-0 mt-2 glass-panel border-white/10 rounded-[1.5rem] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300 z-[100]"
+            >
+              <div className="p-2 space-y-1">
+                <div className="px-3 py-1.5 flex items-center gap-2">
+                  <div className="w-1 h-3 bg-primary rounded-full" />
+                  <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Predictive Matches</span>
+                </div>
+                {suggestions.map((anime) => (
+                  <button
+                    key={anime.id}
+                    onClick={() => handleSuggestionClick(anime.title)}
+                    className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors text-left group"
+                  >
+                    <div className="relative w-10 h-14 rounded-lg overflow-hidden shrink-0 border border-white/5">
+                      <Image 
+                        src={anime.imageUrl} 
+                        alt={anime.title} 
+                        fill 
+                        className="object-cover transition-transform group-hover:scale-110"
+                        sizes="40px"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-0.5">
+                      <p className="text-[10px] font-black text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">
+                        {anime.title}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[8px] text-muted-foreground font-medium italic">
+                          {anime.year || 'TBA'} • {anime.genres[0] || 'Anime'}
+                        </span>
+                        {anime.rating > 0 && (
+                          <div className="flex items-center gap-0.5 text-[8px] text-accent font-black">
+                            <Star className="w-2 h-2 fill-current" />
+                            {Math.round(anime.rating * 10)}%
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <ChevronRight className="w-3 h-3 text-white/20 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </button>
+                ))}
+                <button 
+                  onClick={handleSearchSubmit}
+                  className="w-full p-2.5 flex items-center justify-center gap-2 text-[9px] font-black text-primary uppercase tracking-widest hover:bg-primary/10 transition-colors border-t border-white/5 mt-1"
+                >
+                  <Search className="w-3 h-3" /> View all results for "{searchQuery}"
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         
         <div className="flex items-center gap-2 md:gap-3 border-l border-white/10 pl-2 md:pl-4">
           <NotificationCenter />
