@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,7 +12,6 @@ import {
   deleteDoc,
   where,
   addDoc,
-  getDocs,
   limit
 } from 'firebase/firestore';
 import { ZenithNotification } from '../types/notification';
@@ -33,7 +31,7 @@ export function useNotifications() {
       return;
     }
 
-    // Simplified query to avoid composite index requirement
+    // Single-field query to avoid composite index requirement
     const q = query(
       collection(db, 'notifications'), 
       where('userId', '==', user.uid)
@@ -45,7 +43,7 @@ export function useNotifications() {
         id: doc.id
       } as ZenithNotification));
       
-      // Perform sorting and limiting client-side to avoid "missing index" errors
+      // Perform sorting and limiting client-side
       const processedItems = items
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 20);
@@ -74,18 +72,13 @@ export function useNotifications() {
         for (const aired of recentAiring) {
           const inWatchlist = watchlist.find(w => w.id === aired.id);
           if (inWatchlist && (inWatchlist.status === 'WATCHING' || inWatchlist.status === 'PLAN_TO_WATCH')) {
-            // Check if we already notified for this anime today
-            const existingQ = query(
-              collection(db, 'notifications'),
-              where('userId', '==', user.uid),
-              where('animeId', '==', aired.id),
-              where('type', '==', 'EPISODE'),
-              limit(1)
+            // Check against current state to prevent duplicates without extra Firestore queries
+            const alreadyNotified = notifications.some(n => 
+              n.animeId === aired.id && 
+              n.type === 'EPISODE'
             );
             
-            const existing = await getDocs(existingQ);
-            
-            if (existing.empty) {
+            if (!alreadyNotified) {
               addDoc(collection(db, 'notifications'), {
                 userId: user.uid,
                 animeId: aired.id,
@@ -105,7 +98,7 @@ export function useNotifications() {
 
     const timer = setTimeout(checkNewEpisodes, 3000); // Debounce sync
     return () => clearTimeout(timer);
-  }, [user, watchlist]);
+  }, [user, watchlist, notifications]); // Added notifications to dependencies for duplicate check
 
   const markAsRead = async (id: string) => {
     if (!user) return;

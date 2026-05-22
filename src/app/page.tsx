@@ -104,7 +104,7 @@ export default function HomePage() {
     <div className="bg-background text-foreground flex flex-col">
       <main className="flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden pb-12">
         <div className="space-y-10 animate-in fade-in duration-700">
-          <section className="relative w-full aspect-[16/9] md:aspect-[21/9] min-h-[350px] md:min-h-[600px] overflow-hidden">
+          <section className="relative w-full aspect-[16/9] md:aspect-[21/9] min-h-[400px] md:min-h-[600px] overflow-hidden">
             <Carousel 
               setApi={setCarouselApi} 
               className="w-full h-full"
@@ -126,8 +126,8 @@ export default function HomePage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                         <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
                         
-                        <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 space-y-4 md:space-y-6 max-w-4xl">
-                          <div className="flex items-center gap-3">
+                        <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 space-y-6 md:space-y-8 max-w-4xl">
+                          <div className="flex items-center gap-3 mb-2 md:mb-4">
                             <div className="px-2 py-0.5 md:px-3 md:py-1 bg-primary text-primary-foreground text-[8px] md:text-[10px] font-black rounded uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.5)]">
                               TRENDING NOW
                             </div>
@@ -136,7 +136,7 @@ export default function HomePage() {
                             </div>
                           </div>
                           
-                          <h2 className="text-3xl md:text-7xl font-black uppercase tracking-tighter text-glow leading-[0.9] line-clamp-2">
+                          <h2 className="text-3xl md:text-7xl font-black uppercase tracking-tighter text-glow leading-[0.95] line-clamp-2">
                             {anime.title.split(' ').map((word, i) => (
                               <span key={i} className={i % 2 === 1 ? 'text-primary' : 'text-white'}>
                                 {word}{' '}
