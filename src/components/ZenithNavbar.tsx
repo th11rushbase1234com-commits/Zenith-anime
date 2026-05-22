@@ -44,14 +44,12 @@ export function ZenithNavbar() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        suggestionsRef.current && 
-        !suggestionsRef.current.contains(event.target as Node) && 
-        searchInputRef.current && 
-        !searchInputRef.current.contains(event.target as Node)
-      ) {
+      const isOutsideInput = searchInputRef.current && !searchInputRef.current.contains(event.target as Node);
+      const isOutsideSuggestions = suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node);
+      
+      // If we click outside both the input and the suggestions dropdown, purge the search state
+      if (isOutsideInput && (!suggestionsRef.current || isOutsideSuggestions)) {
         setShowSuggestions(false);
-        // Clear search input if user clicks away without searching
         setSearchQuery('');
       }
     };
@@ -132,8 +130,8 @@ export function ZenithNavbar() {
               </button>
               <Input 
                 ref={searchInputRef}
-                placeholder="discovery engine..." 
-                className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-[10px] md:text-[11px] focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-medium placeholder:text-white/20 tracking-tight"
+                placeholder="Discovery engine..." 
+                className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-[11px] focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-medium placeholder:text-white/30 tracking-tight"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
@@ -163,11 +161,11 @@ export function ZenithNavbar() {
             </button>
           </form>
 
-          {/* Predictive Search Results Dropdown - Higher Opacity */}
+          {/* Suggestive Matrix Dropdown - Balanced Opacity and Density */}
           {showSuggestions && suggestions.length > 0 && (
             <div 
               ref={suggestionsRef}
-              className="absolute top-full left-0 right-0 mt-2 bg-card/98 backdrop-blur-3xl border border-white/10 rounded-[1.5rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 duration-300 z-[100]"
+              className="absolute top-full left-0 right-0 mt-2 bg-card/95 backdrop-blur-3xl border border-white/10 rounded-[1.5rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 duration-300 z-[100]"
             >
               <div className="p-2 space-y-1">
                 <div className="px-3 py-1.5 flex items-center gap-2">
@@ -212,7 +210,7 @@ export function ZenithNavbar() {
                   onClick={handleSearchSubmit}
                   className="w-full p-2.5 flex items-center justify-center gap-2 text-[9px] font-black text-primary uppercase tracking-widest hover:bg-primary/10 transition-colors border-t border-white/5 mt-1"
                 >
-                  <Search className="w-3 h-3" /> view all results for "{searchQuery}"
+                  <Search className="w-3 h-3" /> View all results for "{searchQuery}"
                 </button>
               </div>
             </div>
