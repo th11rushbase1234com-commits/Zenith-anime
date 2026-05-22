@@ -133,7 +133,7 @@ export async function getAnimeByMalIds(malIds: number[]): Promise<Anime[]> {
   const query = `
     query ($ids: [Int]) {
       Page(page: 1, perPage: 50) {
-        media(idMal_in: $ids, type: ANIME) {
+        media(idMal_in: $ids, type: ANIME, isAdult: false) {
           ${MEDIA_QUERY_FIELDS}
         }
       }
@@ -190,8 +190,11 @@ export async function getRecentAiring(page: number = 1, perPage: number = 12): P
     
     const uniqueMedia = new Map();
     data.data.Page.airingSchedules.forEach((item: any) => {
-      if (!uniqueMedia.has(item.media.id)) {
-        uniqueMedia.set(item.media.id, mapMediaToAnime(item.media));
+      // Apply manual filter for airing schedules as some might leak adult content if not handled
+      if (item.media && !item.media.isAdult) {
+        if (!uniqueMedia.has(item.media.id)) {
+          uniqueMedia.set(item.media.id, mapMediaToAnime(item.media));
+        }
       }
     });
     return Array.from(uniqueMedia.values());

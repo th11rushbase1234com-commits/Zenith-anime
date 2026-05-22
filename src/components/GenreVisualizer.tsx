@@ -62,6 +62,7 @@ export function GenreVisualizer({ watchlist }: GenreVisualizerProps) {
                   color: '#ffffff'
                 }}
                 itemStyle={{ color: 'hsl(var(--primary))', fontWeight: '900', textTransform: 'uppercase', fontSize: '10px' }}
+                labelStyle={{ color: '#ffffff', fontWeight: '900', fontSize: '12px', marginBottom: '4px' }}
                 cursor={{ fill: 'rgba(255,255,255,0.05)' }}
               />
               <Bar dataKey="value" fill="hsl(var(--primary))" radius={[10, 10, 10, 10]} barSize={20} />
