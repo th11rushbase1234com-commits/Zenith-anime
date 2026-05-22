@@ -16,7 +16,7 @@ Zenith AI analyzes your consumption history and emotional resonance profile to p
 A high-fidelity management system for your personal library. Track progress, status, and historical data with zero-flicker, hardware-accelerated UI components.
 
 ### 📡 **Broadcast Center**
-Receive real-time alerts for new episode releases and global anime news. The Zenith Persistence Protocol ensures you never miss a beat in the airing cycle.
+Receive real-time alerts for new episode releases. The Zenith Persistence Protocol ensures you never miss a beat in the airing cycle with state-locked notifications.
 
 ---
 
