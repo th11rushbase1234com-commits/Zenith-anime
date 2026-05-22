@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -72,9 +73,9 @@ export function AnimeCard({
   };
 
   return (
-    <div className="group relative flex flex-col gap-3 w-full animate-in fade-in slide-in-from-bottom-2 duration-500 font-body">
+    <div className="group relative flex flex-col gap-3 w-full animate-in fade-in slide-in-from-bottom-2 duration-500 font-body h-full">
       {/* Poster Image Container: Fixed Flicker & Stable Corners */}
-      <div className="relative aspect-[3/4.2] rounded-[1.25rem] md:rounded-[2rem] overflow-hidden bg-white/5 shadow-2xl transition-all duration-500 border border-white/5 isolate transform-gpu [backface-visibility:hidden] [transform:translateZ(0)] [-webkit-mask-image:-webkit-radial-gradient(white,black)]">
+      <div className="relative aspect-[3/4.2] rounded-[1.25rem] md:rounded-[2rem] overflow-hidden bg-white/5 shadow-2xl transition-all duration-500 border border-white/5 isolate transform-gpu [backface-visibility:hidden] [transform:translateZ(0)] [-webkit-mask-image:-webkit-radial-gradient(white,black)] shrink-0">
         <Image 
           src={currentItem.imageUrl} 
           alt={currentItem.title} 
@@ -105,33 +106,35 @@ export function AnimeCard({
         )}
       </div>
 
-      {/* Metadata Section: Prevents Overlapping */}
-      <div className="px-1 flex flex-col gap-1.5 flex-1">
-        <h3 className="font-black text-[10px] md:text-[12px] leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors tracking-tight uppercase">
-          {currentItem.title}
-        </h3>
-        
-        {/* Description: Italic, Sentence-case, Proper Scaling */}
-        <p className="text-[9px] md:text-[10px] text-white/50 italic line-clamp-2 leading-tight font-medium">
-          {currentItem.description}
-        </p>
-
-        <div className="flex items-center justify-between mt-0.5">
-          <div className="flex items-center gap-1.5 text-white/40">
-            <Calendar className="w-2.5 h-2.5" />
-            <span className="text-[7px] md:text-[8px] font-black uppercase tracking-widest leading-none">
-              {currentItem.year || 'TBA'}
-            </span>
-          </div>
-          {currentItem.genres?.[0] && (
-            <span className="text-[7px] md:text-[8px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[70px] md:max-w-[100px] text-right">
-              {currentItem.genres[0]}
-            </span>
-          )}
+      {/* Metadata Section: Prevents Overlapping & Ensures Grid Alignment */}
+      <div className="px-1 flex flex-col gap-1.5 flex-1 h-full">
+        <div className="space-y-1">
+          <h3 className="font-black text-[10px] md:text-[12px] leading-tight line-clamp-2 text-white group-hover:text-primary transition-colors tracking-tight uppercase min-h-[2.4em]">
+            {currentItem.title}
+          </h3>
+          
+          {/* Description: Italic, Sentence-case, Proper Scaling */}
+          <p className="text-[9px] md:text-[10px] text-white/50 italic line-clamp-2 leading-tight font-medium min-h-[2.4em]">
+            {currentItem.description}
+          </p>
         </div>
 
-        {/* Action Button: Dialog Trigger */}
-        <div className="mt-1.5">
+        <div className="mt-auto pt-2">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5 text-white/40">
+              <Calendar className="w-2.5 h-2.5" />
+              <span className="text-[7px] md:text-[8px] font-black uppercase tracking-widest leading-none">
+                {currentItem.year || 'TBA'}
+              </span>
+            </div>
+            {currentItem.genres?.[0] && (
+              <span className="text-[7px] md:text-[8px] text-primary/60 font-black uppercase tracking-widest truncate max-w-[70px] md:max-w-[100px] text-right">
+                {currentItem.genres[0]}
+              </span>
+            )}
+          </div>
+
+          {/* Action Button: Dialog Trigger */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button 

@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 's4.anilist.co',
+        hostname: '**.anilist.co',
         port: '',
         pathname: '/**',
       },
