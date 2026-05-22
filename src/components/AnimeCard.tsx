@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -74,7 +73,6 @@ export function AnimeCard({
 
   return (
     <div className="group relative flex flex-col gap-3 w-full animate-in fade-in slide-in-from-bottom-2 duration-500 font-body h-full">
-      {/* Poster Image Container: Fixed Flicker & Stable Corners */}
       <div className="relative aspect-[3/4.2] rounded-[1.25rem] md:rounded-[2rem] overflow-hidden bg-white/5 shadow-2xl transition-all duration-500 border border-white/5 isolate transform-gpu [backface-visibility:hidden] [transform:translateZ(0)] [-webkit-mask-image:-webkit-radial-gradient(white,black)] shrink-0">
         <Image 
           src={currentItem.imageUrl} 
@@ -84,7 +82,6 @@ export function AnimeCard({
           className="object-cover transition-transform duration-1000 md:group-hover:scale-110 brightness-[0.85] md:group-hover:brightness-[0.4]"
         />
         
-        {/* Status Badge (Top-Left) */}
         <div className="absolute top-2.5 left-2.5 md:top-4 md:left-4 z-10 pointer-events-none">
           {currentStatus && (
             <div className={cn(
@@ -98,22 +95,19 @@ export function AnimeCard({
           )}
         </div>
 
-        {/* Rating Badge (Top-Right) */}
         {currentItem.rating > 0 && (
           <div className="absolute top-2.5 right-2.5 md:top-4 md:right-4 px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-lg bg-accent text-[7px] md:text-[8px] font-black text-black uppercase tracking-tight flex items-center gap-1 shadow-lg z-10 pointer-events-none">
-            <Star className="w-2 h-2 md:w-2.5 md:h-2.5 fill-current" /> {currentItem.rating.toFixed(1)}
+            <Star className="w-2 h-2 md:w-2.5 md:h-2.5 fill-current" /> {Math.round(currentItem.rating * 10)}%
           </div>
         )}
       </div>
 
-      {/* Metadata Section: Prevents Overlapping & Ensures Grid Alignment */}
       <div className="px-1 flex flex-col gap-1.5 flex-1 h-full">
         <div className="space-y-1">
           <h3 className="font-black text-[10px] md:text-[12px] leading-tight line-clamp-2 text-white group-hover:text-primary transition-colors tracking-tight uppercase min-h-[2.4em]">
             {currentItem.title}
           </h3>
           
-          {/* Description: Italic, Sentence-case, Proper Scaling */}
           <p className="text-[9px] md:text-[10px] text-white/50 italic line-clamp-2 leading-tight font-medium min-h-[2.4em]">
             {currentItem.description}
           </p>
@@ -134,7 +128,6 @@ export function AnimeCard({
             )}
           </div>
 
-          {/* Action Button: Dialog Trigger */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button 

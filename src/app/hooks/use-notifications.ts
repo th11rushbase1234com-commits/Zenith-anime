@@ -11,8 +11,7 @@ import {
   updateDoc, 
   deleteDoc,
   where,
-  addDoc,
-  limit
+  addDoc
 } from 'firebase/firestore';
 import { ZenithNotification } from '../types/notification';
 import { getRecentAiring } from '@/services/anilist';
@@ -31,7 +30,6 @@ export function useNotifications() {
       return;
     }
 
-    // Single-field query to avoid composite index requirement
     const q = query(
       collection(db, 'notifications'), 
       where('userId', '==', user.uid)
@@ -43,25 +41,17 @@ export function useNotifications() {
         id: doc.id
       } as ZenithNotification));
       
-      // Perform sorting and limiting client-side
       const processedItems = items
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 20);
 
       setNotifications(processedItems);
       setUnreadCount(items.filter(i => !i.isRead).length);
-    }, (error) => {
-      if (error.code === 'failed-precondition') {
-        console.warn("Zenith Notifications: Index missing, falling back to manual sort.");
-      } else {
-        console.error("Zenith Notifications Error:", error);
-      }
     });
 
     return () => unsubscribe();
   }, [user]);
 
-  // Sync logic to check for new episodes and generate notifications
   useEffect(() => {
     if (!user || watchlist.length === 0) return;
 
@@ -72,38 +62,37 @@ export function useNotifications() {
         for (const aired of recentAiring) {
           const inWatchlist = watchlist.find(w => w.id === aired.id);
           if (inWatchlist && (inWatchlist.status === 'WATCHING' || inWatchlist.status === 'PLAN_TO_WATCH')) {
-            // Check against current state to prevent duplicates without extra Firestore queries
             const alreadyNotified = notifications.some(n => 
               n.animeId === aired.id && 
-              n.type === 'EPISODE'
+              n.type === 'EPISODE' &&
+              n.episodeNumber === aired.lastAiredEpisode
             );
             
-            if (!alreadyNotified) {
+            if (!alreadyNotified && aired.lastAiredEpisode) {
               addDoc(collection(db, 'notifications'), {
                 userId: user.uid,
                 animeId: aired.id,
                 animeTitle: aired.title,
-                message: `New episode released for ${aired.title}! Check it out.`,
+                message: `Episode ${aired.lastAiredEpisode} of ${aired.title} is now available!`,
                 type: 'EPISODE',
                 isRead: false,
+                episodeNumber: aired.lastAiredEpisode,
                 createdAt: new Date().toISOString()
-              }).catch(err => console.error("Failed to create notification:", err));
+              }).catch(() => {});
             }
           }
         }
-      } catch (err) {
-        console.error("Notification sync error:", err);
-      }
+      } catch (err) {}
     };
 
-    const timer = setTimeout(checkNewEpisodes, 3000); // Debounce sync
+    const timer = setTimeout(checkNewEpisodes, 3000);
     return () => clearTimeout(timer);
-  }, [user, watchlist, notifications]); // Added notifications to dependencies for duplicate check
+  }, [user, watchlist, notifications]);
 
   const markAsRead = async (id: string) => {
     if (!user) return;
     const ref = doc(db, 'notifications', id);
-    updateDoc(ref, { isRead: true }).catch(err => console.error("Failed to mark read:", err));
+    updateDoc(ref, { isRead: true }).catch(() => {});
   };
 
   const markAllAsRead = async () => {
@@ -111,12 +100,12 @@ export function useNotifications() {
     const batchPromises = notifications
       .filter(n => !n.isRead)
       .map(n => updateDoc(doc(db, 'notifications', n.id), { isRead: true }));
-    await Promise.all(batchPromises).catch(err => console.error("Batch update failed:", err));
+    await Promise.all(batchPromises).catch(() => {});
   };
 
   const deleteNotification = async (id: string) => {
     if (!user) return;
-    deleteDoc(doc(db, 'notifications', id)).catch(err => console.error("Failed to delete:", err));
+    deleteDoc(doc(db, 'notifications', id)).catch(() => {});
   };
 
   return {

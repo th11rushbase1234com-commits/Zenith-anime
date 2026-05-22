@@ -186,19 +186,18 @@ export async function getRecentAiring(page: number = 1, perPage: number = 12): P
   `;
   
   try {
-    // Request a larger batch (2x) to account for adult content filtering and ensure grid completion
     const data = await fetchAniList(recentQuery, { page, perPage: perPage * 2 });
     if (data.errors || !data.data?.Page?.airingSchedules) return [];
     
     const uniqueMedia = new Map();
     for (const item of data.data.Page.airingSchedules) {
-      // Strict manual filter for adult content as airingSchedules doesn't support top-level isAdult filter
       if (item.media && item.media.isAdult === false) {
         if (!uniqueMedia.has(item.media.id)) {
-          uniqueMedia.set(item.media.id, mapMediaToAnime(item.media));
+          const anime = mapMediaToAnime(item.media);
+          anime.lastAiredEpisode = item.episode;
+          uniqueMedia.set(item.media.id, anime);
         }
       }
-      // Stop once we have reached the requested count
       if (uniqueMedia.size >= perPage) break;
     }
     return Array.from(uniqueMedia.values());

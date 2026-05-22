@@ -14,19 +14,9 @@ function NavigationManager({ children }: { children: React.ReactNode }) {
   const showNavbar = pathname !== '/login';
 
   useEffect(() => {
-    // Global Command Reset: Force origin on any route change, search telemetry update, or discovery action
     window.scrollTo({ top: 0, behavior: 'instant' });
     document.documentElement.scrollTo({ top: 0, behavior: 'instant' });
   }, [pathname, searchParams]);
-
-  useEffect(() => {
-    const navigationEntries = window.performance.getEntriesByType('navigation');
-    const isReload = navigationEntries.length > 0 && (navigationEntries[0] as PerformanceNavigationTiming).type === 'reload';
-
-    if (isReload && window.location.pathname !== '/') {
-      window.location.replace('/');
-    }
-  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
