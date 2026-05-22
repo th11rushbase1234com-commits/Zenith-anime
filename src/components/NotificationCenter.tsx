@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -8,7 +7,6 @@ import {
   Trash2, 
   Calendar, 
   Zap, 
-  ChevronRight,
   Info
 } from 'lucide-react';
 import {
@@ -88,7 +86,7 @@ export function NotificationCenter() {
                       {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                     </span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground line-clamp-2 leading-tight">
+                  <p className="text-[11px] text-muted-foreground line-clamp-2 leading-tight italic font-medium">
                     {notification.message}
                   </p>
                 </div>
@@ -120,14 +118,6 @@ export function NotificationCenter() {
             </div>
           )}
         </div>
-
-        {notifications.length > 0 && (
-          <div className="p-3 border-t border-white/5 bg-white/5">
-            <button className="w-full py-2 flex items-center justify-center gap-2 text-[8px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
-              View All History <ChevronRight className="w-3 h-3" />
-            </button>
-          </div>
-        )}
       </PopoverContent>
     </Popover>
   );
