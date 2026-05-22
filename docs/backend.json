@@ -17,6 +17,7 @@
         },
         "currentEpisode": { "type": "number" },
         "totalEpisodes": { "type": "number" },
+        "lastNotifiedEpisode": { "type": "number", "description": "The last episode number for which a notification was generated to prevent repeats." },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "id", "status"]

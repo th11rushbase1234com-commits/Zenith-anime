@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -62,13 +63,11 @@ export function useNotifications() {
         for (const aired of recentAiring) {
           const inWatchlist = watchlist.find(w => w.id === aired.id);
           if (inWatchlist && (inWatchlist.status === 'WATCHING' || inWatchlist.status === 'PLAN_TO_WATCH')) {
-            const alreadyNotified = notifications.some(n => 
-              n.animeId === aired.id && 
-              n.type === 'EPISODE' &&
-              n.episodeNumber === aired.lastAiredEpisode
-            );
+            // Use persistent lastNotifiedEpisode to prevent reappearing after deletion
+            const alreadyNotified = inWatchlist.lastNotifiedEpisode === aired.lastAiredEpisode;
             
             if (!alreadyNotified && aired.lastAiredEpisode) {
+              // Create the notification document
               addDoc(collection(db, 'notifications'), {
                 userId: user.uid,
                 animeId: aired.id,
@@ -79,6 +78,12 @@ export function useNotifications() {
                 episodeNumber: aired.lastAiredEpisode,
                 createdAt: new Date().toISOString()
               }).catch(() => {});
+
+              // Lock the notified state in the watchlist item itself
+              const animeRef = doc(db, 'watchlists', aired.id);
+              updateDoc(animeRef, {
+                lastNotifiedEpisode: aired.lastAiredEpisode
+              }).catch(() => {});
             }
           }
         }
@@ -87,7 +92,7 @@ export function useNotifications() {
 
     const timer = setTimeout(checkNewEpisodes, 3000);
     return () => clearTimeout(timer);
-  }, [user, watchlist, notifications]);
+  }, [user, watchlist]);
 
   const markAsRead = async (id: string) => {
     if (!user) return;

@@ -1,3 +1,4 @@
+
 export type WatchStatus = 'PLAN_TO_WATCH' | 'WATCHING' | 'COMPLETED' | 'ON_HOLD' | 'DROPPED';
 
 export interface Anime {
@@ -15,6 +16,7 @@ export interface Anime {
   year: number;
   emotionalImpact?: string;
   lastAiredEpisode?: number;
+  lastNotifiedEpisode?: number;
   externalLinks?: { site: string; url: string }[];
   nextAiringEpisode?: {
     episode: number;
