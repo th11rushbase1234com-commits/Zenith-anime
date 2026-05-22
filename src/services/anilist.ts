@@ -186,18 +186,21 @@ export async function getRecentAiring(page: number = 1, perPage: number = 12): P
   `;
   
   try {
-    const data = await fetchAniList(recentQuery, { page, perPage });
-    if (data.errors) return [];
+    // Request a larger batch (2x) to account for adult content filtering and ensure grid completion
+    const data = await fetchAniList(recentQuery, { page, perPage: perPage * 2 });
+    if (data.errors || !data.data?.Page?.airingSchedules) return [];
     
     const uniqueMedia = new Map();
-    data.data.Page.airingSchedules.forEach((item: any) => {
-      // Apply strict manual filter for airing schedules as they don't support a top-level isAdult argument
+    for (const item of data.data.Page.airingSchedules) {
+      // Strict manual filter for adult content as airingSchedules doesn't support top-level isAdult filter
       if (item.media && item.media.isAdult === false) {
         if (!uniqueMedia.has(item.media.id)) {
           uniqueMedia.set(item.media.id, mapMediaToAnime(item.media));
         }
       }
-    });
+      // Stop once we have reached the requested count
+      if (uniqueMedia.size >= perPage) break;
+    }
     return Array.from(uniqueMedia.values());
   } catch (error) {
     return [];
