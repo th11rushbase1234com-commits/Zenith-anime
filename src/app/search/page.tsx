@@ -217,12 +217,9 @@ function SearchResults() {
             ) : results.length > 0 ? (
               <div className="space-y-10">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-glow">
-                    {initialQuery ? (
-                      <>RESULTS: <span className="text-primary">{initialQuery}</span></>
-                    ) : (
-                      <>{initialSort === 'airing' ? 'RECENT TELEMETRY' : 'GLOBAL DISCOVERY'}</>
-                    )}
+                  <h2 className="text-xl md:text-2xl font-black tracking-tighter text-glow">
+                    <span className="uppercase mr-2">RESULTS:</span>
+                    <span className="text-primary italic font-medium">{initialQuery || 'GLOBAL DISCOVERY'}</span>
                   </h2>
                   <div className="text-[9px] text-muted-foreground font-black uppercase tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/10">
                     SECTOR: {results.length} RECORDS LOADED

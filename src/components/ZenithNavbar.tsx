@@ -127,7 +127,7 @@ export function ZenithNavbar() {
               <Input 
                 ref={searchInputRef}
                 placeholder="Discovery engine..." 
-                className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-[10px] focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-medium placeholder:text-white/20 uppercase tracking-tight"
+                className="pl-9 pr-9 h-9 w-full bg-white/5 border-none rounded-full text-xs focus:ring-1 focus:ring-primary transition-all font-medium placeholder:font-medium placeholder:text-white/20 tracking-tight"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
