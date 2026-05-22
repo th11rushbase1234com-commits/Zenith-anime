@@ -35,6 +35,7 @@ import { cn } from '@/lib/utils';
 export function ZenithNavbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<Anime[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,12 +44,16 @@ export function ZenithNavbar() {
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const isOutsideInput = searchInputRef.current && !searchInputRef.current.contains(event.target as Node);
-      const isOutsideSuggestions = suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node);
+      const isSearchArea = 
+        searchInputRef.current?.contains(event.target as Node) || 
+        suggestionsRef.current?.contains(event.target as Node);
       
-      // If we click outside both the input and the suggestions dropdown, purge the search state
-      if (isOutsideInput && (!suggestionsRef.current || isOutsideSuggestions)) {
+      if (!isSearchArea) {
         setShowSuggestions(false);
         setSearchQuery('');
       }
@@ -161,7 +166,6 @@ export function ZenithNavbar() {
             </button>
           </form>
 
-          {/* Suggestive Matrix Dropdown - Balanced Opacity and Density */}
           {showSuggestions && suggestions.length > 0 && (
             <div 
               ref={suggestionsRef}
@@ -219,16 +223,16 @@ export function ZenithNavbar() {
         
         <div className="flex items-center gap-2 md:gap-3 border-l border-white/10 pl-2 md:pl-4">
           <NotificationCenter />
-          {user && (
+          {mounted && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold cursor-pointer hover:bg-primary/30 transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] overflow-hidden shrink-0">
+                <button className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold cursor-pointer hover:bg-primary/30 transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] overflow-hidden shrink-0 outline-none">
                   {user.photoURL ? (
                     <Image src={user.photoURL} alt={userName} width={36} height={36} className="rounded-full object-cover" />
                   ) : (
                     userName.charAt(0).toUpperCase()
                   )}
-                </div>
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64 glass-panel border-white/10 mt-2 p-2">
                 <DropdownMenuLabel className="p-3">
