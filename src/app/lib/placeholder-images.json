@@ -1,0 +1,77 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "avatar-cyber-city",
+      "description": "Cyberpunk City",
+      "imageUrl": "https://picsum.photos/seed/783/200/200",
+      "imageHint": "cyberpunk city"
+    },
+    {
+      "id": "avatar-neon-forest",
+      "description": "Neon Forest",
+      "imageUrl": "https://picsum.photos/seed/784/200/200",
+      "imageHint": "neon forest"
+    },
+    {
+      "id": "avatar-mountain",
+      "description": "Mountain Peak",
+      "imageUrl": "https://picsum.photos/seed/785/200/200",
+      "imageHint": "mountain peak"
+    },
+    {
+      "id": "avatar-aurora",
+      "description": "Aurora Borealis",
+      "imageUrl": "https://picsum.photos/seed/786/200/200",
+      "imageHint": "aurora borealis"
+    },
+    {
+      "id": "avatar-nebula",
+      "description": "Space Nebula",
+      "imageUrl": "https://picsum.photos/seed/787/200/200",
+      "imageHint": "space nebula"
+    },
+    {
+      "id": "avatar-dunes",
+      "description": "Desert Dunes",
+      "imageUrl": "https://picsum.photos/seed/788/200/200",
+      "imageHint": "desert dunes"
+    },
+    {
+      "id": "avatar-ocean",
+      "description": "Deep Ocean",
+      "imageUrl": "https://picsum.photos/seed/789/200/200",
+      "imageHint": "deep ocean"
+    },
+    {
+      "id": "avatar-rain",
+      "description": "Rainy Street",
+      "imageUrl": "https://picsum.photos/seed/790/200/200",
+      "imageHint": "rainy street"
+    },
+    {
+      "id": "avatar-future",
+      "description": "Future Tech",
+      "imageUrl": "https://picsum.photos/seed/791/200/200",
+      "imageHint": "futuristic city"
+    },
+    {
+      "id": "avatar-sunset",
+      "description": "Sunset Horizon",
+      "imageUrl": "https://picsum.photos/seed/792/200/200",
+      "imageHint": "sunset horizon"
+    },
+    {
+      "id": "avatar-abstract",
+      "description": "Abstract Neon",
+      "imageUrl": "https://picsum.photos/seed/793/200/200",
+      "imageHint": "abstract neon"
+    },
+    {
+      "id": "avatar-cave",
+      "description": "Crystal Cave",
+      "imageUrl": "https://picsum.photos/seed/794/200/200",
+      "imageHint": "crystal cave"
+    }
+  ]
+}
